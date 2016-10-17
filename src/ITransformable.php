@@ -35,7 +35,7 @@ interface ITransformabe {
      */
     public function fromArray(
         array $src,
-        EntityManagerInterface $entityManager = null,
+        EntityManagerInterface $entityManager,
         array $policy = [],
         AnnotationReader $ar = null
     );

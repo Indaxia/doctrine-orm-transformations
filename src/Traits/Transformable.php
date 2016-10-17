@@ -1,5 +1,5 @@
 <?php
-namespace ScorpioT1000\Doctrine\ORM\Transformations;
+namespace ScorpioT1000\Doctrine\ORM\Transformations\Traits;
 
 use \Doctrine\Common\Annotations\AnnotationReader;
 use \Doctrine\ORM\EntityManagerInterface;
@@ -26,13 +26,13 @@ trait Transformable {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
             $subPolicy = isset($policy[$pn]) ? $policy[$pn] : Policy::Auto;
-            if($subPolicy == Policy::Skip) { continue; }
-            $result[$pn] = $this->toArrayProperty($p, $pn, $subPolicy, $nested, $ar);
+            if($subPolicy & Policy::Skip) { continue; }
+            $result[$pn] = $this->toArrayProperty($p, $pn, $subPolicy, $nested, $ar, $refClass);
         }
         return $result;
     }
     
-    protected function toArrayProperty($p, $pn, $policy, $nested, AnnotationReader $ar) {
+    protected function toArrayProperty($p, $pn, $policy, $nested, AnnotationReader $ar, \ReflectionClass $headRefClass) {
         $getter = 'get'.ucfirst($pn);
         if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
             $v = $this->$getter();
@@ -41,21 +41,23 @@ trait Transformable {
                 case 'time':
                 case 'datetime':
                 case 'detetimez':
-                    if($v !== null && $policy !== Policy::KeepDateTime) {
+                    if($v !== null && !($policy & Policy::KeepDateTime)) {
                         return $v->format('Y-m-d\TH:i:s').'.000Z';
                     }
                     break;
             }
             return $v;
         } else if($association = $this->getPropertyAssociation($p, $ar)) { // entity or collection
-            if(!$nested || $policy === Policy::DontFetch) {
+            if(!$nested || ($policy & Policy::DontFetch)) {
                 return $this->$pn;
             }
             $result = null;
             if($association instanceof OneToMany) {
-                $result = ['_meta' => ['class' => 'Collection', 'association' => 'OneToMany'], 'values' => []];
+                $result = ['_meta' => ['class' => static::getEntityFullName($headRefClass, $association->targetEntity),
+                                       'association' => 'OneToMany'], 'collection' => []];
             } else if($association instanceof ManyToMany) {
-                $result = ['_meta' => ['class' => 'Collection', 'association' => 'ManyToMany'], 'values' => []];
+                $result = ['_meta' => ['class' => static::getEntityFullName($headRefClass, $association->targetEntity),
+                                       'association' => 'ManyToMany'], 'collection' => []];
             } else { // single entity
                 $result = $this->$getter();
                 if($result) { $result = $result->toArray($policy, true, $ar); }
@@ -63,7 +65,7 @@ trait Transformable {
             }
             $collection = $this->$getter(); // entity collection
             foreach($collection as $el) {
-                $result['values'][] = $el->toArray($policy, true, $ar);
+                $result['collection'][] = $el->toArray($policy, true, $ar);
             }
             return $result;
         }
@@ -73,7 +75,7 @@ trait Transformable {
     /** @see ITransformable::fromArray() */
     public function fromArray(
         array $src,
-        EntityManagerInterface $entityManager = null,
+        EntityManagerInterface $entityManager,
         array $policy = [],
         AnnotationReader $ar = null
     ) {
@@ -88,8 +90,8 @@ trait Transformable {
             $pn = $p->getName();
             if(!isset($src[$pn])) { continue; }
             $subPolicy = isset($policy[$pn]) ? $policy[$pn] : Policy::Auto;
-            if($subPolicy == Policy::Skip) { continue; }
-            $this->fromArrayProperty($src[$pn], $p, $pn, $subPolicy, $ar);
+            if($subPolicy & Policy::Skip) { continue; }
+            $this->fromArrayProperty($src[$pn], $p, $pn, $subPolicy, $ar, $em, $refClass);
         }
     }
     
@@ -97,7 +99,10 @@ trait Transformable {
      * 1. ID field
      * 2. Scalar property
      * 3. Relation property */
-    protected function fromArrayProperty($v, $p, $pn, $policy, AnnotationReader $ar) {
+    protected function fromArrayProperty($v, $p, $pn, $policy,
+                                         AnnotationReader $ar,
+                                         EntityManagerInterface $em,
+                                         \ReflectionClass $refClass) {
         $setter = 'set'.ucfirst($pn);
         if($id = $this->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Id')) {
             // Skip id, it will be processed in the next steps
@@ -159,7 +164,7 @@ trait Transformable {
             }
             throw new FromArrayException('Field "'.$pn.'" must be a type of "'.$column->type.'"');
         } else if($association = $this->getPropertyAssociation($p, $ar)) { // entity or collection
-            $this->fromArrayRelation($v, $p, $pn, $policy, $ar);   
+            $this->fromArrayRelation($v, $p, $pn, $setter, $association, $policy, $ar, $refClass);   
         }
     }
     
@@ -170,19 +175,93 @@ trait Transformable {
      * 4. Sub-entity as null value
      * 5. Sub-collection with some entities (some new, some existent)
      * 6. Sub-collection with no entities */
-    protected static function fromArrayRelation($v, $p, $pn, $policy, AnnotationReader $ar) {
-        
+    protected static function fromArrayRelation($v, $p, $pn, $setter,
+                                                $association, $policy,
+                                                AnnotationReader $ar,
+                                                EntityManagerInterface $em,
+                                                \ReflectionClass $refClass) {
+        if($v === null) { // Sub-entity as null value
+            if($association instanceof OneToMany || $association instanceof ManyToMany) {
+                throw new FromArrayException('Field "'.$pn.'" must be a Collection');
+            }
+            $this->$setter(null);
+        }
+        if(is_array($v)) {
+            $idField = 'id';
+            $class = static::getEntityFullName($refClass, $association->targetEntity);
+            if(!is_subclass_of($class, 'ScorpioT1000\Doctrine\ORM\Transformations\ITransformable')) {
+                throw new FromArrayException('Entity "'.$class.'" must implement ITransformable interface');
+            }
+            
+            if($association instanceof OneToOne || $association instanceof ManyToOne)
+            {
+                $jc = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\JoinColumn'); // find target id field name
+                if($jc) { $idField = $jc->referencedColumnName; }
+                                
+                $subEntity = null;
+                if(empty($v[$idField])) { // Sub-entity with empty id (new)
+                    if(is_int($policy) && ($policy & Policy::DontConstuct)) { return; }
+                    $subEntity = new $class();
+                } else { // Sub-entity with non-empty id (existent)
+                    $subEntity = $em->getReference($class, $v[$idField]);
+                }
+                if($subEntity) {
+                    $subEntity->fromArray($v, $em, $policy, $ar);
+                }
+                $this->$setter($subEntity);
+                return;
+            } else if(isset($v['_meta'])
+                      && is_array($v['_meta'])
+                      && isset($v['collection'])
+                      && is_array($v['collection'])) { // OneToMany, ManyToMany
+                $values = [];
+                $jt = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\JoinTable'); // find target id field name
+                if($jt) {
+                    $ijc = reset($jt->inverseJoinColumns);
+                    if($ijc) {
+                        $idField = $ijc->referencedColumnName;
+                    }
+                }
+                $dontConstruct = is_int($policy) && ($policy & Policy::DontConstuct);
+                foreach($v['collection'] as $e) {
+                    if(empty($e[$idField])) { // Sub-entity with empty id (new)
+                        if($dontConstruct) { continue; }
+                        $subEntity = new $class();
+                    } else { // Sub-entity with non-empty id (existent)
+                        $subEntity = $em->getReference($class, $e[$idField]);
+                    }
+                    if($subEntity) {
+                        $subEntity->fromArray($v, $em, $policy, $ar);
+                    }
+                    $values[] = $subEntity;
+                }
+                $this->$setter(new \Doctrine\Common\Collections\ArrayCollection($values));
+                return;
+            }
+        } else if($policy & Policy::DontFetch) { // don't process entity for this policy
+            return;
+        }
+        throw new FromArrayException('Field "'.$pn.'" must be an Entity representation or contain "collection" field');
     }
     
+    /** @return Annotation|null returns null if its inversed side of bidirectional relation */
     protected static function getPropertyAssociation(\ReflectionProperty $p, AnnotationReader $ar) {
         $ans = $ar->getPropertyAnnotations($p);
         foreach($ans as $an) {
-            if($an instanceof ManyToOne
-               || $an instanceof ManyToMany
-               || $an instanceof OneToOne
+            if(($an instanceof ManyToOne && !$an->inversedBy)
+               || ($an instanceof ManyToMany && !$an->inversedBy)
+               || ($an instanceof OneToOne && !$an->inversedBy)
                || $an instanceof OneToMany) { return $an; }
         }
         return null;
+    }
+    
+    protected static function getEntityFullName(\ReflectionClass $headRefClass, $name) {
+        if($name[0] !== "\\") {
+            $ns = $headRefClass->getNamespaceName();
+            if($ns) { return $ns."\\".$name; }
+        }
+        return $name;        
     }
     
     /** @see ITransformable::toArrays() */
