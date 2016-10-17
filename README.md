@@ -1,4 +1,4 @@
-JSON-ready Doctrine ORM Entity-Array transfomtaions
+JSON-ready Doctrine ORM Entity-Array Transformations
 ======================================
 
 Step 1: Installation
@@ -139,14 +139,14 @@ $result will be something like:
 ]
 ```
 
-It's ready for JSON transformation!
+**It's ready for JSON transformation!**
 ```php
     echo json_encode($result);
 ```    
     
 And we can transform it to Entity again.
-It will retrieve sub-entities by id using EntityManager
-Don't forget to use try-catch block to avoid uncaught exceptions
+It will retrieve sub-entities by id using EntityManager.
+Don't forget to use try-catch block to avoid uncaught exceptions.
 
 ```php
 $carB = new Car();
