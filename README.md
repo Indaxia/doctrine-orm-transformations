@@ -3,8 +3,9 @@ ScorpioT1000's ITransformable examples
 
 First include namespaces:
 ~~~~
-    use AppBundle\Entity\Transformations\ITransformable;
-    use AppBundle\Entity\Transformations\TransformableTrait;
+    use \ScorpioT1000\Doctrine\ORM\Transformations\ITransformable;
+    use \ScorpioT1000\Doctrine\ORM\Transformations\Traits\Transformable;
+    use \ScorpioT1000\Doctrine\ORM\Transformations\Policy;
 ~~~~
 
 How to transform entities to arrays and vice versa
@@ -65,12 +66,12 @@ Let's say we have the following entities:
     
     // here we have some $car. Let's transform it to array.
     $result = $car->toArray([
-                'keys': ITransformabe::EXCLUDE, // 'Car.keys' will be excluded
+                'keys': Policy::Skip, // 'Car.keys' will be excluded
                 'engine': [
-                    'serialNumber': ITransformabe::EXCLUDE // 'Car.engine.serialNumber' will be excluded
+                    'serialNumber': Policy::Skip // 'Car.engine.serialNumber' will be excluded
                 ],
                 'wheels': [
-                    'brakes': ITransformabe::EXCLUDE // The field 'brakes' will be excluded from each Entity in 'Car.engine.wheels' Collection
+                    'brakes': Policy::Skip // The field 'brakes' will be excluded from each Entity in 'Car.engine.wheels' Collection
                 ]
             ]);
             
@@ -113,13 +114,14 @@ Let's say we have the following entities:
     
     // And we can transform it to Entity again.
     // It will retrieve sub-entities by id using EntityManager
+    // Don't forget to use try-catch block to avoid uncaught exceptions
     $carB = new Car();
     $carB->fromArray($result, $entityManager, []);
 ~~~~
 
 
-How to redeclare TransformableTrait methods
--------------------------------------------
+How to redeclare Transformable methods
+--------------------------------------
 
 ~~~~
     class A implements ITransformable {
@@ -128,15 +130,12 @@ How to redeclare TransformableTrait methods
             fromArray as traitFromArray;
         }
         
-        public function toArray($policy = [], $nested = true) {
-            $result = $this->traitToArray($policy, $nested);
-            ...
-            return $result;
+        public function toArray($policy = ['password' => Policy::Skip]) {
+            return $this->traitToArray($policy, false);
         }
         
-        public function fromArray(array $src, $policy = [], EntityManagerInterface $entityManager = null) {
-            ...
-            $this->traitFromArray($src, $policy, $entityManager);
+        public function fromArray(array $src, EntityManagerInterface $entityManager) {
+            $this->traitFromArray($src, ['password' => Policy::Skip], $entityManager);
         }
     }
 ~~~~
