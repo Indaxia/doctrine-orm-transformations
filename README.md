@@ -125,7 +125,7 @@ How to redeclare Transformable methods
 
 ~~~~
     class A implements ITransformable {
-        use TransformableTrait {
+        use Transformable {
             toArray as traitToArray;
             fromArray as traitFromArray;
         }
