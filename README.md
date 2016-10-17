@@ -1,19 +1,33 @@
 ScorpioT1000's ITransformable examples
 ======================================
 
-First include namespaces:
-~~~~
+Step 1: Installation
+--------------------
+
+in **composer.json**:
+```
+ "require": {
+    ...
+    "ScorpioT1000/doctrine-orm-transformations": "^0.1@dev"
+    ...
+ }
+```
+
+Step 2: Reference common classes
+--------------------------------
+
+```
     use \ScorpioT1000\Doctrine\ORM\Transformations\ITransformable;
     use \ScorpioT1000\Doctrine\ORM\Transformations\Traits\Transformable;
     use \ScorpioT1000\Doctrine\ORM\Transformations\Policy;
-~~~~
+```
 
 How to transform entities to arrays and vice versa
 --------------------------------------------------
 
 Let's say we have the following entities:
 
-~~~~
+```
     class Car implements ITransformable {
         /** @ORM\Id
          * @ORM\Column(type="integer") */
@@ -63,8 +77,11 @@ Let's say we have the following entities:
         public function setModel($v) ...
         ...
     }
-    
-    // here we have some $car. Let's transform it to array.
+```
+
+Here we have some $car. Let's transform it to array.
+
+```
     $result = $car->toArray([
                 'keys': Policy::Skip, // 'Car.keys' will be excluded
                 'engine': [
@@ -74,68 +91,75 @@ Let's say we have the following entities:
                     'brakes': Policy::Skip // The field 'brakes' will be excluded from each Entity in 'Car.engine.wheels' Collection
                 ]
             ]);
+```
             
-    /* $result will be something like:
-    *  [
-    *      '_meta' => ['class' => 'Car'],
-    *      'id' => 1,
-    *      'engine' => [
-    *          '_meta' => ['class' => 'Engine', 'association' => 'OneToOne'],
-    *          'id' => 83
-    *      ],
-    *      'wheels' => [
-    *          '_meta' => ['class' => 'Wheel', 'association' => 'OneToMany'],
-    *          'collection' => [
-    *              [
-    *                  '_meta' => ['class' => 'Wheel'],
-    *                  'id' => 1,
-    *                  'model' => 'A'
-    *              ],
-    *              [
-    *                  '_meta' => ['class' => 'Wheel'],
-    *                  'id' => 2,
-    *                  'model' => 'A'
-    *              ],
-    *              [
-    *                  '_meta' => ['class' => 'Wheel'],
-    *                  'id' => 3,
-    *                  'model' => 'B'
-    *              ],
-    *              [
-    *                  '_meta' => ['class' => 'Wheel'],
-    *                  'id' => 4,
-    *                  'model' => 'B'
-    *              ]
-    *          ]
-    *      ]
-    *  ]
-    */
+$result will be something like:
+
+```
+[
+    '_meta' => ['class' => 'Car'],
+    'id' => 1,
+    'engine' => [
+        '_meta' => ['class' => 'Engine', 'association' => 'OneToOne'],
+        'id' => 83
+    ],
+    'wheels' => [
+        '_meta' => ['class' => 'Wheel', 'association' => 'OneToMany'],
+        'collection' => [
+            [
+                '_meta' => ['class' => 'Wheel'],
+                'id' => 1,
+                'model' => 'A'
+            ],
+            [
+                '_meta' => ['class' => 'Wheel'],
+                'id' => 2,
+                'model' => 'A'
+            ],
+            [
+                '_meta' => ['class' => 'Wheel'],
+                'id' => 3,
+                'model' => 'B'
+            ],
+            [
+                '_meta' => ['class' => 'Wheel'],
+                'id' => 4,
+                'model' => 'B'
+            ]
+        ]
+    ]
+]
+```
+
     
     
-    // And we can transform it to Entity again.
-    // It will retrieve sub-entities by id using EntityManager
-    // Don't forget to use try-catch block to avoid uncaught exceptions
+And we can transform it to Entity again.
+It will retrieve sub-entities by id using EntityManager
+Don't forget to use try-catch block to avoid uncaught exceptions
+
+```
     $carB = new Car();
     $carB->fromArray($result, $entityManager, []);
-~~~~
+```
+
+[Read more Policy options](https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Policy.php)
+
+More Demos
+----------
+[Entities & Symfony 3 Controller](https://github.com/ScorpioT1000/doctrine-orm-transformations/tree/master/src/Demo) is included and accessible through the namespace.
 
 
 How to redeclare Transformable methods
 --------------------------------------
 
-~~~~
+```
     class A implements ITransformable {
         use Transformable {
             toArray as traitToArray;
             fromArray as traitFromArray;
         }
         
-        public function toArray($policy = ['password' => Policy::Skip]) {
-            return $this->traitToArray($policy, false);
-        }
-        
-        public function fromArray(array $src, EntityManagerInterface $entityManager) {
-            $this->traitFromArray($src, ['password' => Policy::Skip], $entityManager);
-        }
+        public function toArray ...
+        public function fromArray ...
     }
-~~~~
+```
