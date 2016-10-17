@@ -7,9 +7,8 @@ Step 1: Installation
 in **composer.json**:
 ```json
 "require": {
-    ...
+
     "ScorpioT1000/doctrine-orm-transformations": "^0.1@dev"
-    ...
 }
 ```
 
@@ -99,7 +98,7 @@ $result = $car->toArray([
             
 $result will be something like:
 
-```json
+```php
 [
     '_meta' => ['class' => 'Car'],
     'id' => 1,
@@ -142,15 +141,28 @@ It will retrieve sub-entities by id using EntityManager
 Don't forget to use try-catch block to avoid uncaught exceptions
 
 ```php
-    $carB = new Car();
-    $carB->fromArray($result, $entityManager, []);
+$carB = new Car();
+    
+// Simple way
+$carB->fromArray($result, $entityManager, []);
+
+// With Policy
+$carB->fromArray($result, $entityManager, [
+    'keys': Policy::Skip, // 'Car.keys' will be excluded
+    'engine': [
+        'serialNumber': Policy::Skip // 'Car.engine.serialNumber' will be excluded
+    ],
+    'wheels': [
+        'brakes': Policy::Skip // The field 'brakes' will be excluded from each Entity in 'Car.engine.wheels' Collection
+    ]
+]);
 ```
 
 [Read more Policy options](https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Policy.php)
 
 More Demos
 ----------
-[Entities & Symfony 3 Controller](https://github.com/ScorpioT1000/doctrine-orm-transformations/tree/master/src/Demo) is included and accessible through the namespace.
+[Entities & Symfony 3 Controller](https://github.com/ScorpioT1000/doctrine-orm-transformations/tree/master/src/Demo) are included and accessible through the namespace.
 
 
 How to redeclare Transformable methods
