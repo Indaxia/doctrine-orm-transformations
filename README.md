@@ -83,8 +83,8 @@ Let's say we have the following entities:
     *          'id' => 83
     *      ],
     *      'wheels' => [
-    *          '_meta' => ['class' => 'Collection', 'association' => 'OneToMany'],
-    *          'values' => [
+    *          '_meta' => ['class' => 'Wheel', 'association' => 'OneToMany'],
+    *          'collection' => [
     *              [
     *                  '_meta' => ['class' => 'Wheel'],
     *                  'id' => 1,
