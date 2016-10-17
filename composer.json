@@ -1,0 +1,22 @@
+{
+    "name": "scorpiot1000/doctrine-orm-transformations",
+    "type": "library",
+    "description": "Provides JSON-ready Doctrine ORM Entity-Array transfomtaions",
+    "keywords": ["json", "doctrine", "orm", "entity", "array"],
+    "homepage": "https://github.com/ScorpioT1000/doctrine-orm-transformations",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ScorpioT1000",
+            "email": "ScorpioT1000@yandex.ru",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "ScorpioT1000\\Doctrine\\ORM\\Transformations\\": "src/" }
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "doctrine/orm": "^2.5"
+    }
+}
