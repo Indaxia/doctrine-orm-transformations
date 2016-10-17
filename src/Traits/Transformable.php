@@ -16,7 +16,7 @@ trait Transformable {
     /** @see ITransformable::toArray() */
     public function toArray($policy = [], $nested = true, AnnotationReader $ar = null) {
         $refClass = new \ReflectionClass(get_class($this));
-        $result = ['_meta' => ['class' => $refClass->getName()]];
+        $result = ['_meta' => ['class' => static::getEntityFullName($refClass)]];
         if(! is_array($policy)) { $policy = []; }
         $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
                                        | \ReflectionProperty::IS_PROTECTED
@@ -25,6 +25,7 @@ trait Transformable {
         foreach($ps as $p) {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
+            if($pn[0] === '_' && $pn[1] === '_') { continue; }
             $subPolicy = isset($policy[$pn]) ? $policy[$pn] : Policy::Auto;
             if($subPolicy & Policy::Skip) { continue; }
             $result[$pn] = $this->toArrayProperty($p, $pn, $subPolicy, $nested, $ar, $refClass);
@@ -47,7 +48,7 @@ trait Transformable {
                     break;
             }
             return $v;
-        } else if($association = $this->getPropertyAssociation($p, $ar)) { // entity or collection
+        } else if($association = static::getPropertyAssociation($p, $ar)) { // entity or collection
             if(!$nested || ($policy & Policy::DontFetch)) {
                 return $this->$pn;
             }
@@ -88,7 +89,7 @@ trait Transformable {
         foreach($ps as $p) {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
-            if(!isset($src[$pn])) { continue; }
+            if(!isset($src[$pn]) || ($pn[0] === '_' && $pn[1] === '_')) { continue; }
             $subPolicy = isset($policy[$pn]) ? $policy[$pn] : Policy::Auto;
             if($subPolicy & Policy::Skip) { continue; }
             $this->fromArrayProperty($src[$pn], $p, $pn, $subPolicy, $ar, $entityManager, $refClass);
@@ -115,30 +116,33 @@ trait Transformable {
                 case 'string':
                 case 'text':
                 case 'simple_array':
-                case 'json_array':
                 case 'guid':
-                    if(is_string($v)) { $this->$setter($v); } break;
+                    if(is_string($v)) { $this->$setter($v); return; } break;
+                case 'json_array':
+                    if(is_array($v)) { $this->$setter($v); return; } break;
                 case 'blob':
                     if(is_resource($v) && get_resource_type($v) == 'stream') {
                         $this->$setter($v);
+                        return;
                     } else if(is_string($v)) {
                         $stream = fopen('php://memory','r+');
                         fwrite($stream, $v);
                         rewind($stream);
                         $this->$setter($stream);
+                        return;
                     }
                     break;
                 case 'integer':
                 case 'smallint':
-                    if(is_integer($v)) { $this->$setter($v); } break;
+                    if(is_integer($v)) { $this->$setter($v); return; } break;
                 case 'bigint':
-                    if(is_numeric($v)) { $this->$setter($v); } break;
+                    if(is_numeric($v)) { $this->$setter($v); return; } break;
                 case 'boolean':
-                    if(is_bool($v)) { $this->$setter($v); } break;
+                    if(is_bool($v)) { $this->$setter($v); return; } break;
                 case 'decimal':
-                    if(is_numeric($v)) { $this->$setter($v); } break;
+                    if(is_numeric($v)) { $this->$setter($v); return; } break;
                 case 'float':
-                    if(is_integer($v) || is_double($v)) { $this->$setter($v); } break;
+                    if(is_integer($v) || is_double($v)) { $this->$setter($v); return; } break;
                 case 'object':
                 case 'array':
                     throw new FromArrayException('Column type "'.$column->type.'" is disabled due to CVE-2015-0231');
@@ -149,7 +153,7 @@ trait Transformable {
                     if($v) {
                         if(is_string($v)) {
                             $dt = new \DateTime();
-                            $v = DateTime::createFromFormat('Y-m-d\TH:i:s+', $v, new \DateTimeZone('UTC'));
+                            $v = \DateTime::createFromFormat('Y-m-d\TH:i:s+', $v, new \DateTimeZone('UTC'));
                         }
                         if(! $v instanceof \DateTime) {
                             throw new FromArrayException('Field "'.$pn.'" must be an ISO8601 string'.($column->nullable ? ' or null' : ''));
@@ -160,11 +164,11 @@ trait Transformable {
                         throw new FromArrayException('Field "'.$pn.'" must be an ISO8601 string');
                     }
                     $this->$setter($v);
-                    break;
+                    return;
             }
             throw new FromArrayException('Field "'.$pn.'" must be a type of "'.$column->type.'"');
-        } else if($association = $this->getPropertyAssociation($p, $ar)) { // entity or collection
-            $this->fromArrayRelation($v, $p, $pn, $setter, $association, $policy, $ar, $refClass);   
+        } else if($association = static::getPropertyAssociation($p, $ar)) { // entity or collection
+            $this->fromArrayRelation($v, $p, $pn, $setter, $association, $policy, $ar, $em, $refClass);   
         }
     }
     
@@ -175,7 +179,7 @@ trait Transformable {
      * 4. Sub-entity as null value
      * 5. Sub-collection with some entities (some new, some existent)
      * 6. Sub-collection with no entities */
-    protected static function fromArrayRelation($v, $p, $pn, $setter,
+    protected function fromArrayRelation($v, $p, $pn, $setter,
                                                 $association, $policy,
                                                 AnnotationReader $ar,
                                                 EntityManagerInterface $em,
@@ -256,10 +260,17 @@ trait Transformable {
         return null;
     }
     
-    protected static function getEntityFullName(\ReflectionClass $headRefClass, $name) {
-        if($name[0] !== "\\") {
+    protected static function getEntityFullName(\ReflectionClass $headRefClass, $name = null) {
+        if($name && $name[0] !== "\\") {
             $ns = $headRefClass->getNamespaceName();
-            if($ns) { return $ns."\\".$name; }
+            if($ns) { 
+                $name = $ns."\\".$name; 
+            }
+        } else {
+            $name = $headRefClass->getName();
+        }
+        if(substr($name, 0, 15) === "Proxies\\__CG__\\") {
+            $name = substr($name, 15);
         }
         return $name;        
     }
