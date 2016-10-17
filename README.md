@@ -5,21 +5,21 @@ Step 1: Installation
 --------------------
 
 in **composer.json**:
-```
- "require": {
+```json
+"require": {
     ...
     "ScorpioT1000/doctrine-orm-transformations": "^0.1@dev"
     ...
- }
+}
 ```
 
 Step 2: Reference common classes
 --------------------------------
 
-```
-    use \ScorpioT1000\Doctrine\ORM\Transformations\ITransformable;
-    use \ScorpioT1000\Doctrine\ORM\Transformations\Traits\Transformable;
-    use \ScorpioT1000\Doctrine\ORM\Transformations\Policy;
+```php
+use \ScorpioT1000\Doctrine\ORM\Transformations\ITransformable;
+use \ScorpioT1000\Doctrine\ORM\Transformations\Traits\Transformable;
+use \ScorpioT1000\Doctrine\ORM\Transformations\Policy;
 ```
 
 How to transform entities to arrays and vice versa
@@ -27,7 +27,7 @@ How to transform entities to arrays and vice versa
 
 Let's say we have the following entities:
 
-```
+```php
     class Car implements ITransformable {
         /** @ORM\Id
          * @ORM\Column(type="integer") */
@@ -81,21 +81,25 @@ Let's say we have the following entities:
 
 Here we have some $car. Let's transform it to array.
 
-```
-    $result = $car->toArray([
-                'keys': Policy::Skip, // 'Car.keys' will be excluded
-                'engine': [
-                    'serialNumber': Policy::Skip // 'Car.engine.serialNumber' will be excluded
-                ],
-                'wheels': [
-                    'brakes': Policy::Skip // The field 'brakes' will be excluded from each Entity in 'Car.engine.wheels' Collection
-                ]
-            ]);
+```php
+// Simple way
+$result = $car->toArray();
+    
+// With Policy
+$result = $car->toArray([
+    'keys': Policy::Skip, // 'Car.keys' will be excluded
+    'engine': [
+        'serialNumber': Policy::Skip // 'Car.engine.serialNumber' will be excluded
+    ],
+    'wheels': [
+        'brakes': Policy::Skip // The field 'brakes' will be excluded from each Entity in 'Car.engine.wheels' Collection
+    ]
+]);
 ```
             
 $result will be something like:
 
-```
+```json
 [
     '_meta' => ['class' => 'Car'],
     'id' => 1,
@@ -137,7 +141,7 @@ And we can transform it to Entity again.
 It will retrieve sub-entities by id using EntityManager
 Don't forget to use try-catch block to avoid uncaught exceptions
 
-```
+```php
     $carB = new Car();
     $carB->fromArray($result, $entityManager, []);
 ```
@@ -152,7 +156,7 @@ More Demos
 How to redeclare Transformable methods
 --------------------------------------
 
-```
+```php
     class A implements ITransformable {
         use Transformable {
             toArray as traitToArray;
