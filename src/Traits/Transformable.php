@@ -104,7 +104,7 @@ trait Transformable {
                                          EntityManagerInterface $em,
                                          \ReflectionClass $refClass) {
         $setter = 'set'.ucfirst($pn);
-        if($id = $this->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Id')) {
+        if($id = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Id')) {
             // Skip id, it will be processed in the next steps
         } else if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
             if($v === null && $column->nullable) {
