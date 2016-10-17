@@ -4,12 +4,17 @@ ScorpioT1000's ITransformable examples
 Step 1: Installation
 --------------------
 
-in **composer.json**:
+in **composer.json** add:
 ```json
 "require": {
 
     "ScorpioT1000/doctrine-orm-transformations": "^0.1@dev"
 }
+```
+then
+```shell
+> cd <your doc root>
+> composer update
 ```
 
 Step 2: Reference common classes
