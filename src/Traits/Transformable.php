@@ -76,7 +76,7 @@ trait Transformable {
     public function fromArray(
         array $src,
         EntityManagerInterface $entityManager,
-        array $policy = [],
+        $policy = [],
         AnnotationReader $ar = null
     ) {
         $refClass = new \ReflectionClass(get_class($this));

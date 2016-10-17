@@ -19,7 +19,7 @@ interface ITransformable {
      *  @see readme.md
      *  It excludes any static values.
     */
-    public function toArray(array $policy = [], $nested = true, AnnotationReader $ar = null);
+    public function toArray($policy = [], $nested = true, AnnotationReader $ar = null);
     
     /** Converts fills Entity's fields (including nested Entity and Collection) to the values from the given array.
      *  @param array A special array ready for ITransformable, so it should include '_meta' array
@@ -36,7 +36,7 @@ interface ITransformable {
     public function fromArray(
         array $src,
         EntityManagerInterface $entityManager,
-        array $policy = [],
+        $policy = [],
         AnnotationReader $ar = null
     );
     
