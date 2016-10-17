@@ -91,7 +91,7 @@ trait Transformable {
             if(!isset($src[$pn])) { continue; }
             $subPolicy = isset($policy[$pn]) ? $policy[$pn] : Policy::Auto;
             if($subPolicy & Policy::Skip) { continue; }
-            $this->fromArrayProperty($src[$pn], $p, $pn, $subPolicy, $ar, $em, $refClass);
+            $this->fromArrayProperty($src[$pn], $p, $pn, $subPolicy, $ar, $entityManager, $refClass);
         }
     }
     
