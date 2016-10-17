@@ -18,9 +18,9 @@ trait Transformable {
         $refClass = new \ReflectionClass(get_class($this));
         $result = ['_meta' => ['class' => $refClass->getName()]];
         if(! is_array($policy)) { $policy = []; }
-        $ps = $reflectionClass->getProperties(  \ReflectionProperty::IS_PUBLIC
-                                              | \ReflectionProperty::IS_PROTECTED
-                                              | \ReflectionProperty::IS_PRIVATE);
+        $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
+                                       | \ReflectionProperty::IS_PROTECTED
+                                       | \ReflectionProperty::IS_PRIVATE);
         if(!$ar) { $ar = new AnnotationReader(); }
         foreach($ps as $p) {
             if($p->isStatic()) { continue; }
@@ -81,9 +81,9 @@ trait Transformable {
     ) {
         $refClass = new \ReflectionClass(get_class($this));
         if(! is_array($policy)) { $policy = []; }
-        $ps = $reflectionClass->getProperties(  \ReflectionProperty::IS_PUBLIC
-                                              | \ReflectionProperty::IS_PROTECTED
-                                              | \ReflectionProperty::IS_PRIVATE);
+        $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
+                                       | \ReflectionProperty::IS_PROTECTED
+                                       | \ReflectionProperty::IS_PRIVATE);
         if(!$ar) { $ar = new AnnotationReader(); }
         foreach($ps as $p) {
             if($p->isStatic()) { continue; }
