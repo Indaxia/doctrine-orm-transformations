@@ -5,7 +5,7 @@ use \Doctrine\ORM\EntityManagerInterface;
 use \Doctrine\Common\Annotations\AnnotationReader;
 
 /** Provides JSON-ready Doctrine ORM Entity-Array transfomtaions */
-interface ITransformabe { 
+interface ITransformable { 
     
     /** Converts Entity and it's references to nested array structure.
      *  @param array $policy Associative array of instructions how to operate with the fields.
