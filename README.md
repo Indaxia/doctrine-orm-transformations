@@ -1,4 +1,4 @@
-ScorpioT1000's ITransformable examples
+JSON-ready Doctrine ORM Entity-Array transfomtaions
 ======================================
 
 Step 1: Installation
@@ -139,7 +139,10 @@ $result will be something like:
 ]
 ```
 
-    
+It's ready for JSON transformation!
+```php
+    echo json_encode($result);
+```    
     
 And we can transform it to Entity again.
 It will retrieve sub-entities by id using EntityManager
