@@ -1,5 +1,5 @@
 <?php
-namespace ScorpioT1000\Doctrine\ORM\Transformations\Traits;
+namespace ScorpioT1000\OTR\Traits;
 
 use \Doctrine\Common\Annotations\AnnotationReader;
 use \Doctrine\ORM\EntityManagerInterface;
@@ -7,8 +7,8 @@ use \Doctrine\ORM\Mapping\ManyToOne;
 use \Doctrine\ORM\Mapping\ManyToMany;
 use \Doctrine\ORM\Mapping\OneToOne;
 use \Doctrine\ORM\Mapping\OneToMany;
-use \ScorpioT1000\Doctrine\ORM\Transformations\Exceptions\FromArrayException;
-use \ScorpioT1000\Doctrine\ORM\Transformations\Policy;
+use \ScorpioT1000\OTR\Exceptions\FromArrayException;
+use \ScorpioT1000\OTR\Policy;
 
 /* Implements Entity Transformations methods
  * @see ITransformable */
@@ -193,7 +193,7 @@ trait Transformable {
         if(is_array($v)) {
             $idField = 'id';
             $class = static::getEntityFullName($refClass, $association->targetEntity);
-            if(!is_subclass_of($class, 'ScorpioT1000\Doctrine\ORM\Transformations\ITransformable')) {
+            if(!is_subclass_of($class, 'ScorpioT1000\OTR\ITransformable')) {
                 throw new FromArrayException('Entity "'.$class.'" must implement ITransformable interface');
             }
             

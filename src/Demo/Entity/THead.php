@@ -1,10 +1,10 @@
 <?php
 
-namespace ScorpioT1000\Doctrine\ORM\Transformations\Demo\Entity;
+namespace ScorpioT1000\OTR\Demo\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \ScorpioT1000\Doctrine\ORM\Transformations\ITransformable;
-use \ScorpioT1000\Doctrine\ORM\Transformations\Traits\Transformable;
+use \ScorpioT1000\OTR\ITransformable;
+use \ScorpioT1000\OTR\Traits\Transformable;
 
 /**
  * @ORM\Entity

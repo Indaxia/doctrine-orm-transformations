@@ -1,4 +1,4 @@
 <?php
-namespace ScorpioT1000\Doctrine\ORM\Transformations\Exceptions;
+namespace ScorpioT1000\OTR\Exceptions;
 
 class FromArrayException extends \Exception {}

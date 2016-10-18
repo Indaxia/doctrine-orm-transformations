@@ -13,7 +13,7 @@
         }
     ],
     "autoload": {
-        "psr-4": { "ScorpioT1000\\Doctrine\\ORM\\Transformations\\": "src/" }
+        "psr-4": { "ScorpioT1000\\OTR\\": "src/" }
     },
     "require": {
         "php": ">=5.4.0",

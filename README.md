@@ -32,9 +32,9 @@ Step 2: Reference common classes
 --------------------------------
 
 ```php
-use \ScorpioT1000\Doctrine\ORM\Transformations\ITransformable;
-use \ScorpioT1000\Doctrine\ORM\Transformations\Traits\Transformable;
-use \ScorpioT1000\Doctrine\ORM\Transformations\Policy;
+use \ScorpioT1000\OTR\ITransformable;
+use \ScorpioT1000\OTR\Traits\Transformable;
+use \ScorpioT1000\OTR\Annotations\Policy;
 ```
 
 How to transform entities to arrays and vice versa
@@ -44,11 +44,14 @@ Let's say we have the following entities:
 
 ```php
     class Car implements ITransformable {
+        use Transformable;
+    
         /** @ORM\Id
          * @ORM\Column(type="integer") */
         protected $id;
         
-        /** @ORM\Column(type="string") */
+        /** @Policy\To\Skip
+         * @ORM\Column(type="string") */
         protected $keys;
         
         /** @ORM\OneToMany(targetEntity="Wheel") ... */
@@ -61,11 +64,14 @@ Let's say we have the following entities:
     }
     
     class Engine implements ITransformable {
+        use Transformable;
+        
         /** @ORM\Id
          * @ORM\Column(type="integer") */
         protected $id;
         
-        /** @ORM\Column(type="string") */
+        /** @Policy\To\Skip
+         * @ORM\Column(type="string") */
         protected $serialNumber;
         
         public function getId();
@@ -75,11 +81,14 @@ Let's say we have the following entities:
     }
     
     class Wheel implements ITransformable {
+        use Transformable;
+        
         /** @ORM\Id
          * @ORM\Column(type="integer") */
         protected $id;
         
-        /** @ORM\Column(type="string") */
+        /** @Policy\Skip
+         * @ORM\Column(type="string") */
         protected $brakes;
         
         /** @ORM\Column(type="string") */
@@ -97,18 +106,17 @@ Let's say we have the following entities:
 Here we have some $car. Let's transform it to array.
 
 ```php
-// Simple way
+// Using global policy
 $result = $car->toArray();
     
-// With Policy
+// Using local policy
 $result = $car->toArray([
-    'keys': Policy::Skip, // 'Car.keys' will be excluded
-    'engine': [
-        'serialNumber': Policy::Skip // 'Car.engine.serialNumber' will be excluded
-    ],
-    'wheels': [
-        'brakes': Policy::Skip // The field 'brakes' will be excluded from each Entity in 'Car.engine.wheels' Collection
-    ]
+    'wheels' => new Policy\To\Paginate(offset=0, limit=4)
+]);
+
+// Local policy overrides global policy
+$result = $car->toArray([
+    'keys' => new Policy\Auto
 ]);
 ```
 [Policy options](https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Policy.php)
@@ -168,12 +176,12 @@ $carB->fromArray($result, $entityManager, []);
 
 // With Policy
 $carB->fromArray($result, $entityManager, [
-    'keys': Policy::Skip, // 'Car.keys' will be excluded
-    'engine': [
-        'serialNumber': Policy::Skip // 'Car.engine.serialNumber' will be excluded
+    'keys' => new Policy\Skip,
+    'engine' => [
+        'serialNumber' => new Policy\From\AllowNewOnly
     ],
-    'wheels': [
-        'brakes': Policy::Skip // The field 'brakes' will be excluded from each Entity in 'Car.engine.wheels' Collection
+    'wheels' => [
+        'brakes' => new Policy\From\Accept
     ]
 ]);
 ```

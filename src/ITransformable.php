@@ -1,5 +1,5 @@
 <?php
-namespace ScorpioT1000\Doctrine\ORM\Transformations;
+namespace ScorpioT1000\OTR;
 
 use \Doctrine\ORM\EntityManagerInterface;
 use \Doctrine\Common\Annotations\AnnotationReader;

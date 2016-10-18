@@ -1,6 +1,6 @@
 <?php
 
-namespace ScorpioT1000\Doctrine\ORM\Transformations\Demo\Symfony;
+namespace ScorpioT1000\OTR\Demo\Symfony;
 
 use \Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use \Symfony\Component\HttpFoundation\Request;
@@ -8,13 +8,13 @@ use \Symfony\Component\HttpFoundation\JsonResponse;
 use \Symfony\Bundle\FrameworkBundle\Controller\Controller as SymfonyController;
 use \Symfony\Component\Serializer\Encoder\JsonEncoder;
 
-use \ScorpioT1000\Doctrine\ORM\Transformations\ITransformable;
-use \ScorpioT1000\Doctrine\ORM\Transformations\Traits\Transformable;
-use \ScorpioT1000\Doctrine\ORM\Transformations\Policy;
+use \ScorpioT1000\OTR\ITransformable;
+use \ScorpioT1000\OTR\Traits\Transformable;
+use \ScorpioT1000\OTR\Policy;
 
-use \ScorpioT1000\Doctrine\ORM\Transformations\Demo\Entity\THead;
-use \ScorpioT1000\Doctrine\ORM\Transformations\Demo\Entity\TSub;
-use \ScorpioT1000\Doctrine\ORM\Transformations\Demo\Entity\TSubCol;
+use \ScorpioT1000\OTR\Demo\Entity\THead;
+use \ScorpioT1000\OTR\Demo\Entity\TSub;
+use \ScorpioT1000\OTR\Demo\Entity\TSubCol;
 
 class Controller extends SymfonyController
 {
