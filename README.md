@@ -1,6 +1,16 @@
 JSON-ready Doctrine ORM Entity-Array Transformations
 ======================================
 
+Features
+--------
+- JSON-ready toArray and fromArray Trait (**no need to extend class**);
+- Manipulating fields and nested sub-fields using [Policy](https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Policy.php) for each one;
+- Supports almost all Doctrine Column ORM types ("object" and "array" are excluded due to CVE-2015-0231);
+- Supports nested Entities and Collections for all the [Association](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html) types (be careful with self-referencing);
+- **fromArray** asks EntityManager to find by "referencedColumnName" or creates new sub-entities (depends on Identifier emptiness and Policy);
+- Same for [Collection](https://github.com/doctrine/collections/blob/master/lib/Doctrine/Common/Collections/ArrayCollection.php) members (OneToMany, ManyToMany);
+- Static **toArrays** method transforms multiple entities at once;
+
 Step 1: Installation
 --------------------
 
@@ -100,6 +110,7 @@ $result = $car->toArray([
     ]
 ]);
 ```
+[Policy options](https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Policy.php)
             
 $result will be something like:
 
@@ -165,8 +176,7 @@ $carB->fromArray($result, $entityManager, [
     ]
 ]);
 ```
-
-[Read more Policy options](https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Policy.php)
+[Policy options](https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Policy.php)
 
 More Demos
 ----------
