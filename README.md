@@ -110,9 +110,9 @@ Here we have some $car. Let's transform it to array.
 $result = $car->toArray();
     
 // Using local policy
-$result = $car->toArray([
+$result = $car->toArray((new Policy\Auto)->inside([
     'wheels' => new Policy\To\Paginate(offset=0, limit=4)
-]);
+]));
 
 // Local policy overrides global policy
 $result = $car->toArray([
@@ -172,17 +172,17 @@ Don't forget to use try-catch block to avoid uncaught exceptions.
 $carB = new Car();
     
 // Simple way
-$carB->fromArray($result, $entityManager, []);
+$carB->fromArray($result, $entityManager);
 
 // With Policy
-$carB->fromArray($result, $entityManager, [
-    'keys' => new Policy\Skip,
-    'engine' => [
+$carB->fromArray($result, $entityManager, (new Policy\Auto())->inside([
+    'keys' => mew Policy\Skip,
+    'engine' => (new Policy\Auto())->inside([
         'serialNumber' => new Policy\From\AllowNewOnly
-    ],
-    'wheels' => [
-        'brakes' => new Policy\From\Accept
-    ]
+    ]),
+    'wheels' => (new Policy\Auto())->inside([
+        'brakes' => new Policy\From\Auto
+    ])
 ]);
 ```
 [Policy options](https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Policy.php)

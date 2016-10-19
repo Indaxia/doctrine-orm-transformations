@@ -11,7 +11,9 @@ use \Doctrine\ORM\Mapping as ORM;
  * Be careful with ITransformabe::fromArray - it will remove non-existent collection elements on Policy\Auto.
  * @see http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/tutorials/extra-lazy-associations.html
  * @ORM\Annotation */
-class FetchPaginate implements Interfaces\Policy {
+class FetchPaginate
+    extends \ScorpioT1000\OTR\Annotations\Annotation
+    implements Interfaces\Policy {
     public $offset = 0;
     public $limit = 20;
     public $reverse = false;

@@ -3,48 +3,57 @@ namespace ScorpioT1000\OTR;
 
 use \Doctrine\ORM\EntityManagerInterface;
 use \Doctrine\Common\Annotations\AnnotationReader;
+use Exceptions\Exception;
+use Annotations\PolicyResolver;
+use Annotations\Policy;
 
 /** Provides JSON-ready Doctrine ORM Entity-Array transfomtaions */
 interface ITransformable { 
     
     /** Converts Entity and it's references to nested array structure.
-     *  @param array $policy Associative array of instructions how to operate with the fields.
-     *      Where: the key equals to field name. The value can be one of Policy constants or
-     *      a sub-array containing the same field-instruction key-value scheme for nested entity or collection and so on, recursive.
-     *      @see Policy
-     *  @param boolean $nested include nested elements.
-     *      Set to false if you want to get ID's (for nested Entity) and empty arrays (for nested Collection) instead of nested arrays.
+     *  @param Policy\Interfaces\Policy|null transfromation policy, null equals to Policy\Auto
      *  @param AnnotationReader $ar for internal recursive purposes
+     *  @param PolicyResolver $pr for internal recursive purposes
      *  @return array ready for JSON serialization.
      *  @see readme.md
+     *  @throws Exception when input type or policy aren't acceptable
      *  It excludes any static values.
     */
-    public function toArray($policy = [], $nested = true, AnnotationReader $ar = null);
+    public function toArray(
+        Policy\Interfaces\Policy $policy = null,
+        AnnotationReader $ar = null,
+        PolicyResolver $pr = null
+    );
     
     /** Converts fills Entity's fields (including nested Entity and Collection) to the values from the given array.
      *  @param array A special array ready for ITransformable, so it should include '_meta' array
      *  @param EntityManagerInterface $entityManager Doctrine instance to retrieve nested Entities by ID or create new ones.
-     *  @param array $policy Associative array of instructions how to operate with the fields.
-     *      Where: the key equals to field name. The value can be one of Policy constants or
-     *      a sub-array containing the same field-instruction key-value scheme for nested entity or collection and so on, recursive.
-     *      @see Policy
+     *  @param Policy\Interfaces\Policy|null transfromation policy, null equals to Policy\Auto
      *  @param AnnotationReader $ar for internal recursive purposes
+     *  @param PolicyResolver $pr for internal recursive purposes
      *  @see readme.md
-     *  @throws Exception when input type isn't acceptable
+     *  @throws Exception when input type or policy aren't acceptable
      *  It doesn't process any static values.
      */
     public function fromArray(
         array $src,
         EntityManagerInterface $entityManager,
-        $policy = [],
-        AnnotationReader $ar = null
+        Policy\Interfaces\Policy $policy = null,
+        AnnotationReader $ar = null,
+        PolicyResolver $pr = null
     );
     
     /** Applies toArray to multiple entities.
      * @param array $entities array of entities
      * @param array $policy
-     * @param boolean $nested
+     * @param AnnotationReader $ar for internal recursive purposes
+     * @param PolicyResolver $pr for internal recursive purposes
      * @return array
      * @see ITransformable::toArray */
-    public static function toArrays(array $entities, array $policy = [], $nested = true);
+    public static function toArrays(
+        array $entities,
+        Policy\Interfaces\Policy $policy = null,
+        AnnotationReader $ar = null,
+        PolicyResolver $pr = null
+    );
 }

@@ -9,5 +9,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * @see http://www.iso.org/iso/catalogue_detail?csnumber=40874
  * Note: ITransformable always works in UTC timezone.
  * @ORM\Annotation */
-class KeepDateTime implements Interfaces\KeepDateTimeTo {
+class KeepDateTime
+    extends \ScorpioT1000\OTR\Annotations\Annotation
+    implements Interfaces\KeepDateTimeTo {
 }

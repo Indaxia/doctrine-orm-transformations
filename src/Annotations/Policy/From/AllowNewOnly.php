@@ -8,5 +8,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * @see DenyUnset
  * @see DenyUpdate
  * @ORM\Annotation */
-class AllowNewOnly implements Interfaces\DenyUnsetFrom, Interfaces\DenyUpdateFrom {
+class AllowNewOnly
+    extends \ScorpioT1000\OTR\Annotations\Annotation
+    implements Interfaces\DenyUnsetFrom, Interfaces\DenyUpdateFrom {
 }

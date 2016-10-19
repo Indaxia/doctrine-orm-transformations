@@ -9,5 +9,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * It's applicable to Collection too.
  * It's applicable to scalar fields: it denies to clear the value if it's is set.
  * @ORM\Annotation */
-class DenyUnset implements Interfaces\DenyUnsetFrom {
+class DenyUnset
+    extends \ScorpioT1000\OTR\Annotations\Annotation
+    implements Interfaces\DenyUnsetFrom {
 }

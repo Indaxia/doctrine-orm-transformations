@@ -9,5 +9,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * Global policy: the same behaviour when field isn't specified.
  * Local policy: overrides and ignores all the global policy parameters. 
  * @ORM\Annotation */
-class Auto implements \ScorpioT1000\OTR\Annotations\IPolicy {
+class Auto
+    extends \ScorpioT1000\OTR\Annotations\Annotation
+    implements Interfaces\Auto {
 }

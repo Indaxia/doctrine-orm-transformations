@@ -8,27 +8,33 @@ use \Doctrine\ORM\Mapping\ManyToMany;
 use \Doctrine\ORM\Mapping\OneToOne;
 use \Doctrine\ORM\Mapping\OneToMany;
 use \ScorpioT1000\OTR\Exceptions\FromArrayException;
-use \ScorpioT1000\OTR\Policy;
+use \ScorpioT1000\OTR\Annotations\Policy\Interfaces as PI;
+use \ScorpioT1000\OTR\Annotations\PolicyResolver;
 
 /* Implements Entity Transformations methods
  * @see ITransformable */
 trait Transformable {
     /** @see ITransformable::toArray() */
-    public function toArray($policy = [], $nested = true, AnnotationReader $ar = null) {
+    public function toArray(
+        Policy\Interfaces\Policy $policy = null,
+        AnnotationReader $ar = null,
+        PolicyResolver $pr = null
+    ) {
         $refClass = new \ReflectionClass(get_class($this));
         $result = ['_meta' => ['class' => static::getEntityFullName($refClass)]];
-        if(! is_array($policy)) { $policy = []; }
+        if(! $policy) { $policy = new \ScorpioT1000\OTR\Annotations\Policy\Auto(); }
         $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
                                        | \ReflectionProperty::IS_PROTECTED
                                        | \ReflectionProperty::IS_PRIVATE);
         if(!$ar) { $ar = new AnnotationReader(); }
+        if(!$pr) { $pr = new PolicyResolver(); }
         foreach($ps as $p) {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
             if($pn[0] === '_' && $pn[1] === '_') { continue; }
-            $subPolicy = isset($policy[$pn]) ? $policy[$pn] : Policy::Auto;
-            if($subPolicy & Policy::Skip) { continue; }
-            $result[$pn] = $this->toArrayProperty($p, $pn, $subPolicy, $nested, $ar, $refClass);
+            $propertyPolicy = $pr->resolve(isset($policy->nested[$pn]) ? $policy->nested[$pn] : null);
+            if($subPolicy instanceof PI\SkipTo) { continue; }
+            $result[$pn] = $this->toArrayProperty($p, $pn, $propertyPolicy, $nested, $ar, $refClass);
         }
         return $result;
     }
@@ -42,14 +48,14 @@ trait Transformable {
                 case 'time':
                 case 'datetime':
                 case 'detetimez':
-                    if($v !== null && !($policy & Policy::KeepDateTime)) {
+                    if($v !== null && ($policy instanceof PI\KeepDateTimeTo))) {
                         return $v->format('Y-m-d\TH:i:s').'.000Z';
                     }
                     break;
             }
             return $v;
         } else if($association = static::getPropertyAssociation($p, $ar)) { // entity or collection
-            if(!$nested || ($policy & Policy::DontFetch)) {
+            if(!$nested) {
                 return $this->$pn;
             }
             $result = null;
@@ -77,15 +83,17 @@ trait Transformable {
     public function fromArray(
         array $src,
         EntityManagerInterface $entityManager,
-        $policy = [],
-        AnnotationReader $ar = null
+        Policy\Interfaces\Policy $policy = null,
+        AnnotationReader $ar = null,
+        PolicyResolver $pr = null
     ) {
         $refClass = new \ReflectionClass(get_class($this));
-        if(! is_array($policy)) { $policy = []; }
+        if(!$policy) { $policy = new \ScorpioT1000\OTR\Annotations\Policy\Auto(); }
         $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
                                        | \ReflectionProperty::IS_PROTECTED
                                        | \ReflectionProperty::IS_PRIVATE);
         if(!$ar) { $ar = new AnnotationReader(); }
+        if(!$pr) { $pr = new PolicyResolver(); }
         foreach($ps as $p) {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
@@ -276,9 +284,16 @@ trait Transformable {
     }
     
     /** @see ITransformable::toArrays() */
-    public static function toArrays(array $entities, array $policy = [], $nested = true) {
+    public static function toArrays(
+        array $entities,
+        Policy\Interfaces\Policy $policy = null,
+        AnnotationReader $ar = null,
+        PolicyResolver $pr = null
+    ) {
+        if(!$ar) { $ar = new AnnotationReader(); }
+        if(!$pr) { $ar = new PolicyResolver(); }
         $arrays = [];
-        foreach($entities as $e) { $arrays[] = $e->toArray($policy, $nested); }
+        foreach($entities as $e) { $arrays[] = $e->toArray($policy, $ar, $pr); }
         return $arrays;
     }
 }
