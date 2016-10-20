@@ -8,8 +8,7 @@ use \ScorpioT1000\OTR\Exceptions\PolicyException;
 class PolicyResolver {
     public $resolved;
     
-    /**
-     * @param Policy\Interfaces\Policy|null $policy
+    /** @param Policy\Interfaces\Policy|null $policy
      * @param \ReflectionProperty $p
      * @param AnnotationReader $ar
      * @return PI\Policy */
