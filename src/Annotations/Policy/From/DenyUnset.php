@@ -12,4 +12,6 @@ use \Doctrine\ORM\Mapping as ORM;
 class DenyUnset
     extends \ScorpioT1000\OTR\Annotations\Annotation
     implements Interfaces\DenyUnsetFrom {
+
+    public $priority = 0.100;
 }

@@ -14,4 +14,6 @@ class Skip
     public function inside($policy = []) {
         throw new \ScorpioT1000\OTR\Exceptions\PolicyException("Policy\\From\\Skip cannot contain policies");
     }
+
+    public $priority = 0.9;
 }

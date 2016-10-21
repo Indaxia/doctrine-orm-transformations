@@ -7,8 +7,8 @@ use \Doctrine\ORM\Mapping\ManyToOne;
 use \Doctrine\ORM\Mapping\ManyToMany;
 use \Doctrine\ORM\Mapping\OneToOne;
 use \Doctrine\ORM\Mapping\OneToMany;
-use \ScorpioT1000\OTR\Exceptions\FromArrayException;
-use \ScorpioT1000\OTR\Annotations\Policy\Interfaces as PI;
+use \ScorpioT1000\OTR\Exceptions;
+use \ScorpioT1000\OTR\Annotations\Policy;
 use \ScorpioT1000\OTR\Annotations\PolicyResolver;
 
 /* Implements Entity Transformations methods
@@ -20,26 +20,25 @@ trait Transformable {
         AnnotationReader $ar = null,
         PolicyResolver $pr = null
     ) {
-        $refClass = new \ReflectionClass(get_class($this));
         $result = ['_meta' => ['class' => static::getEntityFullName($refClass)]];
-        if(! $policy) { $policy = new \ScorpioT1000\OTR\Annotations\Policy\Auto(); }
+        if(!$ar) { $ar = new AnnotationReader(); }
+        if(!$pr) { $pr = new PolicyResolver(); }
+        $refClass = new \ReflectionClass(get_class($this));
         $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
                                        | \ReflectionProperty::IS_PROTECTED
                                        | \ReflectionProperty::IS_PRIVATE);
-        if(!$ar) { $ar = new AnnotationReader(); }
-        if(!$pr) { $pr = new PolicyResolver(); }
         foreach($ps as $p) {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
             if($pn[0] === '_' && $pn[1] === '_') { continue; }
-            $propertyPolicy = $pr->resolve(isset($policy->nested[$pn]) ? $policy->nested[$pn] : null);
-            if($subPolicy instanceof PI\SkipTo) { continue; }
-            $result[$pn] = $this->toArrayProperty($p, $pn, $propertyPolicy, $nested, $ar, $refClass);
+            $propertyPolicy = $pr->resolvePropertyPolicy($policy, $pn, $p, $ar);
+            if($propertyPolicy instanceof Policy\Interfaces\SkipTo) { continue; }
+            $result[$pn] = $this->toArrayProperty($p, $pn, $propertyPolicy, $ar, $refClass);
         }
         return $result;
     }
     
-    protected function toArrayProperty($p, $pn, $policy, $nested, AnnotationReader $ar, \ReflectionClass $headRefClass) {
+    protected function toArrayProperty($p, $pn, $policy, AnnotationReader $ar, \ReflectionClass $headRefClass) {
         $getter = 'get'.ucfirst($pn);
         if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
             $v = $this->$getter();
@@ -48,9 +47,13 @@ trait Transformable {
                 case 'time':
                 case 'datetime':
                 case 'detetimez':
-                    if($v !== null && ($policy instanceof PI\KeepDateTimeTo))) {
-                        return $v->format('Y-m-d\TH:i:s').'.000Z';
-                    }
+                    if($v !== null) {
+                        if($policy instanceof Policy\Interfaces\KeepDateTimeTo) {
+                            return $v->format('Y-m-d\TH:i:s').'.000Z';
+                        } else if($policy instanceof Policy\Interfaces\FormatDateTimeTo) {
+                            $r = $v->format($policy->format);
+                            if($r === false) { throw new Exceptions\PolicyException('Wrong DateTime format for field "'.$pn.'"'); }
+                        }
                     break;
             }
             return $v;
@@ -67,12 +70,24 @@ trait Transformable {
                                        'association' => 'ManyToMany'], 'collection' => []];
             } else { // single entity
                 $result = $this->$getter();
-                if($result) { $result = $result->toArray($policy, true, $ar); }
+                if($result) { $result = $result->toArray($policy, $ar, $pr); }
                 return $result;
             }
             $collection = $this->$getter(); // entity collection
-            foreach($collection as $el) {
-                $result['collection'][] = $el->toArray($policy, true, $ar);
+            if($collection->count()) {
+                if($policy instanceof Policy\Interfaces\FetchPaginateTo) {
+                    if($policy->reverse) {
+                        $offset = $collection->count() - $policy->limit - $policy->offset;
+                        if($offset < 0) { $offset = 0; }
+                        $limit = ($collection->count() > $policy->limit) ? $collection->count() : $policy->limit;
+                        $collection = $collection->slice($offset, $limit);
+                    } else {
+                        $collection = $collection->slice($policy->offset, $policy->limit);
+                    }
+                }
+                foreach($collection as $el) {
+                    $result['collection'][] = $el->toArray($policy, $ar, $pr);
+                }
             }
             return $result;
         }
@@ -87,20 +102,19 @@ trait Transformable {
         AnnotationReader $ar = null,
         PolicyResolver $pr = null
     ) {
+        if(!$ar) { $ar = new AnnotationReader(); }
+        if(!$pr) { $pr = new PolicyResolver(); }
         $refClass = new \ReflectionClass(get_class($this));
-        if(!$policy) { $policy = new \ScorpioT1000\OTR\Annotations\Policy\Auto(); }
         $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
                                        | \ReflectionProperty::IS_PROTECTED
                                        | \ReflectionProperty::IS_PRIVATE);
-        if(!$ar) { $ar = new AnnotationReader(); }
-        if(!$pr) { $pr = new PolicyResolver(); }
         foreach($ps as $p) {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
             if(!isset($src[$pn]) || ($pn[0] === '_' && $pn[1] === '_')) { continue; }
-            $subPolicy = isset($policy[$pn]) ? $policy[$pn] : Policy::Auto;
-            if($subPolicy & Policy::Skip) { continue; }
-            $this->fromArrayProperty($src[$pn], $p, $pn, $subPolicy, $ar, $entityManager, $refClass);
+            $propertyPolicy = $pr->resolveTo($pr->getChildPolicy($policy, $pn), $p, $ar);
+            if($propertyPolicy instanceof Policy\Interfaces\SkipFrom) { continue; }
+            $this->fromArrayProperty($src[$pn], $p, $pn, $propertyPolicy, $ar, $entityManager, $refClass);
         }
     }
     
@@ -113,11 +127,29 @@ trait Transformable {
                                          EntityManagerInterface $em,
                                          \ReflectionClass $refClass) {
         $setter = 'set'.ucfirst($pn);
+        $getter = 'get'.ucfirst($pn);
         if($id = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Id')) {
             // Skip id, it will be processed in the next steps
         } else if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
             if($v === null && $column->nullable) {
+                if($policy instanceof Policy\Interfaces\DenyUnsetFrom && $this->$pn)
+                { // cannot unset the existing value with this policy
+                    return;
+                }
                 $this->$setter(null);
+                return;
+            }
+            if($policy instanceof Policy\Interfaces\DenyNewFrom) {
+                if((in_array($column->type, ['integer', 'smallint', 'bigint', 'float', 'decimal'])
+                    && ($v !== null) && ($this->$pn === null)) // numbers can never be "empty": applicable for nullable only
+                   || ($v && !$this->$pn)) {
+                    return;
+                }
+            }
+            if($policy instanceof Policy\Interfaces\DenyUpdateFrom
+                && (($v && $this->$pn)
+                    || in_array($column->type, ['integer', 'smallint', 'bigint', 'float', 'decimal'])))
+            {  // numbers can never be "empty" so they are always denied with this policy
                 return;
             }
             switch($column->type) {
@@ -153,7 +185,7 @@ trait Transformable {
                     if(is_integer($v) || is_double($v)) { $this->$setter($v); return; } break;
                 case 'object':
                 case 'array':
-                    throw new FromArrayException('Column type "'.$column->type.'" is disabled due to CVE-2015-0231');
+                    throw new Exceptions\FromArrayException('Column type "'.$column->type.'" is disabled due to CVE-2015-0231');
                 case 'date':
                 case 'time':
                 case 'datetime':
@@ -164,19 +196,19 @@ trait Transformable {
                             $v = \DateTime::createFromFormat('Y-m-d\TH:i:s+', $v, new \DateTimeZone('UTC'));
                         }
                         if(! $v instanceof \DateTime) {
-                            throw new FromArrayException('Field "'.$pn.'" must be an ISO8601 string'.($column->nullable ? ' or null' : ''));
+                            throw new Exceptions\FromArrayException('Field "'.$pn.'" must be an ISO8601 string'.($column->nullable ? ' or null' : ''));
                         }
                     } else if($column->nullable) {
                         $v = null;
                     } else {
-                        throw new FromArrayException('Field "'.$pn.'" must be an ISO8601 string');
+                        throw new Exceptions\FromArrayException('Field "'.$pn.'" must be an ISO8601 string');
                     }
                     $this->$setter($v);
                     return;
             }
-            throw new FromArrayException('Field "'.$pn.'" must be a type of "'.$column->type.'"');
+            throw new Exceptions\FromArrayException('Field "'.$pn.'" must be a type of "'.$column->type.'"');
         } else if($association = static::getPropertyAssociation($p, $ar)) { // entity or collection
-            $this->fromArrayRelation($v, $p, $pn, $setter, $association, $policy, $ar, $em, $refClass);   
+            $this->fromArrayRelation($v, $p, $pn, $getter, $setter, $association, $policy, $ar, $em, $refClass);   
         }
     }
     
@@ -187,14 +219,17 @@ trait Transformable {
      * 4. Sub-entity as null value
      * 5. Sub-collection with some entities (some new, some existent)
      * 6. Sub-collection with no entities */
-    protected function fromArrayRelation($v, $p, $pn, $setter,
+    protected function fromArrayRelation($v, $p, $pn, $getter, $setter,
                                                 $association, $policy,
                                                 AnnotationReader $ar,
                                                 EntityManagerInterface $em,
                                                 \ReflectionClass $refClass) {
         if($v === null) { // Sub-entity as null value
             if($association instanceof OneToMany || $association instanceof ManyToMany) {
-                throw new FromArrayException('Field "'.$pn.'" must be a Collection');
+                throw new Exceptions\FromArrayException('Field "'.$pn.'" must be a Collection');
+            } else if($policy instanceof Policy\Interfaces\DenyUnsetFrom
+                      && ($this->$getter() !== null)) { // cannot unset Entity with this policy
+                return;
             }
             $this->$setter(null);
         }
@@ -202,7 +237,7 @@ trait Transformable {
             $idField = 'id';
             $class = static::getEntityFullName($refClass, $association->targetEntity);
             if(!is_subclass_of($class, 'ScorpioT1000\OTR\ITransformable')) {
-                throw new FromArrayException('Entity "'.$class.'" must implement ITransformable interface');
+                throw new Exceptions\FromArrayException('Entity "'.$class.'" must implement ITransformable interface');
             }
             
             if($association instanceof OneToOne || $association instanceof ManyToOne)
@@ -253,7 +288,7 @@ trait Transformable {
         } else if($policy & Policy::DontFetch) { // don't process entity for this policy
             return;
         }
-        throw new FromArrayException('Field "'.$pn.'" must be an Entity representation or contain "collection" field');
+        throw new Exceptions\FromArrayException('Field "'.$pn.'" must be an Entity representation or contain "collection" field');
     }
     
     /** @return Annotation|null returns null if its inversed side of bidirectional relation */
@@ -293,7 +328,7 @@ trait Transformable {
         if(!$ar) { $ar = new AnnotationReader(); }
         if(!$pr) { $ar = new PolicyResolver(); }
         $arrays = [];
-        foreach($entities as $e) { $arrays[] = $e->toArray($policy, $ar, $pr); }
+        foreach($entities as $e) { $arrays[] = $e->toArray($policy, null, $ar, $pr); }
         return $arrays;
     }
 }

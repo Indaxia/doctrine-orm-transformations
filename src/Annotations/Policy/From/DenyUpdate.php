@@ -8,8 +8,11 @@ use \Doctrine\ORM\Mapping as ORM;
  * Don't update the existent sub-Entity when it needed, skip instead in ITransformabe::fromArray.
  * It's applicable to Collection too.
  * It's applicable to scalar fields: it denies to change the  new value if the value is already set.
+ * It's applicable to numbers even when numbers are 0, 0.0, "0.0" etc.
  * @ORM\Annotation */
 class DenyUpdate
     extends \ScorpioT1000\OTR\Annotations\Annotation
     implements Interfaces\DenyUpdateFrom {
+
+    public $priority = 0.100;
 }
