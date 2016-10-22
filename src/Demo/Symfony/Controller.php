@@ -10,7 +10,7 @@ use \Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 use \ScorpioT1000\OTR\ITransformable;
 use \ScorpioT1000\OTR\Traits\Transformable;
-use \ScorpioT1000\OTR\Annotations\Policy;
+use \ScorpioT1000\OTR\Policy;
 
 use \ScorpioT1000\OTR\Demo\Entity\THead;
 use \ScorpioT1000\OTR\Demo\Entity\TSub;
@@ -21,7 +21,7 @@ class Controller extends SymfonyController
     /**
      * @Route("/to-array")
      */
-    public function toArrayAction() {        
+    public function toarrayAction() {        
         $th = new THead();
         for($i=0; $i<5; ++$i) { $th->getMany2many()->add(new TSubCol()); }
         $ts = new TSub();
@@ -31,15 +31,14 @@ class Controller extends SymfonyController
         
         $this->getEM()->persist($th);
         $this->getEM()->flush();
-        $pr = new Policy\PolicyResolverProfiler();
-        $arr = $th->toArray(null, null, $pr);
-        return $this->success(['result' => $arr, 'profiler' => $pr->results);
+        
+        return $this->success($th->toArray());
     }
     
     /**
      * @Route("/from-array")
      */
-    public function fromArrayAction() {
+    public function fromarrayAction() {
         try {
             $data = $this->getRequestContentJson();
 
@@ -51,23 +50,14 @@ class Controller extends SymfonyController
                 $th = new THead();
             }
         
-            $pr = new Policy\PolicyResolverProfiler();
-            $th->fromArray($data, $this->getEM(), null, null, $pr);
+            $th->fromArray($data, $this->getEM());
             $this->getEM()->persist($th);
             $this->getEM()->flush();
-            $arr = $th->toArray();
         } catch(\Exception $e) {
             return $this->fail($e->getMessage());
         }
         
-        return $this->success(['result' => $arr, 'profiler' => $pr->results);
-    }
-    
-    /**
-     * @Route("/to-array-global-policy")
-     */
-    public function toArrayGlobalPolicyAction() {
-        
+        return $this->success($th->toArray());
     }
     
     
@@ -97,7 +87,7 @@ class Controller extends SymfonyController
     }
     
     /** @return \Doctrine\ORM\EntityRepository */
-    public function getRepository($name, $ns = "ScorpioT1000\\Doctrine\\ORM\\Transformations\\Demo\\Entity") {
+    public function getRepository($name, $ns = "ScorpioT1000\\OTR\\Demo\\Entity") {
         return $this->getEM()->getRepository($ns.$name);
     }
 }
