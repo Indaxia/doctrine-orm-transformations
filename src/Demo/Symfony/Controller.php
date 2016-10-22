@@ -37,10 +37,11 @@ class Controller extends SymfonyController
             $this->getEM()->flush();
             $pr = new PolicyResolverProfiler();
             $arr = $th->toArray(null, null, $pr);
+            
+            return $this->success(['result' => $arr, 'profiler' => $pr->results]);
         } catch(\Exception $e) {
             return $this->fail($e->getMessage());
         }
-        return $this->success(['result' => $arr, 'profiler' => $pr->results]);
     }
     
     /**
@@ -63,11 +64,12 @@ class Controller extends SymfonyController
             $this->getEM()->persist($th);
             $this->getEM()->flush();
             $arr = $th->toArray();
+            
+            return $this->success(['result' => $arr, 'profiler' => $pr->results]);
         } catch(\Exception $e) {
             return $this->fail($e->getMessage());
         }
         
-        return $this->success(['result' => $arr, 'profiler' => $pr->results]);
     }
     
     /**
@@ -80,10 +82,11 @@ class Controller extends SymfonyController
             $this->getEM()->flush();
             $pr = new PolicyResolverProfiler();
             $arr = $wp->toArray(null, null, $pr);
+            
+            return $this->success(['result' => $arr, 'profiler' => $pr->results]);
         } catch(\Exception $e) {
             return $this->fail($e->getMessage());
         }
-        return $this->success(['result' => $arr, 'profiler' => $pr->results]);
     }
     
     
