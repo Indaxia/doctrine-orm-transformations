@@ -10,7 +10,7 @@ use \Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 use \ScorpioT1000\OTR\ITransformable;
 use \ScorpioT1000\OTR\Traits\Transformable;
-use \ScorpioT1000\OTR\Policy;
+use \ScorpioT1000\OTR\Annotations\Policy;
 
 use \ScorpioT1000\OTR\Demo\Entity\THead;
 use \ScorpioT1000\OTR\Demo\Entity\TSub;
@@ -31,8 +31,9 @@ class Controller extends SymfonyController
         
         $this->getEM()->persist($th);
         $this->getEM()->flush();
-        
-        return $this->success($th->toArray());
+        $pr = new Policy\PolicyResolverProfiler();
+        $arr = $th->toArray(null, null, $pr);
+        return $this->success(['result' => $arr, 'profiler' => $pr->results);
     }
     
     /**
@@ -50,14 +51,16 @@ class Controller extends SymfonyController
                 $th = new THead();
             }
         
-            $th->fromArray($data, $this->getEM());
+            $pr = new Policy\PolicyResolverProfiler();
+            $th->fromArray($data, $this->getEM(), null, null, $pr);
             $this->getEM()->persist($th);
             $this->getEM()->flush();
+            $arr = $th->toArray();
         } catch(\Exception $e) {
             return $this->fail($e->getMessage());
         }
         
-        return $this->success($th->toArray());
+        return $this->success(['result' => $arr, 'profiler' => $pr->results);
     }
     
     

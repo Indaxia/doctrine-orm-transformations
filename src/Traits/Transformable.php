@@ -31,7 +31,7 @@ trait Transformable {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
             if($pn[0] === '_' && $pn[1] === '_') { continue; }
-            $propertyPolicy = $pr->resolvePropertyPolicy($policy, $pn, $p, $ar);
+            $propertyPolicy = $pr->resolvePropertyPolicyTo($policy, $pn, $p, $ar);
             if($propertyPolicy instanceof Policy\Interfaces\SkipTo) { continue; }
             $result[$pn] = $this->toArrayProperty($p, $pn, $propertyPolicy, $ar, $refClass);
         }
@@ -112,9 +112,9 @@ trait Transformable {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
             if(!isset($src[$pn]) || ($pn[0] === '_' && $pn[1] === '_')) { continue; }
-            $propertyPolicy = $pr->resolveTo($pr->getChildPolicy($policy, $pn), $p, $ar);
+            $propertyPolicy = $pr->resolvePropertyPolicyFrom($policy, $pn, $p, $ar);
             if($propertyPolicy instanceof Policy\Interfaces\SkipFrom) { continue; }
-            $this->fromArrayProperty($src[$pn], $p, $pn, $propertyPolicy, $ar, $entityManager, $refClass);
+            $this->fromArrayProperty($src[$pn], $p, $pn, $propertyPolicy, $ar, $pr, $entityManager, $refClass);
         }
     }
     
@@ -124,6 +124,7 @@ trait Transformable {
      * 3. Relation property */
     protected function fromArrayProperty($v, $p, $pn, $policy,
                                          AnnotationReader $ar,
+                                         PolicyResolver $pr,
                                          EntityManagerInterface $em,
                                          \ReflectionClass $refClass) {
         $setter = 'set'.ucfirst($pn);
@@ -132,7 +133,7 @@ trait Transformable {
             // Skip id, it will be processed in the next steps
         } else if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
             if($v === null && $column->nullable) {
-                if($policy instanceof Policy\Interfaces\DenyUnsetFrom && $this->$pn)
+                if($policy instanceof Policy\Interfaces\DenyUnsetFrom && $this->$getter())
                 { // cannot unset the existing value with this policy
                     return;
                 }
@@ -141,16 +142,20 @@ trait Transformable {
             }
             if($policy instanceof Policy\Interfaces\DenyNewFrom) {
                 if((in_array($column->type, ['integer', 'smallint', 'bigint', 'float', 'decimal'])
-                    && ($v !== null) && ($this->$pn === null)) // numbers can never be "empty": applicable for nullable only
-                   || ($v && !$this->$pn)) {
+                    && ($v !== null) && ($this->$getter() === null)) // numbers can never be "empty": applicable for nullable only
+                   || ($v && !$this->$getter())) {
                     return;
                 }
             }
             if($policy instanceof Policy\Interfaces\DenyUpdateFrom
-                && (($v && $this->$pn)
+                && (($v && $this->$getter())
                     || in_array($column->type, ['integer', 'smallint', 'bigint', 'float', 'decimal'])))
             {  // numbers can never be "empty" so they are always denied with this policy
                 return;
+            }
+            
+            if($policy instanceof Policy\Interfaces\CustomFrom) {
+                if(! $policy->$closure($v, $this->$getter(), $em, $pn)) { return; }
             }
             switch($column->type) {
                 case 'string':
@@ -208,20 +213,20 @@ trait Transformable {
             }
             throw new Exceptions\FromArrayException('Field "'.$pn.'" must be a type of "'.$column->type.'"');
         } else if($association = static::getPropertyAssociation($p, $ar)) { // entity or collection
-            $this->fromArrayRelation($v, $p, $pn, $getter, $setter, $association, $policy, $ar, $em, $refClass);   
+            $this->fromArrayRelation($v, $p, $pn, $getter, $setter, $association, $policy, $ar, $pr, $em, $refClass);   
         }
     }
     
-    /** Here we have 6 cases:
+    /** Here we have 5 cases:
      * 1. Sub-entity with empty id (new)
      * 2. Sub-entity with non-empty id (existent)
-     * 3. Sub-entity as id based on Policy::DontFetch
-     * 4. Sub-entity as null value
-     * 5. Sub-collection with some entities (some new, some existent)
-     * 6. Sub-collection with no entities */
+     * 3. Sub-entity as null value
+     * 4. Sub-collection with some entities (some new, some existent)
+     * 5. Sub-collection with no entities */
     protected function fromArrayRelation($v, $p, $pn, $getter, $setter,
                                                 $association, $policy,
                                                 AnnotationReader $ar,
+                                                PolicyResolver $pr,
                                                 EntityManagerInterface $em,
                                                 \ReflectionClass $refClass) {
         if($v === null) { // Sub-entity as null value
@@ -247,13 +252,17 @@ trait Transformable {
                                 
                 $subEntity = null;
                 if(empty($v[$idField])) { // Sub-entity with empty id (new)
-                    if(is_int($policy) && ($policy & Policy::DontConstuct)) { return; }
+                    if($policy instanceof Policy\Interfaces\DenyNewFrom) { return; }
                     $subEntity = new $class();
                 } else { // Sub-entity with non-empty id (existent)
+                    if($policy instanceof Policy\Interfaces\DenyUpdateFrom) { return; }
                     $subEntity = $em->getReference($class, $v[$idField]);
                 }
                 if($subEntity) {
-                    $subEntity->fromArray($v, $em, $policy, $ar);
+                    $subEntity->fromArray($v, $em, $policy, $ar, $pr);
+                }
+                if($policy instanceof Policy\Interfaces\Custom) {
+                    if(! $policy->$closure($subEntity, $this->$getter(), $em, $pn)) { return; }
                 }
                 $this->$setter($subEntity);
                 return;
@@ -269,20 +278,52 @@ trait Transformable {
                         $idField = $ijc->referencedColumnName;
                     }
                 }
-                $dontConstruct = is_int($policy) && ($policy & Policy::DontConstuct);
-                foreach($v['collection'] as $e) {
-                    if(empty($e[$idField])) { // Sub-entity with empty id (new)
-                        if($dontConstruct) { continue; }
+                
+                $newEntities = [];
+                $existentRaw = [];
+                foreach($v['collection'] as $e) { // find new entities
+                    if(empty($e[$idField])) { // new
+                        if($policy instanceof Policy\Interfaces\DenyNewFrom) { continue; }
                         $subEntity = new $class();
-                    } else { // Sub-entity with non-empty id (existent)
-                        $subEntity = $em->getReference($class, $e[$idField]);
+                        $subEntity->fromArray($v, $em, $policy, $ar, $pr);
+                        if($policy instanceof Policy\Interfaces\Custom) {
+                            if(! $policy->$closure($subEntity, null, $em, $pn)) { continue; }
+                        }
+                        $newEntities[] = $subEntity;
+                    } else {
+                        $existentRaw[$e[$idField]] = $e;
                     }
-                    if($subEntity) {
-                        $subEntity->fromArray($v, $em, $policy, $ar);
-                    }
-                    $values[] = $subEntity;
                 }
-                $this->$setter(new \Doctrine\Common\Collections\ArrayCollection($values));
+                
+                
+                $collection = $this->$getter();
+                if(! $collection instanceof \Doctrine\Common\Collections\Collection) {
+                    throw new Exceptions\FromArrayException('Method "'.$getter.'" of the field "'.$pn.'" doesn\'t return Collection');
+                }
+                $idGetter = 'get'.ucfirst($idField);                
+                foreach($collection as $index => $e) {
+                    $id = $e->$idGetter();
+                    $existent = isset($existentRaw[$id]) ? $existentRaw[$id] : null;
+                    if($existent) { // update
+                        if(!$policy instanceof Policy\Interfaces\DenyUpdateFrom) {
+                            if($policy instanceof Policy\Interfaces\Custom) {
+                                if(! $policy->$closure($existent, $e, $em, $pn)) { continue; }
+                            }
+                            $e->fromArray($existent, $em, $policy, $ar, $pr);
+                        }
+                    } else { // doesn't exists in source, unset
+                        if(!$policy instanceof Policy\Interfaces\DenyUnsetFrom) {
+                            if($policy instanceof Policy\Interfaces\Custom) {
+                                if(! $policy->$closure(null, $e, $em, $pn)) { continue; }
+                            }
+                            $collection->remove($index);
+                        }
+                    }
+                }
+                
+                foreach($newEntities as $e) { // insert all new
+                    $collection->add($e);
+                }
                 return;
             }
         } else if($policy & Policy::DontFetch) { // don't process entity for this policy

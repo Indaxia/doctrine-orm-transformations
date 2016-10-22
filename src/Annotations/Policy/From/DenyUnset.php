@@ -6,8 +6,9 @@ use \Doctrine\ORM\Mapping as ORM;
 
 /** ITransformable policy.
  * Don't delete the existent sub-Entity when it needed, skip instead in ITransformabe::fromArray.
- * It's applicable to Collection too.
- * It's applicable to scalar fields: it denies to clear the value if it's is set.
+ * It's applicable to Collection too, but it works really slow when "fetch" option is set to "LAZY".
+ *      Use fetch options "EAGER" or "EXTRA_LAZY" instead.
+ * It's applicable to scalar fields: it denies to clear the value if it is set.
  * @ORM\Annotation */
 class DenyUnset
     extends \ScorpioT1000\OTR\Annotations\Annotation

@@ -10,10 +10,9 @@ use \Doctrine\ORM\Mapping as ORM;
  * Global policy: the same behaviour when field isn't specified.
  * Local policy: overrides and ignores all the global policy parameters. 
  * @ORM\Annotation */
-class Aotu
+class Auto
     extends \ScorpioT1000\OTR\Annotations\Annotation
     implements Interfaces\AutoFrom
-{        
-
+{
     public $priority = 0.0001;
 }
