@@ -21,7 +21,7 @@ class Controller extends SymfonyController
     /**
      * @Route("/to-array")
      */
-    public function toarrayAction() {        
+    public function toArrayAction() {        
         $th = new THead();
         for($i=0; $i<5; ++$i) { $th->getMany2many()->add(new TSubCol()); }
         $ts = new TSub();
@@ -39,7 +39,7 @@ class Controller extends SymfonyController
     /**
      * @Route("/from-array")
      */
-    public function fromarrayAction() {
+    public function fromArrayAction() {
         try {
             $data = $this->getRequestContentJson();
 
@@ -61,6 +61,13 @@ class Controller extends SymfonyController
         }
         
         return $this->success(['result' => $arr, 'profiler' => $pr->results);
+    }
+    
+    /**
+     * @Route("/to-array-global-policy")
+     */
+    public function toArrayGlobalPolicyAction() {
+        
     }
     
     
