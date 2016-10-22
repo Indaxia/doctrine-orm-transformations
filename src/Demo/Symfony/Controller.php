@@ -10,35 +10,43 @@ use \Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 use \ScorpioT1000\OTR\ITransformable;
 use \ScorpioT1000\OTR\Traits\Transformable;
-use \ScorpioT1000\OTR\Policy;
+use \ScorpioT1000\OTR\Annotations\Policy;
+use \ScorpioT1000\OTR\Annotations\PolicyResolver;
+use \ScorpioT1000\OTR\Annotations\PolicyResolverProfiler;
 
 use \ScorpioT1000\OTR\Demo\Entity\THead;
 use \ScorpioT1000\OTR\Demo\Entity\TSub;
 use \ScorpioT1000\OTR\Demo\Entity\TSubCol;
+use \ScorpioT1000\OTR\Demo\Entity\WithPolicy;
 
 class Controller extends SymfonyController
 {
     /**
      * @Route("/to-array")
      */
-    public function toarrayAction() {        
-        $th = new THead();
-        for($i=0; $i<5; ++$i) { $th->getMany2many()->add(new TSubCol()); }
-        $ts = new TSub();
-        for($i=0; $i<2; ++$i) { $ts->getOne2many()->add(new TSubCol()); }
-        $th->setMany2one($ts);
-        $th->setOne2one(new TSub());
-        
-        $this->getEM()->persist($th);
-        $this->getEM()->flush();
-        
-        return $this->success($th->toArray());
+    public function toArrayAction() {
+        try {
+            $th = new THead();
+            for($i=0; $i<5; ++$i) { $th->getMany2many()->add(new TSubCol()); }
+            $ts = new TSub();
+            for($i=0; $i<2; ++$i) { $ts->getOne2many()->add(new TSubCol()); }
+            $th->setMany2one($ts);
+            $th->setOne2one(new TSub());
+            
+            $this->getEM()->persist($th);
+            $this->getEM()->flush();
+            $pr = new PolicyResolverProfiler();
+            $arr = $th->toArray(null, null, $pr);
+        } catch(\Exception $e) {
+            return $this->fail($e->getMessage());
+        }
+        return $this->success(['result' => $arr, 'profiler' => $pr->results]);
     }
     
     /**
      * @Route("/from-array")
      */
-    public function fromarrayAction() {
+    public function fromArrayAction() {
         try {
             $data = $this->getRequestContentJson();
 
@@ -50,14 +58,32 @@ class Controller extends SymfonyController
                 $th = new THead();
             }
         
-            $th->fromArray($data, $this->getEM());
+            $pr = new PolicyResolverProfiler();
+            $th->fromArray($data, $this->getEM(), null, null, $pr);
             $this->getEM()->persist($th);
             $this->getEM()->flush();
+            $arr = $th->toArray();
         } catch(\Exception $e) {
             return $this->fail($e->getMessage());
         }
         
-        return $this->success($th->toArray());
+        return $this->success(['result' => $arr, 'profiler' => $pr->results]);
+    }
+    
+    /**
+     * @Route("/to-array-global-policy")
+     */
+    public function toArrayGlobalPolicyAction() {
+        try {
+            $wp = new WithPolicy();
+            $this->getEM()->persist($wp);
+            $this->getEM()->flush();
+            $pr = new PolicyResolverProfiler();
+            $arr = $wp->toArray(null, null, $pr);
+        } catch(\Exception $e) {
+            return $this->fail($e->getMessage());
+        }
+        return $this->success(['result' => $arr, 'profiler' => $pr->results]);
     }
     
     

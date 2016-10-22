@@ -20,10 +20,10 @@ trait Transformable {
         AnnotationReader $ar = null,
         PolicyResolver $pr = null
     ) {
-        $result = ['_meta' => ['class' => static::getEntityFullName($refClass)]];
         if(!$ar) { $ar = new AnnotationReader(); }
         if(!$pr) { $pr = new PolicyResolver(); }
         $refClass = new \ReflectionClass(get_class($this));
+        $result = ['_meta' => ['class' => static::getEntityFullName($refClass)]];
         $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
                                        | \ReflectionProperty::IS_PROTECTED
                                        | \ReflectionProperty::IS_PRIVATE);
@@ -54,6 +54,7 @@ trait Transformable {
                             $r = $v->format($policy->format);
                             if($r === false) { throw new Exceptions\PolicyException('Wrong DateTime format for field "'.$pn.'"'); }
                         }
+                    }
                     break;
             }
             return $v;

@@ -1,5 +1,5 @@
 <?php
-namespace ScorpioT1000\OTR\Annotaions;
+namespace ScorpioT1000\OTR\Annotations;
 
 abstract class Annotation extends \Doctrine\Common\Annotations\Annotation {
     public $nested = [];

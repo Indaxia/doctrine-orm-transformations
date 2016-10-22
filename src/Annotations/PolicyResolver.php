@@ -9,7 +9,7 @@ class PolicyResolver {
     public $resolved;
     
     /** @return Policy\Interfaces\Policy|null */
-    public function resolvePropertyPolicyFrom(Policy\Interfaces\Policy $policy,
+    public function resolvePropertyPolicyFrom(Policy\Interfaces\Policy $policy = null,
                                               $propertyName,
                                               \ReflectionProperty $p,
                                               AnnotationReader $ar) {
@@ -44,7 +44,7 @@ class PolicyResolver {
     }
     
     /** @return Policy\Interfaces\Policy|null */
-    public function resolvePropertyPolicyTo(Policy\Interfaces\Policy $policy,
+    public function resolvePropertyPolicyTo(Policy\Interfaces\Policy $policy = null,
                                             $propertyName,
                                             \ReflectionProperty $p,
                                             AnnotationReader $ar) {

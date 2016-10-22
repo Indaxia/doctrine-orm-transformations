@@ -3,9 +3,9 @@ namespace ScorpioT1000\OTR;
 
 use \Doctrine\ORM\EntityManagerInterface;
 use \Doctrine\Common\Annotations\AnnotationReader;
-use Exceptions\Exception;
-use Annotations\PolicyResolver;
-use Annotations\Policy;
+use \ScorpioT1000\OTR\Exceptions\Exception;
+use \ScorpioT1000\OTR\Annotations\PolicyResolver;
+use \ScorpioT1000\OTR\Annotations\Policy;
 
 /** Provides JSON-ready Doctrine ORM Entity-Array transfomtaions */
 interface ITransformable { 
