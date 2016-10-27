@@ -197,7 +197,7 @@ class WithPolicy implements ITransformable
         if($addNested) {
             $this->juliet = new Simple();
             $this->kilo = new Simple();
-            $this->lima = new Simple());
+            $this->lima = new Simple();
             $this->mike = new \Doctrine\Common\Collections\ArrayCollection();
             $this->mike->add(new Simple());
             $this->mike->add(new Simple());

@@ -33,12 +33,12 @@ trait Transformable {
             if($pn[0] === '_' && $pn[1] === '_') { continue; }
             $propertyPolicy = $pr->resolvePropertyPolicyTo($policy, $pn, $p, $ar);
             if($propertyPolicy instanceof Policy\Interfaces\SkipTo) { continue; }
-            $result[$pn] = $this->toArrayProperty($p, $pn, $propertyPolicy, $ar, $refClass);
+            $result[$pn] = $this->toArrayProperty($p, $pn, $propertyPolicy, $ar, $pr, $refClass);
         }
         return $result;
     }
     
-    protected function toArrayProperty($p, $pn, $policy, AnnotationReader $ar, \ReflectionClass $headRefClass) {
+    protected function toArrayProperty($p, $pn, $policy, AnnotationReader $ar, PolicyResolver $pr, \ReflectionClass $headRefClass) {
         $getter = 'get'.ucfirst($pn);
         if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
             $v = $this->$getter();
@@ -48,20 +48,17 @@ trait Transformable {
                 case 'datetime':
                 case 'detetimez':
                     if($v !== null) {
-                        if($policy instanceof Policy\Interfaces\KeepDateTimeTo) {
-                            return $v->format('Y-m-d\TH:i:s').'.000Z';
-                        } else if($policy instanceof Policy\Interfaces\FormatDateTimeTo) {
+                        if($policy instanceof Policy\Interfaces\FormatDateTimeTo) {
                             $r = $v->format($policy->format);
                             if($r === false) { throw new Exceptions\PolicyException('Wrong DateTime format for field "'.$pn.'"'); }
+                        } else if(!$policy instanceof Policy\Interfaces\KeepDateTimeTo) {
+                            return $v->format('Y-m-d\TH:i:s').'.000Z';
                         }
                     }
                     break;
             }
             return $v;
         } else if($association = static::getPropertyAssociation($p, $ar)) { // entity or collection
-            if(!$nested) {
-                return $this->$pn;
-            }
             $result = null;
             if($association instanceof OneToMany) {
                 $result = ['_meta' => ['class' => static::getEntityFullName($headRefClass, $association->targetEntity),
@@ -196,20 +193,20 @@ trait Transformable {
                 case 'time':
                 case 'datetime':
                 case 'detetimez':
-                    if($v) {
-                        if(is_string($v)) {
-                            $dt = new \DateTime();
-                            $v = \DateTime::createFromFormat('Y-m-d\TH:i:s+', $v, new \DateTimeZone('UTC'));
+                    $dt = $v;
+                    if($dt) {
+                        if(is_string($dt)) {
+                            $dt = \DateTime::createFromFormat('Y-m-d\TH:i:s+', substr($dt, 0, 19), new \DateTimeZone('UTC'));
                         }
-                        if(! $v instanceof \DateTime) {
+                        if(! $dt instanceof \DateTime) {
                             throw new Exceptions\FromArrayException('Field "'.$pn.'" must be an ISO8601 string'.($column->nullable ? ' or null' : ''));
                         }
                     } else if($column->nullable) {
-                        $v = null;
+                        $dt = null;
                     } else {
                         throw new Exceptions\FromArrayException('Field "'.$pn.'" must be an ISO8601 string');
                     }
-                    $this->$setter($v);
+                    $this->$setter($dt);
                     return;
             }
             throw new Exceptions\FromArrayException('Field "'.$pn.'" must be a type of "'.$column->type.'"');

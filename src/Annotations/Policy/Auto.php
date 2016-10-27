@@ -8,10 +8,10 @@ use \Doctrine\ORM\Mapping as ORM;
  * Automatically decides what to store, it typically uses getter/setter of the field.
  * Global policy: the same behaviour when field isn't specified.
  * Local policy: overrides and ignores all the global policy parameters. 
- * @ORM\Annotation */
+ * @Annotation */
 class Auto
     extends \ScorpioT1000\OTR\Annotations\Annotation
     implements Interfaces\AutoTo, Interfaces\AutoFrom {
 
-    public static $priority = 0.0001;
+    public $priority = 0.0001;
 }

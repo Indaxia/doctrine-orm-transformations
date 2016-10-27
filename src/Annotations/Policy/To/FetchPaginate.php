@@ -9,7 +9,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * It works with OneToMany and ManyToMany associations ONLY!
  * It works effectively when "fetch" option is set to "EXTRA_LAZY" - sends offset and limit instruction directly to the database.
  * @see http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/tutorials/extra-lazy-associations.html
- * @ORM\Annotation */
+ * @Annotation */
 class FetchPaginate
     extends \ScorpioT1000\OTR\Annotations\Policy\To\Auto
     implements Interfaces\FetchPaginateTo {

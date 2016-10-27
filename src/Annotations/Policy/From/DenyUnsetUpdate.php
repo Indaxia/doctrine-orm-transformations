@@ -7,7 +7,7 @@ use \Doctrine\ORM\Mapping as ORM;
 /** ITransformable aggregate policy.
  * @see DenyUnset
  * @see DenyUpdate
- * @ORM\Annotation */
+ * @Annotation */
 class DenyUnsetUpdate
     extends \ScorpioT1000\OTR\Annotations\Annotation
     implements Interfaces\DenyUnsetFrom, Interfaces\DenyUpdateFrom {

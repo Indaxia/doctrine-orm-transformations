@@ -8,7 +8,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * Donesn't convert \DateTime to ISO8601 string in ITransformabe::toArray
  * @see http://www.iso.org/iso/catalogue_detail?csnumber=40874
  * Note: ITransformable always works in UTC timezone.
- * @ORM\Annotation */
+ * @Annotation */
 class KeepDateTime
     extends \ScorpioT1000\OTR\Annotations\Policy\To\Auto
     implements Interfaces\KeepDateTimeTo {

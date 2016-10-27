@@ -9,7 +9,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * It's applicable to Collection too.
  * It's applicable to scalar fields: it denies to change the  new value if the value is already set.
  * It's applicable to numbers even when numbers are 0, 0.0, "0.0" etc.
- * @ORM\Annotation */
+ * @Annotation */
 class DenyUpdate
     extends \ScorpioT1000\OTR\Annotations\Annotation
     implements Interfaces\DenyUpdateFrom {

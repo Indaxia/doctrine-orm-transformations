@@ -6,7 +6,7 @@ use \Doctrine\ORM\Mapping as ORM;
 /** ITransformable policy.
  * Skips the field in both ITransformabe::fromArray and ITransformabe::toArray.
  * Opposite to Accept.
- * @ORM\Annotation */
+ * @Annotation */
 class Skip 
     extends \ScorpioT1000\OTR\Annotations\Annotation
     implements Interfaces\SkipTo, Interfaces\SkipFrom 
@@ -15,5 +15,5 @@ class Skip
         throw new \ScorpioT1000\OTR\Exceptions\PolicyException("Policy\\Skip cannot contain policies");
     }
 
-    public static $priority = 0.9;
+    public $priority = 0.9;
 }

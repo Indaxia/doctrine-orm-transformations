@@ -9,7 +9,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * It's applicable to Collection too.
  * It's applicable to scalar fields: it denies to set the new value if the value is empty.
  * It's not applicable to non-nullable numbers.
- * @ORM\Annotation */
+ * @Annotation */
 class DenyNew
     extends \ScorpioT1000\OTR\Annotations\Annotation
     implements Interfaces\DenyNewFrom {

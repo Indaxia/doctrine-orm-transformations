@@ -6,7 +6,7 @@ use \Doctrine\ORM\Mapping as ORM;
 
 /** ITransformable policy.
  * Uses closure as a proof to determine if the field should be changed or skipped.
- * @ORM\Annotation */
+ * @Annotation */
 class Custom
     extends \ScorpioT1000\OTR\Annotations\Annotation
     implements Interfaces\CustomFrom

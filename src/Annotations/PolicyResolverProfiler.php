@@ -19,7 +19,7 @@ class PolicyResolverProfiler extends PolicyResolver {
                                               \ReflectionProperty $p,
                                               AnnotationReader $ar) {
         $result = parent::resolvePropertyPolicyFrom($policy, $propertyName, $p, $ar);
-        $this->results[] = '[From] '.number_format(microtime(true) - $timeStart, 6)
+        $this->results[] = '[From] '.number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getName().'.'.$propertyName
             .' -> '.($result ? get_class($result) : 'null');
         return $result;
@@ -31,7 +31,7 @@ class PolicyResolverProfiler extends PolicyResolver {
                                             \ReflectionProperty $p,
                                             AnnotationReader $ar) {
         $result = parent::resolvePropertyPolicyTo($policy, $propertyName, $p, $ar);
-        $this->results[] = '[To] '.number_format(microtime(true) - $timeStart, 6)
+        $this->results[] = '[To] '.number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getName().'.'.$propertyName
             .' -> '.($result ? get_class($result) : 'null');
         return $result;

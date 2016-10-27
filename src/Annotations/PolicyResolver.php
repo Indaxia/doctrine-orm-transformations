@@ -28,12 +28,12 @@ class PolicyResolver {
             }
         } else if($policy instanceof Policy\Interfaces\PolicyFrom) {
             // inherit parent policy with nothing inside
-            $p = clone $policy;
-            $policies[] = $p->inside([]);
+            $newp = clone $policy;
+            $policies[] = $newp->inside([]);
         }
         
         // global
-        $pa = $ar->getPropertyAnnotation($p);
+        $pa = $ar->getPropertyAnnotations($p);
         foreach($pa as $a) {
             if($a instanceof Policy\Interfaces\PolicyFrom) {
                 // add global policies with double lowered priority
@@ -63,12 +63,12 @@ class PolicyResolver {
             }
         } else if($policy instanceof Policy\Interfaces\PolicyTo) {
             // inherit parent policy with nothing inside
-            $p = clone $policy;
-            $policies[] = $p->inside([]);
+            $newp = clone $policy;
+            $policies[] = $newp->inside([]);
         }
         
         // global
-        $pa = $ar->getPropertyAnnotation($p);
+        $pa = $ar->getPropertyAnnotations($p);
         foreach($pa as $a) {
             if($a instanceof Policy\Interfaces\PolicyTo) {
                 // add global policies with double lowered priority

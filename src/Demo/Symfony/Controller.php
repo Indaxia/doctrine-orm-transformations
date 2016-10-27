@@ -40,7 +40,7 @@ class Controller extends SymfonyController
             
             return $this->success(['result' => $arr, 'profiler' => $pr->results]);
         } catch(\Exception $e) {
-            return $this->fail($e->getMessage());
+            return $this->fail($e->getMessage(), $e->getTraceAsString());
         }
     }
     
@@ -67,7 +67,7 @@ class Controller extends SymfonyController
             
             return $this->success(['result' => $arr, 'profiler' => $pr->results]);
         } catch(\Exception $e) {
-            return $this->fail($e->getMessage());
+            return $this->fail($e->getMessage(), $e->getTraceAsString());
         }
         
     }
@@ -85,7 +85,7 @@ class Controller extends SymfonyController
             
             return $this->success(['result' => $arr, 'profiler' => $pr->results]);
         } catch(\Exception $e) {
-            return $this->fail($e->getMessage());
+            return $this->fail($e->getMessage(), $e->getTraceAsString());
         }
     }
     
@@ -99,8 +99,8 @@ class Controller extends SymfonyController
         return new JsonResponse(['success' => true, 'data' => $data]);
     }
     
-    public function fail($error) {
-        return new JsonResponse(['success' => false, 'message' => $error]);
+    public function fail($error, $info = []) {
+        return new JsonResponse(['success' => false, 'message' => $error, 'info' => $info]);
     }
     
     /** @return \Doctrine\ORM\EntityManager */
@@ -117,6 +117,6 @@ class Controller extends SymfonyController
     
     /** @return \Doctrine\ORM\EntityRepository */
     public function getRepository($name, $ns = "ScorpioT1000\\OTR\\Demo\\Entity") {
-        return $this->getEM()->getRepository($ns.$name);
+        return $this->getEM()->getRepository($ns."\\".$name);
     }
 }
