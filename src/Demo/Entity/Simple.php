@@ -17,8 +17,8 @@ class Simple implements ITransformable
     
     /**
      * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue */
+     * @ORM\Column(name="customId", type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO") */
     protected $customId;
     
     

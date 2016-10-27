@@ -18,7 +18,7 @@ class WithPolicy implements ITransformable
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue */
+     * @ORM\GeneratedValue(strategy="AUTO") */
     protected $id;
     
     /**
@@ -191,28 +191,26 @@ class WithPolicy implements ITransformable
      * */
     protected $zulu = ['something',0xDEADF00D];
     
-    public function __construct($addNested = false) {
+    public function __construct() {
         $this->id = bin2hex(openssl_random_pseudo_bytes(16));
         $this->bravo = new \DateTime();
         $this->charlie = new \DateTime();
-        if($addNested) {
-            $this->juliet = new Simple();
-            $this->kilo = new Simple();
-            $this->lima = new Simple();
-            $this->mike = new \Doctrine\Common\Collections\ArrayCollection();
-            $this->mike->add(new Simple());
-            $this->mike->add(new Simple());
-            $this->mike->add(new Simple());
-            $this->november = new \Doctrine\Common\Collections\ArrayCollection();
-            $this->november->add(new Simple());
-            $this->november->add(new Simple());
-            $this->november->add(new Simple());
-            $this->oscar = new \Doctrine\Common\Collections\ArrayCollection();
-            $this->oscar->add(new Simple());
-            $this->oscar->add(new Simple());
-            $this->oscar->add(new Simple());
-            $this->papa = new \Doctrine\Common\Collections\ArrayCollection();
-        }
+        $this->juliet = new Simple();
+        $this->kilo = new Simple();
+        $this->lima = new Simple();
+        $this->mike = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->mike->add(new Simple());
+        $this->mike->add(new Simple());
+        $this->mike->add(new Simple());
+        $this->november = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->november->add(new Simple());
+        $this->november->add(new Simple());
+        $this->november->add(new Simple());
+        $this->oscar = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->oscar->add(new Simple());
+        $this->oscar->add(new Simple());
+        $this->oscar->add(new Simple());
+        $this->papa = new \Doctrine\Common\Collections\ArrayCollection();
     }
     public function getId() { return $this->id; }
     public function getAlpha() { return $this->alpha; }

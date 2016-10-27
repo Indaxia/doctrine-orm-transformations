@@ -51,6 +51,7 @@ trait Transformable {
                         if($policy instanceof Policy\Interfaces\FormatDateTimeTo) {
                             $r = $v->format($policy->format);
                             if($r === false) { throw new Exceptions\PolicyException('Wrong DateTime format for field "'.$pn.'"'); }
+                            return $r;
                         } else if(!$policy instanceof Policy\Interfaces\KeepDateTimeTo) {
                             return $v->format('Y-m-d\TH:i:s').'.000Z';
                         }
