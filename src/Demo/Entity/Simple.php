@@ -9,7 +9,7 @@ use \ScorpioT1000\OTR\Annotations\Policy;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="TransformationsDemo_Simple")
+ * @ORM\Table(name="OTR_Simple")
  */
 class Simple implements ITransformable
 {

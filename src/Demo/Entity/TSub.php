@@ -8,7 +8,7 @@ use \ScorpioT1000\OTR\Traits\Transformable;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="TransformationsDemo_TSub")
+ * @ORM\Table(name="OTR_TSub")
  */
 class TSub implements ITransformable
 {
