@@ -11,7 +11,7 @@ class Skip
     extends \ScorpioT1000\OTR\Annotations\Annotation
     implements Interfaces\SkipTo
 {        
-    public function inside($policy = []) {
+    public function inside(array $policy) {
         throw new \ScorpioT1000\OTR\Exceptions\PolicyException("Policy\\To\\Skip cannot contain policies");
     }
 

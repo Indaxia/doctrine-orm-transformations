@@ -17,11 +17,11 @@ class Simple implements ITransformable
     
     /**
      * @ORM\Id
-     * @ORM\Column(type="string", length=32, nullable=false) */
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue */
     protected $customId;
     
-    public function __construct($addNested = true) {
-         $this->customId = bin2hex(openssl_random_pseudo_bytes(16));
-    }
     
+        
     public function getCustomId() { return $this->customId; }
+}

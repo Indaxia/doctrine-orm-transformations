@@ -17,7 +17,8 @@ class WithPolicy implements ITransformable
     
     /**
      * @ORM\Id
-     * @ORM\Column(type="string", length=32, nullable=false) */
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue */
     protected $id;
     
     /**
@@ -33,7 +34,7 @@ class WithPolicy implements ITransformable
     protected $bravo;
     
     /**
-     * @Policy\To\FormtaDateTime
+     * @Policy\To\FormatDateTime
      * @ORM\Column(type="datetime")
      * */
     protected $charlie;
@@ -97,7 +98,7 @@ class WithPolicy implements ITransformable
     /**
      * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"})
      * @ORM\JoinTable(name="TransformationsDemo_WithPolicy_Simple",
-     *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="identifier") },
+     *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="id") },
      *      inverseJoinColumns={ @ORM\JoinColumn(name="p2_id", referencedColumnName="customId") }
      * )
      */
@@ -107,7 +108,7 @@ class WithPolicy implements ITransformable
      * @Policy\From\DenyNew
      * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"})
      * @ORM\JoinTable(name="TransformationsDemo_WithPolicy_november_Simple",
-     *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="identifier") },
+     *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="id") },
      *      inverseJoinColumns={ @ORM\JoinColumn(name="p2_id", referencedColumnName="customId") }
      * )
      */
@@ -117,7 +118,7 @@ class WithPolicy implements ITransformable
      * @Policy\From\DenyUpdate
      * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"})
      * @ORM\JoinTable(name="TransformationsDemo_WithPolicy_oscar_Simple",
-     *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="identifier") },
+     *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="id") },
      *      inverseJoinColumns={ @ORM\JoinColumn(name="p2_id", referencedColumnName="customId") }
      * )
      */
@@ -127,7 +128,7 @@ class WithPolicy implements ITransformable
      * @Policy\From\DenyUnset
      * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"})
      * @ORM\JoinTable(name="TransformationsDemo_WithPolicy_papa_Simple",
-     *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="identifier") },
+     *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="id") },
      *      inverseJoinColumns={ @ORM\JoinColumn(name="p2_id", referencedColumnName="customId") }
      * )
      */
