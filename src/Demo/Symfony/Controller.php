@@ -36,7 +36,8 @@ class Controller extends SymfonyController
             $this->getEM()->persist($th);
             $this->getEM()->flush();
             $pr = new PolicyResolverProfiler();
-            $arr = $th->toArray(null, null, $pr);
+			
+            $arr = $th->toArray(null, null, $pr); // EXAMPLE
             
             return $this->success(['result' => $arr, 'profiler' => $pr->results]);
         } catch(\Exception $e) {
@@ -60,9 +61,12 @@ class Controller extends SymfonyController
             }
         
             $pr = new PolicyResolverProfiler();
-            $th->fromArray($data, $this->getEM(), null, null, $pr);
+			
+            $th->fromArray($data, $this->getEM(), null, null, $pr); // EXAMPLE
+			
             $this->getEM()->persist($th);
             $this->getEM()->flush();
+			
             $arr = $th->toArray();
             
             return $this->success(['result' => $arr, 'profiler' => $pr->results]);
@@ -81,7 +85,38 @@ class Controller extends SymfonyController
             $this->getEM()->persist($wp);
             $this->getEM()->flush();
             $pr = new PolicyResolverProfiler();
-            $arr = $wp->toArray(null, null, $pr);
+			
+            $arr = $wp->toArray(null, null, $pr); // EXAMPLE
+            
+            return $this->success(['result' => $arr, 'profiler' => $pr->results]);
+        } catch(\Exception $e) {
+            return $this->fail($e->getMessage(), $e->getTraceAsString());
+        }
+    }
+	
+	/**
+     * @Route("/to-array-local-policy")
+     */
+    public function toArrayLocalPolicyAction() {
+        try {
+            $wp = new WithPolicy();
+            $this->getEM()->persist($wp);
+            $this->getEM()->flush();
+            $pr = new PolicyResolverProfiler();
+			
+			// EXAMPLE
+            $arr = $wp->toArray((new Policy\Auto())->inside([
+				'bravo' => new Policy\To\FormatDateTime(['format' => 'Y m d H i s']),
+				'juliet' => new Policy\Skip,
+				'mike' => new Policy\To\FetchPaginate(['offset' => 1, 'limit' => 2]),
+				'november' => new Policy\To\FetchPaginate(['limit' => 1, 'reverse' => true]),
+				'sierra' => (new Policy\To\Custom())->format(function ($v,$pn) {
+					return number_format($v,10);
+				}),
+				'yankee' => (new Policy\To\Custom())->format(function ($v,$pn) {
+					return empty($v) ? $v : shuffle($v);
+				})
+			]), null, $pr);
             
             return $this->success(['result' => $arr, 'profiler' => $pr->results]);
         } catch(\Exception $e) {

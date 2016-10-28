@@ -40,6 +40,9 @@ trait Transformable {
     
     protected function toArrayProperty($p, $pn, $policy, AnnotationReader $ar, PolicyResolver $pr, \ReflectionClass $headRefClass) {
         $getter = 'get'.ucfirst($pn);
+        if($policy instanceof Policy\Interfaces\CustomTo) {
+            return $policy->$c($this->$getter(), $pn);
+        }
         if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
             $v = $this->$getter();
             switch($column->type) {
@@ -128,6 +131,11 @@ trait Transformable {
                                          \ReflectionClass $refClass) {
         $setter = 'set'.ucfirst($pn);
         $getter = 'get'.ucfirst($pn);
+            
+        if($policy instanceof Policy\Interfaces\CustomFrom) {
+            if($policy->$closure($v, $pn, $this, $em)) { return; }
+        }
+            
         if($id = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Id')) {
             // Skip id, it will be processed in the next steps
         } else if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
@@ -151,10 +159,6 @@ trait Transformable {
                     || in_array($column->type, ['integer', 'smallint', 'bigint', 'float', 'decimal'])))
             {  // numbers can never be "empty" so they are always denied with this policy
                 return;
-            }
-            
-            if($policy instanceof Policy\Interfaces\CustomFrom) {
-                if(! $policy->$closure($v, $this->$getter(), $em, $pn)) { return; }
             }
             switch($column->type) {
                 case 'string':

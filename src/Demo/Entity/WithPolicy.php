@@ -96,7 +96,7 @@ class WithPolicy implements ITransformable
     protected $lima;
     
     /**
-     * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"})
+     * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"}, fetch="EXTRA_LAZY")
      * @ORM\JoinTable(name="TransformationsDemo_WithPolicy_Simple",
      *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="id") },
      *      inverseJoinColumns={ @ORM\JoinColumn(name="p2_id", referencedColumnName="customId") }
