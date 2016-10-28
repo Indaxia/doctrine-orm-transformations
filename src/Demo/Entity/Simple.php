@@ -21,7 +21,12 @@ class Simple implements ITransformable
      * @ORM\GeneratedValue(strategy="AUTO") */
     protected $customId;
     
+    /** @ORM\Column(type="string") */
+    protected $value = "";
+    
     
         
     public function getCustomId() { return $this->customId; }
+    public function getValue() { return $this->value; }
+    public function setValue($v) { $this->value = $v; }
 }

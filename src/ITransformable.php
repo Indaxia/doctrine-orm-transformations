@@ -26,13 +26,14 @@ interface ITransformable {
     );
     
     /** Converts fills Entity's fields (including nested Entity and Collection) to the values from the given array.
-     *  @param array A special array ready for ITransformable, so it should include '_meta' array
+     *  @param array A special array ready for ITransformable, so it should include '__meta' array
      *  @param EntityManagerInterface $entityManager Doctrine instance to retrieve nested Entities by ID or create new ones.
      *  @param Policy\Interfaces\Policy|null transfromation policy, null equals to Policy\Auto
      *  @param AnnotationReader $ar for internal recursive purposes
      *  @param PolicyResolver $pr for internal recursive purposes
      *  @see readme.md
      *  @throws Exception when input type or policy aren't acceptable
+     *  @return ITransformable $this
      *  It doesn't process any static values.
      */
     public function fromArray(

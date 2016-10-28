@@ -107,9 +107,14 @@ class Controller extends SymfonyController
 			// EXAMPLE
             $arr = $wp->toArray((new Policy\Auto())->inside([
 				'bravo' => new Policy\To\FormatDateTime(['format' => 'Y m d H i s']),
+				'charlie' => new Policy\To\KeepDateTime,
 				'juliet' => new Policy\Skip,
+				'lima' => (new Policy\To\Custom())->format(function ($v,$pn) {
+					return ['custom entity output' => 'id = '.$v->getCustomId()];
+				}),
 				'mike' => new Policy\To\FetchPaginate(['offset' => 1, 'limit' => 2]),
 				'november' => new Policy\To\FetchPaginate(['limit' => 1, 'reverse' => true]),
+				'oscar' => new Policy\To\Skip,
 				'sierra' => (new Policy\To\Custom())->format(function ($v,$pn) {
 					return number_format($v,10);
 				}),
@@ -122,6 +127,37 @@ class Controller extends SymfonyController
         } catch(\Exception $e) {
             return $this->fail($e->getMessage(), $e->getTraceAsString());
         }
+    }
+	
+	/**
+     * @Route("/from-array-global-policy")
+     */
+    public function fromArrayGlobalPolicyAction() {
+        try {
+            $data = $this->getRequestContentJson();
+
+            if(empty($data)) { return $this->fail('Input must be a JSON object representing Transformable Entity'); }
+            $e = empty($data['id'])
+                ? null
+                : $this->getRepository('WithPolicy')->findOneBy(['id' => $data['id']]);
+            if(! $e) {
+                $e = new WithPolicy();
+            }
+        
+            $pr = new PolicyResolverProfiler();
+			
+            $e->fromArray($data, $this->getEM(), null, null, $pr); // EXAMPLE
+			
+            $this->getEM()->persist($e);
+            $this->getEM()->flush();
+			
+            $arr = $e->toArray();
+            
+            return $this->success(['result' => $arr, 'profiler' => $pr->results]);
+        } catch(\Exception $e) {
+            return $this->fail($e->getMessage(), $e->getTraceAsString());
+        }
+        
     }
     
     

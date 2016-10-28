@@ -23,7 +23,7 @@ trait Transformable {
         if(!$ar) { $ar = new AnnotationReader(); }
         if(!$pr) { $pr = new PolicyResolver(); }
         $refClass = new \ReflectionClass(get_class($this));
-        $result = ['_meta' => ['class' => static::getEntityFullName($refClass)]];
+        $result = ['__meta' => ['class' => static::getEntityFullName($refClass)]];
         $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
                                        | \ReflectionProperty::IS_PROTECTED
                                        | \ReflectionProperty::IS_PRIVATE);
@@ -41,7 +41,7 @@ trait Transformable {
     protected function toArrayProperty($p, $pn, $policy, AnnotationReader $ar, PolicyResolver $pr, \ReflectionClass $headRefClass) {
         $getter = 'get'.ucfirst($pn);
         if($policy instanceof Policy\Interfaces\CustomTo) {
-            return $policy->$c($this->$getter(), $pn);
+            return call_user_func_array($policy->closure, [$this->$getter(), $pn]);
         }
         if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
             $v = $this->$getter();
@@ -65,10 +65,10 @@ trait Transformable {
         } else if($association = static::getPropertyAssociation($p, $ar)) { // entity or collection
             $result = null;
             if($association instanceof OneToMany) {
-                $result = ['_meta' => ['class' => static::getEntityFullName($headRefClass, $association->targetEntity),
+                $result = ['__meta' => ['class' => static::getEntityFullName($headRefClass, $association->targetEntity),
                                        'association' => 'OneToMany'], 'collection' => []];
             } else if($association instanceof ManyToMany) {
-                $result = ['_meta' => ['class' => static::getEntityFullName($headRefClass, $association->targetEntity),
+                $result = ['__meta' => ['class' => static::getEntityFullName($headRefClass, $association->targetEntity),
                                        'association' => 'ManyToMany'], 'collection' => []];
             } else { // single entity
                 $result = $this->$getter();
@@ -113,11 +113,12 @@ trait Transformable {
         foreach($ps as $p) {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
-            if(!isset($src[$pn]) || ($pn[0] === '_' && $pn[1] === '_')) { continue; }
+            if(!array_key_exists($pn, $src) || ($pn[0] === '_' && $pn[1] === '_')) { continue; }
             $propertyPolicy = $pr->resolvePropertyPolicyFrom($policy, $pn, $p, $ar);
             if($propertyPolicy instanceof Policy\Interfaces\SkipFrom) { continue; }
             $this->fromArrayProperty($src[$pn], $p, $pn, $propertyPolicy, $ar, $pr, $entityManager, $refClass);
         }
+        return $this;
     }
     
     /** Here we have 3 cases:
@@ -133,7 +134,7 @@ trait Transformable {
         $getter = 'get'.ucfirst($pn);
             
         if($policy instanceof Policy\Interfaces\CustomFrom) {
-            if($policy->$closure($v, $pn, $this, $em)) { return; }
+            if(call_user_func_array($policy->closure, [$v, $pn, $this, $em])) { return; }
         }
             
         if($id = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Id')) {
@@ -163,9 +164,9 @@ trait Transformable {
             switch($column->type) {
                 case 'string':
                 case 'text':
-                case 'simple_array':
                 case 'guid':
                     if(is_string($v)) { $this->$setter($v); return; } break;
+                case 'simple_array':
                 case 'json_array':
                     if(is_array($v)) { $this->$setter($v); return; } break;
                 case 'blob':
@@ -240,12 +241,17 @@ trait Transformable {
                 return;
             }
             $this->$setter(null);
+            return;
         }
         if(is_array($v)) {
             $idField = 'id';
             $class = static::getEntityFullName($refClass, $association->targetEntity);
             if(!is_subclass_of($class, 'ScorpioT1000\OTR\ITransformable')) {
                 throw new Exceptions\FromArrayException('Entity "'.$class.'" must implement ITransformable interface');
+            }
+            $subPolicy = $policy;
+            if($policy instanceof Policy\Interfaces\DenyFrom) {
+                $subPolicy = (new Policy\From\Auto())->insideOf($policy);
             }
             
             if($association instanceof OneToOne || $association instanceof ManyToOne)
@@ -262,15 +268,12 @@ trait Transformable {
                     $subEntity = $em->getReference($class, $v[$idField]);
                 }
                 if($subEntity) {
-                    $subEntity->fromArray($v, $em, $policy, $ar, $pr);
-                }
-                if($policy instanceof Policy\Interfaces\Custom) {
-                    if(! $policy->$closure($subEntity, $this->$getter(), $em, $pn)) { return; }
+                    $subEntity->fromArray($v, $em, $subPolicy, $ar, $pr);
                 }
                 $this->$setter($subEntity);
                 return;
-            } else if(isset($v['_meta'])
-                      && is_array($v['_meta'])
+            } else if(isset($v['__meta'])
+                      && is_array($v['__meta'])
                       && isset($v['collection'])
                       && is_array($v['collection'])) { // OneToMany, ManyToMany
                 $values = [];
@@ -288,10 +291,7 @@ trait Transformable {
                     if(empty($e[$idField])) { // new
                         if($policy instanceof Policy\Interfaces\DenyNewFrom) { continue; }
                         $subEntity = new $class();
-                        $subEntity->fromArray($v, $em, $policy, $ar, $pr);
-                        if($policy instanceof Policy\Interfaces\Custom) {
-                            if(! $policy->$closure($subEntity, null, $em, $pn)) { continue; }
-                        }
+                        $subEntity->fromArray($v, $em, $subPolicy, $ar, $pr);
                         $newEntities[] = $subEntity;
                     } else {
                         $existentRaw[$e[$idField]] = $e;
@@ -309,16 +309,10 @@ trait Transformable {
                     $existent = isset($existentRaw[$id]) ? $existentRaw[$id] : null;
                     if($existent) { // update
                         if(!$policy instanceof Policy\Interfaces\DenyUpdateFrom) {
-                            if($policy instanceof Policy\Interfaces\Custom) {
-                                if(! $policy->$closure($existent, $e, $em, $pn)) { continue; }
-                            }
-                            $e->fromArray($existent, $em, $policy, $ar, $pr);
+                            $e->fromArray($existent, $em, $subPolicy, $ar, $pr);
                         }
                     } else { // doesn't exists in source, unset
                         if(!$policy instanceof Policy\Interfaces\DenyUnsetFrom) {
-                            if($policy instanceof Policy\Interfaces\Custom) {
-                                if(! $policy->$closure(null, $e, $em, $pn)) { continue; }
-                            }
                             $collection->remove($index);
                         }
                     }
@@ -329,8 +323,6 @@ trait Transformable {
                 }
                 return;
             }
-        } else if($policy & Policy::DontFetch) { // don't process entity for this policy
-            return;
         }
         throw new Exceptions\FromArrayException('Field "'.$pn.'" must be an Entity representation or contain "collection" field');
     }

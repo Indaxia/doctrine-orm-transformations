@@ -18,7 +18,8 @@ class PolicyResolver {
         // local
         $policies = [];
         if(isset($policy->nested[$propertyName])) { // has property policy
-            if($policy instanceof Policy\Interfaces\PolicyFrom) {
+            if(($policy instanceof Policy\Interfaces\PolicyFrom)
+                  && !($policy instanceof Policy\Interfaces\DenyFrom)) {
                 // add parent policy with lowered priority and nothing inside
                 $policies[] = $policy->createWithLowerPriority()->inside([]);
             }
@@ -26,7 +27,8 @@ class PolicyResolver {
                 // add current policy
                 $policies[] = $policy->nested[$propertyName];
             }
-        } else if($policy instanceof Policy\Interfaces\PolicyFrom) {
+        } else if(($policy instanceof Policy\Interfaces\PolicyFrom)
+                  && !($policy instanceof Policy\Interfaces\DenyFrom)) {
             // inherit parent policy with nothing inside
             $newp = clone $policy;
             $policies[] = $newp->inside([]);
