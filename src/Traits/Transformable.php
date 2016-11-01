@@ -311,7 +311,7 @@ trait Transformable {
                         if(!$policy instanceof Policy\Interfaces\DenyUpdateFrom) {
                             $e->fromArray($existent, $em, $subPolicy, $ar, $pr); // PROBLEM: sub-fields not updated!!!
                         }
-                    } else { // doesn't exists in source, unset
+                    } else { // doesn't exist in source, unset
                         if(!$policy instanceof Policy\Interfaces\DenyUnsetFrom) {
                             $collection->remove($index);
                         }

@@ -24,10 +24,6 @@ class Custom
      *      or FALSE to process it using Auto policy.
      * @return Custom */
     public function parse(\Closure $c) {
-        if(! $c) {
-            throw new \ScorpioT1000\OTR\Exceptions\PolicyException(
-                'Closure is not specified for Custom policy');
-        }
         $this->closure = $c;
         return $this;
     }
