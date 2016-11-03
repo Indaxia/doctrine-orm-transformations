@@ -56,7 +56,7 @@ class THead implements ITransformable
     
     /**
      * @ORM\ManyToMany(targetEntity="TSubCol", cascade={"persist", "remove"})
-     * @ORM\JoinTable(name="TransformationsDemo_THead_TSubCol",
+     * @ORM\JoinTable(name="OTR_THead_TSubCol",
      *      joinColumns={ @ORM\JoinColumn(name="thead_id", referencedColumnName="id") },
      *      inverseJoinColumns={ @ORM\JoinColumn(name="tsubcol_id", referencedColumnName="cid") }
      * )

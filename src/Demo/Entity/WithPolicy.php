@@ -97,7 +97,7 @@ class WithPolicy implements ITransformable
     
     /**
      * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"}, fetch="EXTRA_LAZY")
-     * @ORM\JoinTable(name="TransformationsDemo_WithPolicy_Simple",
+     * @ORM\JoinTable(name="OTR_WithPolicy_Simple",
      *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="id") },
      *      inverseJoinColumns={ @ORM\JoinColumn(name="p2_id", referencedColumnName="customId") }
      * )
@@ -107,7 +107,7 @@ class WithPolicy implements ITransformable
     /**
      * @Policy\From\DenyNew
      * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"}, fetch="EAGER")
-     * @ORM\JoinTable(name="TransformationsDemo_WithPolicy_november_Simple",
+     * @ORM\JoinTable(name="OTR_WithPolicy_november_Simple",
      *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="id") },
      *      inverseJoinColumns={ @ORM\JoinColumn(name="p2_id", referencedColumnName="customId") }
      * )
@@ -117,7 +117,7 @@ class WithPolicy implements ITransformable
     /**
      * @Policy\From\DenyUpdate
      * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"}, fetch="EAGER")
-     * @ORM\JoinTable(name="TransformationsDemo_WithPolicy_oscar_Simple",
+     * @ORM\JoinTable(name="OTR_WithPolicy_oscar_Simple",
      *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="id") },
      *      inverseJoinColumns={ @ORM\JoinColumn(name="p2_id", referencedColumnName="customId") }
      * )
@@ -127,7 +127,7 @@ class WithPolicy implements ITransformable
     /**
      * @Policy\From\DenyUnset
      * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"}, fetch="EAGER")
-     * @ORM\JoinTable(name="TransformationsDemo_WithPolicy_papa_Simple",
+     * @ORM\JoinTable(name="OTR_WithPolicy_papa_Simple",
      *      joinColumns={ @ORM\JoinColumn(name="p1_id", referencedColumnName="id") },
      *      inverseJoinColumns={ @ORM\JoinColumn(name="p2_id", referencedColumnName="customId") }
      * )
