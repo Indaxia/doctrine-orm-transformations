@@ -1,7 +1,10 @@
 <?php
 namespace ScorpioT1000\OTR\Traits;
 
+use \Doctrine\Common\Annotations\Reader;
 use \Doctrine\Common\Annotations\AnnotationReader;
+use \Doctrine\Common\Annotations\CachedReader;
+use \Doctrine\Common\Cache\ArrayCache;
 use \Doctrine\ORM\EntityManagerInterface;
 use \Doctrine\ORM\Mapping\ManyToOne;
 use \Doctrine\ORM\Mapping\ManyToMany;
@@ -17,10 +20,10 @@ trait Transformable {
     /** @see ITransformable::toArray() */
     public function toArray(
         Policy\Interfaces\Policy $policy = null,
-        AnnotationReader $ar = null,
+        Reader $ar = null,
         PolicyResolver $pr = null
     ) {
-        if(!$ar) { $ar = new AnnotationReader(); }
+        if(!$ar) { $ar = static::createCachedReader(); }
         if(!$pr) { $pr = new PolicyResolver(); }
         $refClass = new \ReflectionClass(get_class($this));
         $result = ['__meta' => ['class' => static::getEntityFullName($refClass)]];
@@ -38,7 +41,7 @@ trait Transformable {
         return $result;
     }
     
-    protected function toArrayProperty($p, $pn, $policy, AnnotationReader $ar, PolicyResolver $pr, \ReflectionClass $headRefClass) {
+    protected function toArrayProperty($p, $pn, $policy, Reader $ar, PolicyResolver $pr, \ReflectionClass $headRefClass) {
         $getter = 'get'.ucfirst($pn);
         if($policy instanceof Policy\Interfaces\CustomTo) {
             return call_user_func_array($policy->closure, [$this->$getter(), $pn]);
@@ -101,10 +104,10 @@ trait Transformable {
         array $src,
         EntityManagerInterface $entityManager,
         Policy\Interfaces\Policy $policy = null,
-        AnnotationReader $ar = null,
+        Reader $ar = null,
         PolicyResolver $pr = null
     ) {
-        if(!$ar) { $ar = new AnnotationReader(); }
+        if(!$ar) { $ar = static::createCachedReader(); }
         if(!$pr) { $pr = new PolicyResolver(); }
         $refClass = new \ReflectionClass(get_class($this));
         $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
@@ -126,7 +129,7 @@ trait Transformable {
      * 2. Scalar property
      * 3. Relation property */
     protected function fromArrayProperty($v, $p, $pn, $policy,
-                                         AnnotationReader $ar,
+                                         Reader $ar,
                                          PolicyResolver $pr,
                                          EntityManagerInterface $em,
                                          \ReflectionClass $refClass) {
@@ -166,6 +169,12 @@ trait Transformable {
                 case 'text':
                 case 'guid':
                     if(is_string($v)) { $this->$setter($v); return; } break;
+                case 'object':
+                case 'array':
+                    if(! $pr->hasOption(PolicyResolver::OPT_IGNORE_CVE_2015_0231)) {
+                        throw new Exceptions\FromArrayException('Column type "'.$column->type.'" is disabled due to CVE-2015-0231.'
+                                                                .'Use PolicyResolver::IGNORE_CVE_2015_0231 to ignore.');
+                    }
                 case 'simple_array':
                 case 'json_array':
                     if(is_array($v)) { $this->$setter($v); return; } break;
@@ -192,9 +201,6 @@ trait Transformable {
                     if(is_numeric($v)) { $this->$setter($v); return; } break;
                 case 'float':
                     if(is_integer($v) || is_double($v)) { $this->$setter($v); return; } break;
-                case 'object':
-                case 'array':
-                    throw new Exceptions\FromArrayException('Column type "'.$column->type.'" is disabled due to CVE-2015-0231');
                 case 'date':
                 case 'time':
                 case 'datetime':
@@ -229,7 +235,7 @@ trait Transformable {
      * 5. Sub-collection with no entities */
     protected function fromArrayRelation($v, $p, $pn, $getter, $setter,
                                                 $association, $policy,
-                                                AnnotationReader $ar,
+                                                Reader $ar,
                                                 PolicyResolver $pr,
                                                 EntityManagerInterface $em,
                                                 \ReflectionClass $refClass) {
@@ -328,7 +334,7 @@ trait Transformable {
     }
     
     /** @return Annotation|null returns null if its inversed side of bidirectional relation */
-    protected static function getPropertyAssociation(\ReflectionProperty $p, AnnotationReader $ar) {
+    protected static function getPropertyAssociation(\ReflectionProperty $p, Reader $ar) {
         $ans = $ar->getPropertyAnnotations($p);
         foreach($ans as $an) {
             if(($an instanceof ManyToOne && !$an->inversedBy)
@@ -358,13 +364,17 @@ trait Transformable {
     public static function toArrays(
         array $entities,
         Policy\Interfaces\Policy $policy = null,
-        AnnotationReader $ar = null,
+        Reader $ar = null,
         PolicyResolver $pr = null
     ) {
-        if(!$ar) { $ar = new AnnotationReader(); }
+        if(!$ar) { $ar = static::createCachedReader(); }
         if(!$pr) { $ar = new PolicyResolver(); }
         $arrays = [];
         foreach($entities as $e) { $arrays[] = $e->toArray($policy, null, $ar, $pr); }
         return $arrays;
+    }
+    
+    public static function createCachedReader() {
+        return new CachedReader(new AnnotationReader(), new ArrayCache());
     }
 }

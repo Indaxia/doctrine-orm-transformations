@@ -2,7 +2,7 @@
 namespace ScorpioT1000\OTR;
 
 use \Doctrine\ORM\EntityManagerInterface;
-use \Doctrine\Common\Annotations\AnnotationReader;
+use \Doctrine\Common\Annotations\Reader;
 use \ScorpioT1000\OTR\Exceptions\Exception;
 use \ScorpioT1000\OTR\Annotations\PolicyResolver;
 use \ScorpioT1000\OTR\Annotations\Policy;
@@ -12,7 +12,7 @@ interface ITransformable {
     
     /** Converts Entity and it's references to nested array structure.
      *  @param Policy\Interfaces\Policy|null transfromation policy, null equals to Policy\Auto
-     *  @param AnnotationReader $ar for internal recursive purposes
+     *  @param Reader $ar for internal recursive purposes
      *  @param PolicyResolver $pr for internal recursive purposes
      *  @return array ready for JSON serialization.
      *  @see readme.md
@@ -21,7 +21,7 @@ interface ITransformable {
     */
     public function toArray(
         Policy\Interfaces\Policy $policy = null,
-        AnnotationReader $ar = null,
+        Reader $ar = null,
         PolicyResolver $pr = null
     );
     
@@ -29,7 +29,7 @@ interface ITransformable {
      *  @param array A special array ready for ITransformable, so it should include '__meta' array
      *  @param EntityManagerInterface $entityManager Doctrine instance to retrieve nested Entities by ID or create new ones.
      *  @param Policy\Interfaces\Policy|null transfromation policy, null equals to Policy\Auto
-     *  @param AnnotationReader $ar for internal recursive purposes
+     *  @param Reader $ar for internal recursive purposes
      *  @param PolicyResolver $pr for internal recursive purposes
      *  @see readme.md
      *  @throws Exception when input type or policy aren't acceptable
@@ -40,21 +40,21 @@ interface ITransformable {
         array $src,
         EntityManagerInterface $entityManager,
         Policy\Interfaces\Policy $policy = null,
-        AnnotationReader $ar = null,
+        Reader $ar = null,
         PolicyResolver $pr = null
     );
     
     /** Applies toArray to multiple entities.
      * @param array $entities array of entities
      * @param array $policy
-     * @param AnnotationReader $ar for internal recursive purposes
+     * @param Reader $ar for internal recursive purposes
      * @param PolicyResolver $pr for internal recursive purposes
      * @return array
      * @see ITransformable::toArray */
     public static function toArrays(
         array $entities,
         Policy\Interfaces\Policy $policy = null,
-        AnnotationReader $ar = null,
+        Reader $ar = null,
         PolicyResolver $pr = null
     );
 }
