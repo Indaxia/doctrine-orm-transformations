@@ -51,7 +51,7 @@ trait Transformable {
             switch($column->type) {
                 case 'simple_array':
                     // @see https://github.com/doctrine/doctrine2/issues/4673
-                    if($v == [null] && $pr->hasOption(PolicyResolver::SIMPLE_ARRAY_FIX)) {
+                    if($pr->hasOption(PolicyResolver::SIMPLE_ARRAY_FIX) && is_array($v) && (count($v) === 1) && ($v[0] === null)) {
                         return [];
                     } break;
                 case 'date':
