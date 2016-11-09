@@ -9,8 +9,9 @@ class PolicyResolverProfiler extends PolicyResolver {
     public $results = [];
     public $timeStart = 0.0;
     
-    public function __construct() {
+    public function __construct($options = 0x00) {
         $this->timeStart = microtime(true);
+        parent::__construct($options);
     }
     
     /** @return Policy\Interfaces\Policy|null */

@@ -13,6 +13,12 @@ class PolicyResolver {
     const NO_POLICY_NESTING = 0x02;
     /** Don't use any of global policies (from Entity annotations) */
     const NO_GLOBAL_POLICIES = 0x04;
+    /** Allow setting to null value for non-nullable scalar types */
+    const ALLOW_NON_NULLABLE = 0x08;
+    /** Replaces empty "simple_array" type with array(null) and vice versa
+     * to fix doctrine empty simple_array issue #4673.
+     * @see https://github.com/doctrine/doctrine2/issues/4673 */
+    const SIMPLE_ARRAY_FIX = 0x10;
     
     public $resolved;
     protected $options;
@@ -26,6 +32,18 @@ class PolicyResolver {
     public function getOptions() { return $this->options; }
     public function setOptions($v) { $this->options = $v; }
     public function hasOption($o) { return $this->options & $o; }
+    
+    public function isNumberType($t) {
+        switch($t) {
+            case 'integer':
+            case 'smallint':
+            case 'bigint':
+            case 'float':
+            case 'decimal':
+                return true;
+        }
+        return false;
+    }
     
     /** @return Policy\Interfaces\Policy|null */
     public function resolvePropertyPolicyFrom(Policy\Interfaces\Policy $policy = null,

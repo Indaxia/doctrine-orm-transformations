@@ -49,6 +49,11 @@ trait Transformable {
         if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
             $v = $this->$getter();
             switch($column->type) {
+                case 'simple_array':
+                    // @see https://github.com/doctrine/doctrine2/issues/4673
+                    if($v == [null] && $pr->hasOption(PolicyResolver::SIMPLE_ARRAY_FIX)) {
+                        return [];
+                    } break;
                 case 'date':
                 case 'time':
                 case 'datetime':
@@ -143,27 +148,34 @@ trait Transformable {
         if($id = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Id')) {
             // Skip id, it will be processed in the next steps
         } else if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
-            if($v === null && $column->nullable) {
-                if($policy instanceof Policy\Interfaces\DenyUnsetFrom && $this->$getter())
-                { // cannot unset the existing value with this policy
-                    return;
+            $oldV = $this->$getter();
+
+            if($policy instanceof Policy\Interfaces\DenyUnsetFrom) {
+                if($v === null && !$column->nullable) { return; } // deny set to null
+                if(!$pr->isNumberType($column->type) && !$v) { 
+                    // numbers can never be "empty": deny unset for non-numbers only
+                    return; 
                 }
-                $this->$setter(null);
-                return;
             }
+            
             if($policy instanceof Policy\Interfaces\DenyNewFrom) {
-                if((in_array($column->type, ['integer', 'smallint', 'bigint', 'float', 'decimal'])
-                    && ($v !== null) && ($this->$getter() === null)) // numbers can never be "empty": applicable for nullable only
-                   || ($v && !$this->$getter())) {
-                    return;
+                if($pr->isNumberType($column->type)) {
+                    // numbers can never be "empty": deny new for nullable only
+                    if($oldV === null) { return; }
+                } else if($v && !$oldV) { 
+                    return; // deny new for other types
                 }
             }
-            if($policy instanceof Policy\Interfaces\DenyUpdateFrom
-                && (($v && $this->$getter())
-                    || in_array($column->type, ['integer', 'smallint', 'bigint', 'float', 'decimal'])))
-            {  // numbers can never be "empty" so they are always denied with this policy
-                return;
+            
+            if($policy instanceof Policy\Interfaces\DenyUpdateFrom) {
+                if($pr->isNumberType($column->type)) { 
+                    // numbers can never be "empty": deny update for non-nullable only
+                    if($v !== null && $oldV !== null) { return; }
+                } else if($v && $oldV) { 
+                    return; // deny update for other types
+                }
             }
+            
             switch($column->type) {
                 case 'string':
                 case 'text':
@@ -176,6 +188,13 @@ trait Transformable {
                                                                 .'Use PolicyResolver::IGNORE_CVE_2015_0231 to ignore.');
                     }
                 case 'simple_array':
+                    if(is_array($v)) {
+                        // @see https://github.com/doctrine/doctrine2/issues/4673
+                        if((count($v) === 0) && !$column->nullbale && $pr->hasOption(PolicyResolver::SIMPLE_ARRAY_FIX)) {
+                            $this->$setter([null]);
+                        }
+                        $this->$setter($v);
+                    } break;
                 case 'json_array':
                     if(is_array($v)) { $this->$setter($v); return; } break;
                 case 'blob':
@@ -221,11 +240,20 @@ trait Transformable {
                     $this->$setter($dt);
                     return;
             }
+            if($v === null) {
+                if($column->nullable || $pr->hasOption(PolicyResolver::ALLOW_NON_NULLABLE)) {
+                    $this->$setter(null);
+                    return;
+                } else {
+                    throw new Exceptions\FromArrayException('Field "'.$pn.'" cannot be null. Use PolicyResolver::ALLOW_NON_NULLABLE to ignore.');
+                }
+            }
             throw new Exceptions\FromArrayException('Field "'.$pn.'" must be a type of "'.$column->type.'"');
         } else if($association = static::getPropertyAssociation($p, $ar)) { // entity or collection
             $this->fromArrayRelation($v, $p, $pn, $getter, $setter, $association, $policy, $ar, $pr, $em, $refClass);   
         }
     }
+    
     
     /** Here we have 5 cases:
      * 1. Sub-entity with empty id (new)
@@ -297,7 +325,7 @@ trait Transformable {
                     if(empty($e[$idField])) { // new
                         if($policy instanceof Policy\Interfaces\DenyNewFrom) { continue; }
                         $subEntity = new $class();
-                        $subEntity->fromArray($v, $em, $subPolicy, $ar, $pr);
+                        $subEntity->fromArray($e, $em, $subPolicy, $ar, $pr);
                         $newEntities[] = $subEntity;
                     } else {
                         $existentRaw[$e[$idField]] = $e;

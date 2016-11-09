@@ -84,7 +84,7 @@ class Controller extends SymfonyController
             $wp = new WithPolicy();
             $this->getEM()->persist($wp);
             $this->getEM()->flush();
-            $pr = new PolicyResolverProfiler();
+            $pr = new PolicyResolverProfiler(PolicyResolver::SIMPLE_ARRAY_FIX);
 			
             $arr = $wp->toArray(null, null, $pr); // EXAMPLE
             
@@ -102,7 +102,7 @@ class Controller extends SymfonyController
             $wp = new WithPolicy();
             $this->getEM()->persist($wp);
             $this->getEM()->flush();
-            $pr = new PolicyResolverProfiler();
+            $pr = new PolicyResolverProfiler(PolicyResolver::SIMPLE_ARRAY_FIX);
 			
 			// EXAMPLE
             $arr = $wp->toArray((new Policy\Auto())->inside([
@@ -144,7 +144,7 @@ class Controller extends SymfonyController
                 $e = new WithPolicy();
             }
         
-            $pr = new PolicyResolverProfiler();
+            $pr = new PolicyResolverProfiler(PolicyResolver::SIMPLE_ARRAY_FIX);
 			
             $e->fromArray($data, $this->getEM(), null, null, $pr); // EXAMPLE
 			
