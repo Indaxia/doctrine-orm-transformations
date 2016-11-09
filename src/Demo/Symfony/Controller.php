@@ -151,7 +151,7 @@ class Controller extends SymfonyController
             $this->getEM()->persist($e);
             $this->getEM()->flush();
 			
-            $arr = $e->toArray();
+            $arr = $e->toArray(null, null, new PolicyResolver(PolicyResolver::SIMPLE_ARRAY_FIX));
             
             return $this->success(['result' => $arr, 'profiler' => $pr->results]);
         } catch(\Exception $e) {
