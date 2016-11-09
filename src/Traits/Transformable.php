@@ -190,7 +190,7 @@ trait Transformable {
                 case 'simple_array':
                     if(is_array($v)) {
                         // @see https://github.com/doctrine/doctrine2/issues/4673
-                        if((count($v) === 0) && !$column->nullbale && $pr->hasOption(PolicyResolver::SIMPLE_ARRAY_FIX)) {
+                        if((count($v) === 0) && !$column->nullable && $pr->hasOption(PolicyResolver::SIMPLE_ARRAY_FIX)) {
                             $this->$setter([null]);
                         }
                         $this->$setter($v);
