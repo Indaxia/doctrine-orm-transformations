@@ -192,6 +192,7 @@ trait Transformable {
                         // @see https://github.com/doctrine/doctrine2/issues/4673
                         if((count($v) === 0) && !$column->nullable && $pr->hasOption(PolicyResolver::SIMPLE_ARRAY_FIX)) {
                             $this->$setter([null]);
+                            return;
                         }
                         $this->$setter($v);
                     } break;
