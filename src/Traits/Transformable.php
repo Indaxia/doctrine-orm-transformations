@@ -194,7 +194,7 @@ trait Transformable {
                             $this->$setter([null]);
                             return;
                         }
-                        $this->$setter($v);
+                        $this->$setter($v); return;
                     } break;
                 case 'json_array':
                     if(is_array($v)) { $this->$setter($v); return; } break;
