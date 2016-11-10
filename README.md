@@ -10,12 +10,13 @@ Features
 --------
 - JSON-ready toArray and fromArray Trait (**no need to extend class**);
 - Manipulating fields and **nested** sub-fields using [Policy](https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Policy.php) for each one;
-- Supports almost all Doctrine Column ORM types ("object" and "array" are excluded due to CVE-2015-0231);
+- Supports all Doctrine ORM Column types;
 - Supports JavaScript [ISO8601](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse) format for "date", "time" and "datetime" types;
 - Supports nested **Entities** and **Collections** for all the [Association](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html) types (be careful with self-referencing);
 - **fromArray** asks EntityManager to find by "referencedColumnName" or creates new sub-entities (depends on Identifier emptiness and Policy);
 - Same for [Collection](https://github.com/doctrine/collections/blob/master/lib/Doctrine/Common/Collections/ArrayCollection.php) members (OneToMany, ManyToMany);
 - Static **toArrays** method transforms multiple entities at once;
+- Has workarounds for [CVE-2015-0231](http://cve.mitre.org/cgi-bin/cvename.cgi?name=2015-0231) and [Doctrine issue #4673](https://github.com/doctrine/doctrine2/issues/4673);
 
 Step 1: Installation
 --------------------
@@ -24,7 +25,7 @@ in **composer.json** add:
 ```json
 "require": {
 
-    "ScorpioT1000/doctrine-orm-transformations": "^0.1@dev"
+    "Indaxia/doctrine-orm-transformations": "^0.3"
 }
 ```
 then
@@ -37,9 +38,9 @@ Step 2: Reference common classes
 --------------------------------
 
 ```php
-use \ScorpioT1000\OTR\ITransformable;
-use \ScorpioT1000\OTR\Traits\Transformable;
-use \ScorpioT1000\OTR\Annotations\Policy;
+use \Indaxia\OTR\ITransformable;
+use \Indaxia\OTR\Traits\Transformable;
+use \Indaxia\OTR\Annotations\Policy;
 ```
 
 How to transform entities to arrays and vice versa
@@ -124,7 +125,7 @@ $result = $car->toArray([
     'keys' => new Policy\Auto
 ]);
 ```
-[Policy options](https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Policy.php)
+[Policy options](https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Policy.php)
             
 $result will be something like:
 
@@ -168,7 +169,9 @@ $result will be something like:
 ```php
     echo json_encode($result);
 ```    
+You can also use something like array2XML and more.
     
+
 And we can transform it to Entity again.
 It will retrieve sub-entities by id using EntityManager.
 Don't forget to use try-catch block to avoid uncaught exceptions.
@@ -190,11 +193,11 @@ $carB->fromArray($result, $entityManager, (new Policy\Auto())->inside([
     ])
 ]);
 ```
-[Policy options](https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Policy.php)
+[Policy options](https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Policy.php)
 
 More Demos
 ----------
-[Entities & Symfony 3 Controller](https://github.com/ScorpioT1000/doctrine-orm-transformations/tree/master/src/Demo) are included and accessible through the namespace.
+[Example Entities & Symfony 3 Controller](https://github.com/Indaxia/doctrine-orm-transformations/tree/master/examples) are included.
 
 
 How to redeclare Transformable methods
