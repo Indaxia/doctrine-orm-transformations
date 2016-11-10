@@ -210,4 +210,6 @@ How to redeclare Transformable methods
     }
 ```
 
-[Indaxia](//indaxia.com) / 2016
+-------------------------------
+
+[Indaxia](http://indaxia.com) / 2016
