@@ -23,7 +23,8 @@ $isDevMode = true;
 $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/Entity"), $isDevMode);
 
 $entityManager = Mocks\EntityManagerMock::create(
-    new Mocks\ConnectionMock([], new Mocks\DriverMock())
+    new Mocks\ConnectionMock([], new Mocks\DriverMock()),
+    $config
 );
 
 
