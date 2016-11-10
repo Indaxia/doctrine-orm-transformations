@@ -1,9 +1,10 @@
 <?php
 namespace Indaxia\OTR\Tests\Entity;
 
-use \Indaxia\OTR\ITransformable;
-use \Indaxia\OTR\Traits\Transformable;
-use \Indaxia\OTR\Annotations\Policy;
+use Doctrine\ORM\Mapping as ORM;
+use Indaxia\OTR\ITransformable;
+use Indaxia\OTR\Traits\Transformable;
+use Indaxia\OTR\Annotations\Policy;
 
 class Simple implements ITransformable {
     use Transformable;
