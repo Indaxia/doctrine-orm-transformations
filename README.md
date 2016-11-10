@@ -164,7 +164,7 @@ $result will be something like:
 ```php
     echo json_encode($result);
 ```    
-You can also use something like array2XML and more.
+You can also use something like [array2XML](https://github.com/Jeckerson/array2xml) and more.
     
 
 And we can transform it to Entity again.
