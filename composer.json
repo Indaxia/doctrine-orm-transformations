@@ -15,8 +15,14 @@
     "autoload": {
         "psr-4": { "Indaxia\\OTR\\": "src/" }
     },
+    "autoload-dev": {
+        "psr-4": { "Indaxia\\OTR\\Tests": "tests/" }
+    },
     "require": {
         "php": ">=5.4.0",
         "doctrine/orm": "^2.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.6.*"
     }
 }
