@@ -16,7 +16,7 @@
         "psr-4": { "Indaxia\\OTR\\": "src/" }
     },
     "autoload-dev": {
-        "psr-4": { "Indaxia\\OTR\\Tests": "tests/" }
+        "psr-4": { "Indaxia\\OTR\\Tests\\": "tests/" }
     },
     "require": {
         "php": ">=5.4.0",
