@@ -1,11 +1,11 @@
 <?php
 
-namespace ScorpioT1000\OTR\Demo\Entity;
+namespace Indaxia\OTR\Demo\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \ScorpioT1000\OTR\ITransformable;
-use \ScorpioT1000\OTR\Traits\Transformable;
-use \ScorpioT1000\OTR\Annotations\Policy;
+use \Indaxia\OTR\ITransformable;
+use \Indaxia\OTR\Traits\Transformable;
+use \Indaxia\OTR\Annotations\Policy;
 
 /**
  * @ORM\Entity

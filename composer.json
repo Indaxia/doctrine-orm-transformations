@@ -1,9 +1,9 @@
 {
-    "name": "scorpiot1000/doctrine-orm-transformations",
+    "name": "indaxia/doctrine-orm-transformations",
     "type": "library",
     "description": "Provides JSON-ready Doctrine ORM Entity-Array transfomtaions",
     "keywords": ["json", "doctrine", "orm", "entity", "array"],
-    "homepage": "https://github.com/ScorpioT1000/doctrine-orm-transformations",
+    "homepage": "https://github.com/Indaxia/doctrine-orm-transformations",
     "license": "MIT",
     "authors": [
         {
@@ -13,7 +13,7 @@
         }
     ],
     "autoload": {
-        "psr-4": { "ScorpioT1000\\OTR\\": "src/" }
+        "psr-4": { "Indaxia\\OTR\\": "src/" }
     },
     "require": {
         "php": ">=5.4.0",

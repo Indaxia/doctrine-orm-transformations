@@ -1,5 +1,5 @@
 <?php
-namespace ScorpioT1000\OTR\Traits;
+namespace Indaxia\OTR\Traits;
 
 use \Doctrine\Common\Annotations\Reader;
 use \Doctrine\Common\Annotations\AnnotationReader;
@@ -10,9 +10,9 @@ use \Doctrine\ORM\Mapping\ManyToOne;
 use \Doctrine\ORM\Mapping\ManyToMany;
 use \Doctrine\ORM\Mapping\OneToOne;
 use \Doctrine\ORM\Mapping\OneToMany;
-use \ScorpioT1000\OTR\Exceptions;
-use \ScorpioT1000\OTR\Annotations\Policy;
-use \ScorpioT1000\OTR\Annotations\PolicyResolver;
+use \Indaxia\OTR\Exceptions;
+use \Indaxia\OTR\Annotations\Policy;
+use \Indaxia\OTR\Annotations\PolicyResolver;
 
 /* Implements Entity Transformations methods
  * @see ITransformable */
@@ -281,7 +281,7 @@ trait Transformable {
         if(is_array($v)) {
             $idField = 'id';
             $class = static::getEntityFullName($refClass, $association->targetEntity);
-            if(!is_subclass_of($class, 'ScorpioT1000\OTR\ITransformable')) {
+            if(!is_subclass_of($class, 'Indaxia\OTR\ITransformable')) {
                 throw new Exceptions\FromArrayException('Entity "'.$class.'" must implement ITransformable interface');
             }
             $subPolicy = $policy;

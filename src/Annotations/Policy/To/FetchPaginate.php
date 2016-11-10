@@ -1,7 +1,7 @@
 <?php
-namespace ScorpioT1000\OTR\Annotations\Policy\To;
+namespace Indaxia\OTR\Annotations\Policy\To;
 
-use \ScorpioT1000\OTR\Annotations\Policy\Interfaces;
+use \Indaxia\OTR\Annotations\Policy\Interfaces;
 use \Doctrine\ORM\Mapping as ORM;
 
 /** ITransformable policy.
@@ -11,7 +11,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * @see http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/tutorials/extra-lazy-associations.html
  * @Annotation */
 class FetchPaginate
-    extends \ScorpioT1000\OTR\Annotations\Policy\To\Auto
+    extends \Indaxia\OTR\Annotations\Policy\To\Auto
     implements Interfaces\FetchPaginateTo {
     public $offset = 0;
     public $limit = 20;

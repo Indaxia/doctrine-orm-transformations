@@ -1,14 +1,14 @@
 <?php
-namespace ScorpioT1000\OTR\Annotations\Policy\To;
+namespace Indaxia\OTR\Annotations\Policy\To;
 
-use \ScorpioT1000\OTR\Annotations\Policy\Interfaces;
+use \Indaxia\OTR\Annotations\Policy\Interfaces;
 use \Doctrine\ORM\Mapping as ORM;
 
 /** ITransformable policy.
  * Uses closure to format field.
  * @Annotation */
 class Custom
-    extends \ScorpioT1000\OTR\Annotations\Annotation
+    extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\CustomTo
 {
     public $priority = 0.5;

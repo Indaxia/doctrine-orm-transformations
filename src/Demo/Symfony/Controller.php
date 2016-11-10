@@ -1,6 +1,6 @@
 <?php
 
-namespace ScorpioT1000\OTR\Demo\Symfony;
+namespace Indaxia\OTR\Demo\Symfony;
 
 use \Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use \Symfony\Component\HttpFoundation\Request;
@@ -8,16 +8,16 @@ use \Symfony\Component\HttpFoundation\JsonResponse;
 use \Symfony\Bundle\FrameworkBundle\Controller\Controller as SymfonyController;
 use \Symfony\Component\Serializer\Encoder\JsonEncoder;
 
-use \ScorpioT1000\OTR\ITransformable;
-use \ScorpioT1000\OTR\Traits\Transformable;
-use \ScorpioT1000\OTR\Annotations\Policy;
-use \ScorpioT1000\OTR\Annotations\PolicyResolver;
-use \ScorpioT1000\OTR\Annotations\PolicyResolverProfiler;
+use \Indaxia\OTR\ITransformable;
+use \Indaxia\OTR\Traits\Transformable;
+use \Indaxia\OTR\Annotations\Policy;
+use \Indaxia\OTR\Annotations\PolicyResolver;
+use \Indaxia\OTR\Annotations\PolicyResolverProfiler;
 
-use \ScorpioT1000\OTR\Demo\Entity\THead;
-use \ScorpioT1000\OTR\Demo\Entity\TSub;
-use \ScorpioT1000\OTR\Demo\Entity\TSubCol;
-use \ScorpioT1000\OTR\Demo\Entity\WithPolicy;
+use \Indaxia\OTR\Demo\Entity\THead;
+use \Indaxia\OTR\Demo\Entity\TSub;
+use \Indaxia\OTR\Demo\Entity\TSubCol;
+use \Indaxia\OTR\Demo\Entity\WithPolicy;
 
 class Controller extends SymfonyController
 {
@@ -187,7 +187,7 @@ class Controller extends SymfonyController
     }
     
     /** @return \Doctrine\ORM\EntityRepository */
-    public function getRepository($name, $ns = "ScorpioT1000\\OTR\\Demo\\Entity") {
+    public function getRepository($name, $ns = "Indaxia\\OTR\\Demo\\Entity") {
         return $this->getEM()->getRepository($ns."\\".$name);
     }
 }

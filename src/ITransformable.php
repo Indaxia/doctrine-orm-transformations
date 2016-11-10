@@ -1,11 +1,11 @@
 <?php
-namespace ScorpioT1000\OTR;
+namespace Indaxia\OTR;
 
 use \Doctrine\ORM\EntityManagerInterface;
 use \Doctrine\Common\Annotations\Reader;
-use \ScorpioT1000\OTR\Exceptions\Exception;
-use \ScorpioT1000\OTR\Annotations\PolicyResolver;
-use \ScorpioT1000\OTR\Annotations\Policy;
+use \Indaxia\OTR\Exceptions\Exception;
+use \Indaxia\OTR\Annotations\PolicyResolver;
+use \Indaxia\OTR\Annotations\Policy;
 
 /** Provides JSON-ready Doctrine ORM Entity-Array transfomtaions */
 interface ITransformable { 

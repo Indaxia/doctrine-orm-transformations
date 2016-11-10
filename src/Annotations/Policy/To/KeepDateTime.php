@@ -1,7 +1,7 @@
 <?php
-namespace ScorpioT1000\OTR\Annotations\Policy\To;
+namespace Indaxia\OTR\Annotations\Policy\To;
 
-use \ScorpioT1000\OTR\Annotations\Policy\Interfaces;
+use \Indaxia\OTR\Annotations\Policy\Interfaces;
 use \Doctrine\ORM\Mapping as ORM;
 
 /** ITransformable policy.
@@ -10,7 +10,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * Note: ITransformable always works in UTC timezone.
  * @Annotation */
 class KeepDateTime
-    extends \ScorpioT1000\OTR\Annotations\Policy\To\Auto
+    extends \Indaxia\OTR\Annotations\Policy\To\Auto
     implements Interfaces\KeepDateTimeTo {
 
     public $priority = 0.010;

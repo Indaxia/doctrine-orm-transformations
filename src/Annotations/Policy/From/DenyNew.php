@@ -1,7 +1,7 @@
 <?php
-namespace ScorpioT1000\OTR\Annotations\Policy\From;
+namespace Indaxia\OTR\Annotations\Policy\From;
 
-use \ScorpioT1000\OTR\Annotations\Policy\Interfaces;
+use \Indaxia\OTR\Annotations\Policy\Interfaces;
 use \Doctrine\ORM\Mapping as ORM;
 
 /** ITransformable policy.
@@ -12,7 +12,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * It's not inherited from parent's policy (!). Specify inside() to change behaviour.
  * @Annotation */
 class DenyNew
-    extends \ScorpioT1000\OTR\Annotations\Annotation
+    extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\DenyNewFrom {
 
     public $priority = 0.100;

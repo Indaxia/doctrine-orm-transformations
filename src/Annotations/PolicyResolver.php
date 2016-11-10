@@ -1,9 +1,9 @@
 <?php
-namespace ScorpioT1000\OTR\Annotations;
+namespace Indaxia\OTR\Annotations;
 
 use \Doctrine\Common\Annotations\Reader;
-use \ScorpioT1000\OTR\Annotations\Policy;
-use \ScorpioT1000\OTR\Exceptions\PolicyException;
+use \Indaxia\OTR\Annotations\Policy;
+use \Indaxia\OTR\Exceptions\PolicyException;
 
 class PolicyResolver {
     /** Allows to use serialize/unserialize in entity array field types.

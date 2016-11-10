@@ -1,7 +1,7 @@
 <?php
-namespace ScorpioT1000\OTR\Annotations\Policy\To;
+namespace Indaxia\OTR\Annotations\Policy\To;
 
-use \ScorpioT1000\OTR\Annotations\Policy\Interfaces;
+use \Indaxia\OTR\Annotations\Policy\Interfaces;
 use \Doctrine\ORM\Mapping as ORM;
 
 /** ITransformable policy.
@@ -11,7 +11,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * Local policy: overrides and ignores all the global policy parameters. 
  * @Annotation */
 class Auto
-    extends \ScorpioT1000\OTR\Annotations\Annotation
+    extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\AutoTo
 {        
 

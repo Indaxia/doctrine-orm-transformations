@@ -1,7 +1,7 @@
 <?php
-namespace ScorpioT1000\OTR\Annotations\Policy\From;
+namespace Indaxia\OTR\Annotations\Policy\From;
 
-use \ScorpioT1000\OTR\Annotations\Policy\Interfaces;
+use \Indaxia\OTR\Annotations\Policy\Interfaces;
 use \Doctrine\ORM\Mapping as ORM;
 
 /** ITransformable aggregate policy.
@@ -9,7 +9,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * @see DenyNew
  * @Annotation */
 class DenyNewUnset
-    extends \ScorpioT1000\OTR\Annotations\Annotation
+    extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\DenyUnsetFrom, Interfaces\DenyNewFrom {
 
     public $priority = 0.100;

@@ -1,7 +1,7 @@
 <?php
-namespace ScorpioT1000\OTR\Annotations\Policy\From;
+namespace Indaxia\OTR\Annotations\Policy\From;
 
-use \ScorpioT1000\OTR\Annotations\Policy\Interfaces;
+use \Indaxia\OTR\Annotations\Policy\Interfaces;
 use \Doctrine\ORM\Mapping as ORM;
 
 /** ITransformable policy.
@@ -14,7 +14,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * Warning: it allows to assign new entities instead of existent. Use Skip to deny any changes.
  * @Annotation */
 class DenyUnset
-    extends \ScorpioT1000\OTR\Annotations\Annotation
+    extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\DenyUnsetFrom {
 
     public $priority = 0.100;

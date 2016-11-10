@@ -1,5 +1,5 @@
 <?php
-namespace ScorpioT1000\OTR\Annotations\Policy;
+namespace Indaxia\OTR\Annotations\Policy;
 
 use \Doctrine\ORM\Mapping as ORM;
 
@@ -8,11 +8,11 @@ use \Doctrine\ORM\Mapping as ORM;
  * Opposite to Accept.
  * @Annotation */
 class Skip 
-    extends \ScorpioT1000\OTR\Annotations\Annotation
+    extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\SkipTo, Interfaces\SkipFrom 
 {        
     public function inside(array $policy) {
-        throw new \ScorpioT1000\OTR\Exceptions\PolicyException("Policy\\Skip cannot contain policies");
+        throw new \Indaxia\OTR\Exceptions\PolicyException("Policy\\Skip cannot contain policies");
     }
 
     public $priority = 0.9;

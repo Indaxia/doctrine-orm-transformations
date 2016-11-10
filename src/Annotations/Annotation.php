@@ -1,5 +1,5 @@
 <?php
-namespace ScorpioT1000\OTR\Annotations;
+namespace Indaxia\OTR\Annotations;
 
 abstract class Annotation implements \Doctrine\ORM\Mapping\Annotation {
     public $nested = [];

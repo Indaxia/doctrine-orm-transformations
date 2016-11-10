@@ -1,4 +1,4 @@
 <?php
-namespace ScorpioT1000\OTR\Exceptions;
+namespace Indaxia\OTR\Exceptions;
 
 class Exception extends \Exception {}
