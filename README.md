@@ -209,3 +209,5 @@ How to redeclare Transformable methods
         public function fromArray ...
     }
 ```
+
+[Indaxia](//indaxia.com) / 2016
