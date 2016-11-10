@@ -1,1 +1,5 @@
 *.komodoproject
+/vendor/
+/build/
+/phpunit.xml
+/var/*
