@@ -1,6 +1,6 @@
 <?php
 
-namespace Doctrine\Tests\Mocks;
+namespace Indaxia\OTR\Tests\Mocks;
 
 use Doctrine\Common\EventManager;
 use Doctrine\ORM\Configuration;
