@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Provides JSON-ready Doctrine ORM Entity-Array transfomtaions",
     "keywords": ["json", "doctrine", "orm", "entity", "array"],
-    "homepage": "https://github.com/Indaxia/doctrine-orm-transformations",
+    "homepage": "http://indaxia.github.io/doctrine-orm-transformations/",
     "license": "MIT",
     "authors": [
         {
