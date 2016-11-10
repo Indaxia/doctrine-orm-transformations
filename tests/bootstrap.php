@@ -11,3 +11,19 @@ $ phpunit
 EOT
     );
 }
+
+date_default_timezone_set('UTC');
+error_reporting(E_ALL | E_STRICT);
+
+use Doctrine\ORM\Tools\Setup;
+use Doctrine\Tests\Mocks;
+
+// Create a simple "default" Doctrine ORM configuration for Annotations
+$isDevMode = true;
+$config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/Entity"), $isDevMode);
+
+$entityManager = Mocks\EntityManagerMock::create(
+    new Mocks\ConnectionMock([], new Mocks\DriverMock())
+);
+
+
