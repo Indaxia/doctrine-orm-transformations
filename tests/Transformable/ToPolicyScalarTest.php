@@ -42,7 +42,7 @@ class ToPolicyScalarTest extends TestCase
         $this->assertEquals($dt->format('Y-m-d\TH:i:s').'.000Z', $a['date']);
         $this->assertEquals($dt->format('Y-m-d\TH:i:s').'.000Z', $a['time']);
         $this->assertEquals('test string \'"', $a['str']);
-        $this->assertEmpty($a['strSkip']);
+        $this->assertArrayNotHasKey('strSkip', $a);
         $this->assertEquals(['a string', 1337, 13.37, true], $a['ja']);
         $this->assertEquals(['a string', 1337, 13.37, true], $a['sa']);
         $this->assertEquals([], $a['sae']);
