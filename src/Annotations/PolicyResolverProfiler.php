@@ -22,7 +22,7 @@ class PolicyResolverProfiler extends PolicyResolver {
         $result = parent::resolvePropertyPolicyFrom($policy, $propertyName, $p, $ar);
         $this->results[] = '[From] '.number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getName().'.'.$propertyName
-            .' -> '.($result ? get_class($result) : 'null');
+            .' -> '.($result ? get_class($result).' (p'.$result->priority.')' : 'null');
         return $result;
     }
     
@@ -34,7 +34,7 @@ class PolicyResolverProfiler extends PolicyResolver {
         $result = parent::resolvePropertyPolicyTo($policy, $propertyName, $p, $ar);
         $this->results[] = '[To] '.number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getName().'.'.$propertyName
-            .' -> '.($result ? get_class($result) : 'null');
+            .' -> '.($result ? get_class($result).' (p'.$result->priority.')' : 'null');
         return $result;
     }
 }
