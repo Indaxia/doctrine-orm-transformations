@@ -9,6 +9,8 @@ class PolicyResolverProfiler extends PolicyResolver {
     public $results = [];
     public $timeStart = 0.0;
     
+    const PROFILER_DETAILS = 0x10000;
+    
     public function __construct($options = 0x00) {
         $this->timeStart = microtime(true);
         parent::__construct($options);
@@ -20,7 +22,8 @@ class PolicyResolverProfiler extends PolicyResolver {
                                               \ReflectionProperty $p,
                                               Reader $ar) {
         $result = parent::resolvePropertyPolicyFrom($policy, $propertyName, $p, $ar);
-        $this->results[] = '[From] '.number_format(microtime(true) - $this->timeStart, 6)
+        $this->results[] = '[From] '
+            .number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getName().'.'.$propertyName
             .' -> '.($result ? get_class($result).' (p'.$result->priority.')' : 'null');
         return $result;
@@ -32,9 +35,34 @@ class PolicyResolverProfiler extends PolicyResolver {
                                             \ReflectionProperty $p,
                                             Reader $ar) {
         $result = parent::resolvePropertyPolicyTo($policy, $propertyName, $p, $ar);
-        $this->results[] = '[To] '.number_format(microtime(true) - $this->timeStart, 6)
+        $this->results[] = '[To] '
+            .number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getName().'.'.$propertyName
             .' -> '.($result ? get_class($result).' (p'.$result->priority.')' : 'null');
         return $result;
+    }
+    
+    public function mergeFrom(array $policies) {
+        $result = parent::mergeFrom($policies);
+        if($this->hasOption(PROFILER_DETAILS)) {
+            foreach($policies as $p) {
+                $this->addResult($p);
+            }
+        }
+        return $result;
+    }
+    
+    public function mergeTo(array $policies) {
+        $result = parent::mergeTo($policies);
+        if($this->hasOption(PROFILER_DETAILS)) {
+            foreach($policies as $p) {
+                $this->addResult($p);
+            }
+        }
+        return $result;
+    }
+    
+    protected function addResult($policy) {
+        $this->results[] = ' > '.get_class($policy).' p'.$policy->priority.($policy->nested ? ' {...}('.count($policy->nested).')' : '');
     }
 }
