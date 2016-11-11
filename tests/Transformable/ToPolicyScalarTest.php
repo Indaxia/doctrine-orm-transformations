@@ -28,8 +28,10 @@ class ToPolicyScalarTest extends TestCase
             ->setBln(true)
             ->setFlt(0.0000001)
             ->setStrNull(null);
-            
-        $a = $e->toArray(null, null, new PolicyResolver(PolicyResolver::SIMPLE_ARRAY_FIX));
+        $prp = new PolicyResolverProfiler(PolicyResolver::SIMPLE_ARRAY_FIX);
+        $a = $e->toArray(null, null, $prp);
+        
+        echo PHP_EOL; foreach($prp->results as $r) { echo '    '.$r.PHP_EOL; } echo PHP_EOL; 
         
         $this->assertEquals(['class' => 'Indaxia\OTR\Tests\Entity\ToPolicyScalar'], $a['__meta']);
         $this->assertEquals(123456, $a['id']);
@@ -47,8 +49,6 @@ class ToPolicyScalarTest extends TestCase
         $this->assertEquals('1234567890987654321', $a['BI']);
         $this->assertEquals(true, $a['bln']);
         $this->assertEquals(0.0000001, $a['flt'], '', 0.00000001);
-        
-        var_dump($a['dt3']);
     }
     
 }
