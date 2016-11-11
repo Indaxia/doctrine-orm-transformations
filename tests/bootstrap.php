@@ -23,7 +23,7 @@ AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 
 // Create a simple "default" Doctrine ORM configuration for Annotations
 $isDevMode = true;
-$config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/Entity"), $isDevMode);
+$config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/Entity"), $isDevMode, null, null, false);
 
 $entityManager = Mocks\EntityManagerMock::create(
     new Mocks\ConnectionMock([], new Mocks\DriverMock()), 
