@@ -1,6 +1,7 @@
 <?php
 
-if (!($loader = include __DIR__ . '/../vendor/autoload.php')) {
+$loader = include __DIR__ . '/../vendor/autoload.php';
+if ($loader) {
     die(<<<EOT
 You need to install the project dependencies using Composer:
 $ wget http://getcomposer.org/composer.phar
@@ -19,16 +20,15 @@ use Doctrine\ORM\Tools\Setup;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Indaxia\OTR\Tests\Mocks;
 
+AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 
 // Create a simple "default" Doctrine ORM configuration for Annotations
 $isDevMode = true;
-$config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/Entity"), $isDevMode, null, null, false);
+$config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/Entity"), $isDevMode);
 
 $entityManager = Mocks\EntityManagerMock::create(
     new Mocks\ConnectionMock([], new Mocks\DriverMock()), 
     $config
 );
 
-AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
-AnnotationRegistry::registerFile(__DIR__ . '/../vendor/doctrine/orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php');
 
