@@ -15,6 +15,7 @@ class ToPolicyScalarTest extends TestCase
             ->setId(123456)
             ->setDt1($dt)
             ->setDt2($dt)
+            ->setDt3($dt)
             ->setDate($dt)
             ->setTime($dt)
             ->setStr('test string \'"')
@@ -25,7 +26,8 @@ class ToPolicyScalarTest extends TestCase
             ->setDeci(123.456789)
             ->setBI('1234567890987654321')
             ->setBln(true)
-            ->setFlt(0.0000001);
+            ->setFlt(0.0000001)
+            ->setStrNull(null);
             
         $a = $e->toArray(null, null, new PolicyResolver(PolicyResolver::SIMPLE_ARRAY_FIX));
         

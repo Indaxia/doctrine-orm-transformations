@@ -59,12 +59,17 @@ class ToPolicyScalar implements ITransformable {
     /** @ORM\Column(type="boolean") */
     protected $bln;
     
+    /** @ORM\Column(type="string", nullable=true) */
+    protected $strNull;
+    
     public function getId() { return $this->id; }
     public function setId($v) { $this->id = $v; return $this; }
     public function getDt1() { return $this->dt1; }
     public function setDt1($v) { $this->dt1 = $v; return $this; }
     public function getDt2() { return $this->dt2; }
     public function setDt2($v) { $this->dt2 = $v; return $this; }
+    public function getDt3() { return $this->dt3; }
+    public function setDt3($v) { $this->dt3 = $v; return $this; }
     public function getStr() { return $this->str; }
     public function setStr($v) { $this->str = $v; return $this; }
     public function getStrSkip() { return $this->strSkip; }
@@ -87,4 +92,6 @@ class ToPolicyScalar implements ITransformable {
     public function setBln($v) { $this->bln = $v; return $this; }
     public function getFlt() { return $this->flt; }
     public function setFlt($v) { $this->flt = $v; return $this; }
+    public function getStrNull() { return $this->strNull; }
+    public function setStrNull($v) { $this->strNull = $v; return $this; }
 }
