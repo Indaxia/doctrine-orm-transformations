@@ -4,6 +4,7 @@ namespace Indaxia\OTR\Tests\Transformable;
 use PHPUnit\Framework\TestCase;
 use Indaxia\OTR\Tests\Entity;
 use Indaxia\OTR\Annotations\PolicyResolver;
+use Indaxia\OTR\Annotations\PolicyResolverProfiler;
 
 class ToPolicyScalarTest extends TestCase
 {
