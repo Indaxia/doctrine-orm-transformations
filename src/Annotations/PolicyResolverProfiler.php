@@ -24,8 +24,7 @@ class PolicyResolverProfiler extends PolicyResolver {
         $this->results[] = '[From] ';
         $el = & $this->results[count($this->results)];
         $result = parent::resolvePropertyPolicyFrom($policy, $propertyName, $p, $ar);
-        $el .=
-            .number_format(microtime(true) - $this->timeStart, 6)
+        $el .= number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getName().'.'.$propertyName
             .' -> '.($result ? get_class($result).' (p'.$result->priority.')' : 'null');
         return $result;
@@ -39,8 +38,7 @@ class PolicyResolverProfiler extends PolicyResolver {
         $this->results[] = '[To] ';
         $el = & $this->results[count($this->results)];
         $result = parent::resolvePropertyPolicyTo($policy, $propertyName, $p, $ar);
-        $el .=
-            .number_format(microtime(true) - $this->timeStart, 6)
+        $el .= number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getName().'.'.$propertyName
             .' -> '.($result ? get_class($result).' (p'.$result->priority.')' : 'null');
         return $result;
