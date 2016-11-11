@@ -34,7 +34,7 @@ class ToPolicyScalar implements ITransformable {
     /** @ORM\Column(length=255) */
     protected $str;
     
-    /** @Policy\Skip
+    /** @Policy\To\Skip
      * @ORM\Column(length=255) */
     protected $strSkip;
     
