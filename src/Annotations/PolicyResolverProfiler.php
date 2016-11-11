@@ -9,7 +9,7 @@ class PolicyResolverProfiler extends PolicyResolver {
     public $results = [];
     public $timeStart = 0.0;
     
-    const PROFILER_DETAILS = 0x10000;
+    const PRIORITY_DETAILS = 0x10000;
     
     public function __construct($options = 0x00) {
         $this->timeStart = microtime(true);
@@ -54,7 +54,7 @@ class PolicyResolverProfiler extends PolicyResolver {
     
     public function mergeTo(array $policies) {
         $result = parent::mergeTo($policies);
-        if($this->hasOption(PROFILER_DETAILS)) {
+        if($this->hasOption(static::PRIORITY_DETAILS)) {
             foreach($policies as $p) {
                 $this->addResult($p);
             }

@@ -29,7 +29,7 @@ class ToPolicyScalarTest extends TestCase
             ->setBln(true)
             ->setFlt(0.0000001)
             ->setStrNull(null);
-        $prp = new PolicyResolverProfiler(PolicyResolver::SIMPLE_ARRAY_FIX | PolicyResolverProfiler::PROFILER_DETAILS);
+        $prp = new PolicyResolverProfiler(PolicyResolver::SIMPLE_ARRAY_FIX | PolicyResolverProfiler::PRIORITY_DETAILS);
         $a = $e->toArray(null, null, $prp);
         
         echo PHP_EOL; foreach($prp->results as $r) { echo '    '.$r.PHP_EOL; } echo PHP_EOL; 
