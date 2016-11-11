@@ -27,7 +27,7 @@ class ToSimpleTest extends TestCase
             ->setId(null)
             ->setValue(null);
             
-        $this->assertEquals[
+        $this->assertEquals([
             '__meta' => [
                 'class' => 'Indaxia\OTR\Tests\Entity\Simple'
             ],
