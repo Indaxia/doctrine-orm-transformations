@@ -16,7 +16,10 @@ date_default_timezone_set('UTC');
 error_reporting(E_ALL | E_STRICT);
 
 use Doctrine\ORM\Tools\Setup;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use Indaxia\OTR\Tests\Mocks;
+
+AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 
 // Create a simple "default" Doctrine ORM configuration for Annotations
 $isDevMode = true;
