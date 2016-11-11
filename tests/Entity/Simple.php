@@ -6,6 +6,9 @@ use Indaxia\OTR\ITransformable;
 use Indaxia\OTR\Traits\Transformable;
 use Indaxia\OTR\Annotations\Policy;
 
+/**
+ * @ORM\Entity
+ */
 class Simple implements ITransformable {
     use Transformable;
     
