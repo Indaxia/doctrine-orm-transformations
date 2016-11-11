@@ -21,8 +21,10 @@ class PolicyResolverProfiler extends PolicyResolver {
                                               $propertyName,
                                               \ReflectionProperty $p,
                                               Reader $ar) {
+        $this->results[] = '[From] ';
+        $el = & $this->results[count($this->results)];
         $result = parent::resolvePropertyPolicyFrom($policy, $propertyName, $p, $ar);
-        $this->results[] = '[From] '
+        $el .=
             .number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getName().'.'.$propertyName
             .' -> '.($result ? get_class($result).' (p'.$result->priority.')' : 'null');
@@ -34,8 +36,10 @@ class PolicyResolverProfiler extends PolicyResolver {
                                             $propertyName,
                                             \ReflectionProperty $p,
                                             Reader $ar) {
+        $this->results[] = '[To] ';
+        $el = & $this->results[count($this->results)];
         $result = parent::resolvePropertyPolicyTo($policy, $propertyName, $p, $ar);
-        $this->results[] = '[To] '
+        $el .=
             .number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getName().'.'.$propertyName
             .' -> '.($result ? get_class($result).' (p'.$result->priority.')' : 'null');
