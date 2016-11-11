@@ -11,7 +11,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * @see http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/tutorials/extra-lazy-associations.html
  * @Annotation */
 class FetchPaginate
-    extends \Indaxia\OTR\Annotations\Policy\To\Auto
+    extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\FetchPaginateTo {
     public $offset = 0;
     public $limit = 20;

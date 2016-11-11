@@ -10,7 +10,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * Note: ITransformable always works in UTC timezone.
  * @Annotation */
 class FormatDateTime
-    extends \Indaxia\OTR\Annotations\Policy\To\Auto
+    extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\FormatDateTimeTo {
     public $format = 'r';
 
