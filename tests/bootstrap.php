@@ -19,7 +19,6 @@ use Doctrine\ORM\Tools\Setup;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Indaxia\OTR\Tests\Mocks;
 
-AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 
 // Create a simple "default" Doctrine ORM configuration for Annotations
 $isDevMode = true;
@@ -29,5 +28,7 @@ $entityManager = Mocks\EntityManagerMock::create(
     new Mocks\ConnectionMock([], new Mocks\DriverMock()), 
     $config
 );
+
+AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 
 
