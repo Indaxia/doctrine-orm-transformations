@@ -31,22 +31,24 @@ class ToPolicyScalarTest extends TestCase
             
         $a = $e->toArray(null, null, new PolicyResolver(PolicyResolver::SIMPLE_ARRAY_FIX));
         
-        $this->assertEquals($a['__meta'], ['class' => 'Indaxia\OTR\Tests\Entity\ToPolicyScalar']);
-        $this->assertEquals($a['id'], 123456);
-        $this->assertEquals($a['dt1'], 'Thu, 31 Dec 2099 23:59:59 +0000');
-        $this->assertEquals($a['dt2'], '2099_12_31_23_59_59');
-        $this->assertEquals($a['dt3'], $dt);
-        $this->assertEquals($a['date'], $dt->format('Y-m-d\TH:i:s').'.000Z');
-        $this->assertEquals($a['time'], $dt->format('Y-m-d\TH:i:s').'.000Z');
-        $this->assertEquals($a['str'], 'test string \'"');
+        $this->assertEquals(['class' => 'Indaxia\OTR\Tests\Entity\ToPolicyScalar'], $a['__meta']);
+        $this->assertEquals(123456, $a['id']);
+        $this->assertEquals('Thu, 31 Dec 2099 23:59:59 +0000', $a['dt1']);
+        $this->assertEquals('2099_12_31_23_59_59', $a['dt2']);
+        $this->assertEquals($dt, $a['dt3']);
+        $this->assertEquals($dt->format('Y-m-d\TH:i:s').'.000Z', $a['date']);
+        $this->assertEquals($dt->format('Y-m-d\TH:i:s').'.000Z', $a['time']);
+        $this->assertEquals('test string \'"', $a['str']);
         $this->assertEmpty($a['strSkip']);
-        $this->assertEquals($a['ja'], ['a string', 1337, 13.37, true]);
-        $this->assertEquals($a['sa'], ['a string', 1337, 13.37, true]);
-        $this->assertEquals($a['sae'], []);
-        $this->assertEquals($a['deci'], 123.456789);
-        $this->assertEquals($a['BI'], '1234567890987654321');
-        $this->assertEquals($a['bln'], true);
-        $this->assertEquals($a['flt'], 0.0000001, '', 0.00000001);
+        $this->assertEquals(['a string', 1337, 13.37, true], $a['ja']);
+        $this->assertEquals(['a string', 1337, 13.37, true], $a['sa']);
+        $this->assertEquals([], $a['sae']);
+        $this->assertEquals(123.456789, $a['deci']);
+        $this->assertEquals('1234567890987654321', $a['BI']);
+        $this->assertEquals(true, $a['bln']);
+        $this->assertEquals(0.0000001, $a['flt'], '', 0.00000001);
+        
+        var_dump($a['dt3']);
     }
     
 }
