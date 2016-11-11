@@ -16,15 +16,15 @@ class ToPolicyScalar implements ITransformable {
      * @ORM\Column(type="integer") */
     protected $id;
     
-    /* @Policy\To\FormatDateTime
+    /** @Policy\To\FormatDateTime
      * @ORM\Column(type="datetime") */
     protected $dt1;
     
-    /* @Policy\To\FormatDateTime(format="Y_m_d_H_i_s")
+    /** @Policy\To\FormatDateTime(format="Y_m_d_H_i_s")
      * @ORM\Column(type="datetime") */
     protected $dt2;
     
-    /* @Policy\To\KeepDateTime
+    /** @Policy\To\KeepDateTime
      * @ORM\Column(type="datetime") */
     protected $dt3;
     
