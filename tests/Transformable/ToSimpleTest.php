@@ -4,7 +4,7 @@ namespace Indaxia\OTR\Tests\Transformable;
 use PHPUnit\Framework\TestCase;
 use Indaxia\OTR\Tests\Entity;
 
-class ToArrayTest extends TestCase
+class ToSimpleTest extends TestCase
 {
     public function testSimple()
     {
