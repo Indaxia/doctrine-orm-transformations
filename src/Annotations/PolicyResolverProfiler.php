@@ -27,7 +27,7 @@ class PolicyResolverProfiler extends PolicyResolver {
         $el .= number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringShortClass()->getName().'.'.$propertyName
             .' -> '.($result ? (new \ReflectionClass($result))->getShortName()
-            .' (p'.rtrim(number_format($result->priority, 16),'0').')' : 'null');
+            .' (p '.rtrim(number_format($result->priority, 16),'0').')' : 'null');
         return $result;
     }
     
@@ -42,7 +42,7 @@ class PolicyResolverProfiler extends PolicyResolver {
         $el .= number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getShortName().'.'.$propertyName
             .' -> '.($result ? (new \ReflectionClass($result))->getShortName()
-            .' (p'.rtrim(number_format($result->priority, 16),'0').')' : 'null');
+            .' (p '.rtrim(number_format($result->priority, 16),'0').')' : 'null');
         return $result;
     }
     
@@ -68,7 +68,7 @@ class PolicyResolverProfiler extends PolicyResolver {
     
     protected function addResult($policy) {
         $this->results[] = '    > '.(new \ReflectionClass($policy))->getShortName()
-            .' p'.rtrim(number_format($policy->priority, 16),'0')
+            .' (p '.rtrim(number_format($policy->priority, 16),'0').')'
             .($policy->nested ? ' {...}('.count($policy->nested).')' : '');
     }
 }
