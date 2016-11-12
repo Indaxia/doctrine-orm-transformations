@@ -50,7 +50,10 @@ class PolicyResolver {
                                               $propertyName,
                                               \ReflectionProperty $p,
                                               Reader $ar) {
-        if(! $policy) { $policy = new Policy\From\Auto(); }
+        if(! $policy) {
+            $policy = new Policy\From\Auto();
+            $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
+        }
         
         // local
         $policies = [];
@@ -91,7 +94,10 @@ class PolicyResolver {
                                             $propertyName,
                                             \ReflectionProperty $p,
                                             Reader $ar) {
-        if(! $policy) { $policy = new Policy\To\Auto(); }
+        if(! $policy) {
+            $policy = new Policy\From\Auto();
+            $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
+        }
         
         // local
         $policies = [];
