@@ -15,5 +15,5 @@ class Auto
     implements Interfaces\AutoTo
 {        
 
-    public $priority = 0.0001;
+    public $priority = 0.1;
 }
