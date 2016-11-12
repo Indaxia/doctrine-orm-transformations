@@ -55,6 +55,8 @@ class PolicyResolver {
             $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
         }
         
+        $policies = [];
+        
         // global
         if(! $this->hasOption(PolicyResolver::NO_GLOBAL_POLICIES)) {
             $pa = $ar->getPropertyAnnotations($p);
@@ -67,7 +69,6 @@ class PolicyResolver {
         }
         
         // local
-        $policies = [];
         if(isset($policy->nested[$propertyName])) { // has property policy
             if(($policy instanceof Policy\Interfaces\PolicyFrom)
                   && !($policy instanceof Policy\Interfaces\DenyFrom)
@@ -99,6 +100,8 @@ class PolicyResolver {
             $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
         }
         
+        $policies = [];
+        
         // global
         if(! $this->hasOption(PolicyResolver::NO_GLOBAL_POLICIES)) {
             $pa = $ar->getPropertyAnnotations($p);
@@ -111,7 +114,6 @@ class PolicyResolver {
         }
         
         // local
-        $policies = [];
         if(isset($policy->nested[$propertyName])) { // has property policy
             if(($policy instanceof Policy\Interfaces\PolicyTo)
                && !$this->hasOption(PolicyResolver::NO_POLICY_NESTING)) {
