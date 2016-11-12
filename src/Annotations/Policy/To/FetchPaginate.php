@@ -17,5 +17,5 @@ class FetchPaginate
     public $limit = 20;
     public $reverse = false; // count from the end
 
-    public $priority = 0.020;
+    public $priority = 0.2;
 }

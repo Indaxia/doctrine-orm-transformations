@@ -13,5 +13,5 @@ class KeepDateTime
     extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\KeepDateTimeTo {
 
-    public $priority = 0.010;
+    public $priority = 0.2;
 }

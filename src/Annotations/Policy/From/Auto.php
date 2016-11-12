@@ -14,5 +14,5 @@ class Auto
     extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\AutoFrom
 {
-    public $priority = 0.0001;
+    public $priority = 0.1;
 }

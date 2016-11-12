@@ -12,5 +12,5 @@ class DenyUnsetUpdate
     extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\DenyUnsetFrom, Interfaces\DenyUpdateFrom {
 
-    public $priority = 0.100;
+    public $priority = 0.6;
 }

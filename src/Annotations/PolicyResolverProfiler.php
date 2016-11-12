@@ -26,7 +26,7 @@ class PolicyResolverProfiler extends PolicyResolver {
         $result = parent::resolvePropertyPolicyFrom($policy, $propertyName, $p, $ar);
         $el .= number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getName().'.'.$propertyName
-            .' -> '.($result ? get_class($result).' (p'.$result->priority.')' : 'null');
+            .' -> '.($result ? get_class($result).' (p'.rtrim(number_format($result->priority, 16),'0').')' : 'null');
         return $result;
     }
     
@@ -40,7 +40,7 @@ class PolicyResolverProfiler extends PolicyResolver {
         $result = parent::resolvePropertyPolicyTo($policy, $propertyName, $p, $ar);
         $el .= number_format(microtime(true) - $this->timeStart, 6)
             .': '.$p->getDeclaringClass()->getName().'.'.$propertyName
-            .' -> '.($result ? get_class($result).' (p'.$result->priority.')' : 'null');
+            .' -> '.($result ? get_class($result).' (p'.rtrim(number_format($result->priority, 16),'0').')' : 'null');
         return $result;
     }
     
@@ -65,6 +65,6 @@ class PolicyResolverProfiler extends PolicyResolver {
     }
     
     protected function addResult($policy) {
-        $this->results[] = ' > '.get_class($policy).' p'.$policy->priority.($policy->nested ? ' {...}('.count($policy->nested).')' : '');
+        $this->results[] = ' > '.get_class($policy).' p'.rtrim(number_format($policy->priority, 16),'0').($policy->nested ? ' {...}('.count($policy->nested).')' : '');
     }
 }

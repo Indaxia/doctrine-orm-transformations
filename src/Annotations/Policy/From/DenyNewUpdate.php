@@ -12,5 +12,5 @@ class DenyNewUpdate
     extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\DenyUpdateFrom, Interfaces\DenyNewFrom {
 
-    public $priority = 0.100;
+    public $priority = 0.6;
 }

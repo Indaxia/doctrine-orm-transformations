@@ -14,7 +14,7 @@ class FormatDateTime
     implements Interfaces\FormatDateTimeTo {
     public $format = 'r';
 
-    public $priority = 0.010;
+    public $priority = 0.2;
     
     public function format($f) { $this->format = $f; return $this; }
 }
