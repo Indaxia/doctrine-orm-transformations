@@ -22,12 +22,12 @@ abstract class Annotation implements \Doctrine\ORM\Mapping\Annotation {
     }
     public function createWithLowerPriority($times = 1.0) {
         $new = clone $this;
-        $new->priority /= (self::PRIORITY_MULTIPLIER * $times);
+        $new->priority /= (pow(self::PRIORITY_MULTIPLIER, $times));
         return $new;
     }
     public function createWithIncreasedPriority($times = 1.0) {
         $new = clone $this;
-        $new->priority *= (self::PRIORITY_MULTIPLIER * $times);
+        $new->priority *= (pow(self::PRIORITY_MULTIPLIER, $times));
         return $new;
     }
     
