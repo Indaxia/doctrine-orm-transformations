@@ -74,7 +74,7 @@ class ToPolicyScalarTest extends TestCase
             'dt2' => new Policy\To\Skip,
             'dt3' => new Policy\Auto,
             'date' => new Policy\To\KeepDateTime,
-            'time' => new Policy\To\FormatDateTime('Y_m_d_H_i_s'),
+            'time' => (new Policy\To\FormatDateTime)->format('Y_m_d_H_i_s'),
             'str' => (new Policy\To\Custom)->format(function($value, $propertyName) {
                 return str_replace('test', 'demo', $value);
             }),
