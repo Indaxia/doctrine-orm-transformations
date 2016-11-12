@@ -15,4 +15,6 @@ class FormatDateTime
     public $format = 'r';
 
     public $priority = 0.010;
+    
+    public function format($f) { $this->format = $f; return $this; }
 }
