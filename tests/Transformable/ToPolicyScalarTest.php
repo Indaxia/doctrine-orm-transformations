@@ -87,7 +87,7 @@ class ToPolicyScalarTest extends TestCase
         
         $this->assertEquals('2099-12-31T23:59:59.000Z', $a['dt1']);
         $this->assertArrayNotHasKey('dt2', $a);
-        $this->assertEquals($dt, $a['dt3']);
+        $this->assertEquals('2099-12-31T23:59:59.000Z', $a['dt3']);
         $this->assertEquals($dt, $a['date']);
         $this->assertEquals($dt->format('Y_m_d_H_i_s'), $a['time']);
         $this->assertEquals('demo string \'"', $a['str']);
