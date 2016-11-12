@@ -116,9 +116,9 @@ $result = $car->toArray((new Policy\Auto)->inside([
 ]));
 
 // Local policy overrides global policy
-$result = $car->toArray([
+$result = $car->toArray((new Policy\Auto)->inside([
     'keys' => new Policy\Auto
-]);
+]));
 ```
 [Policy options](https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Policy.php)
             

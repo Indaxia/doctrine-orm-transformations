@@ -52,7 +52,7 @@ class PolicyResolver {
                                               Reader $ar) {
         if(! $policy) {
             $policy = new Policy\From\Auto();
-            $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
+            $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority);
         }
         
         $policies = [];
@@ -62,8 +62,8 @@ class PolicyResolver {
             $pa = $ar->getPropertyAnnotations($p);
             foreach($pa as $a) {
                 if($a instanceof Policy\Interfaces\PolicyFrom) {
-                    // add global policies with double lowered priority
-                    $policies[] = $a->createWithLowerPriority(2.0); 
+                    // add global policies with lowered priority
+                    $policies[] = $a->createWithLowerPriority(); 
                 }
             }
         }
@@ -97,7 +97,7 @@ class PolicyResolver {
                                             Reader $ar) {
         if(! $policy) {
             $policy = new Policy\To\Auto();
-            $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
+            $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority);
         }
         
         $policies = [];
@@ -107,8 +107,8 @@ class PolicyResolver {
             $pa = $ar->getPropertyAnnotations($p);
             foreach($pa as $a) {
                 if($a instanceof Policy\Interfaces\PolicyTo) {
-                    // add global policies with double lowered priority
-                    $policies[] = $a->createWithLowerPriority(2.0); 
+                    // add global policies with lowered priority
+                    $policies[] = $a->createWithLowerPriority(); 
                 }
             }
         }
