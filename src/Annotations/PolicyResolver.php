@@ -95,7 +95,7 @@ class PolicyResolver {
                                             \ReflectionProperty $p,
                                             Reader $ar) {
         if(! $policy) {
-            $policy = new Policy\From\Auto();
+            $policy = new Policy\To\Auto();
             $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
         }
         
