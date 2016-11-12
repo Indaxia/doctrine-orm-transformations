@@ -52,6 +52,7 @@ class PolicyResolverProfiler extends PolicyResolver {
             foreach($policies as $p) {
                 $this->addResult($p);
             }
+            $this->results[] = '';
         }
         return $result;
     }
@@ -62,12 +63,13 @@ class PolicyResolverProfiler extends PolicyResolver {
             foreach($policies as $p) {
                 $this->addResult($p);
             }
+            $this->results[] = '';
         }
         return $result;
     }
     
     protected function addResult($policy) {
-        $this->results[] = '    > '.(new \ReflectionClass($policy))->getShortName()
+        $this->results[] = '    - '.(new \ReflectionClass($policy))->getShortName()
             .' (p '.rtrim(number_format($policy->priority, 16),'0').')'
             .($policy->nested ? ' {...}('.count($policy->nested).')' : '');
     }
