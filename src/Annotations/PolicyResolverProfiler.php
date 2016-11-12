@@ -67,7 +67,7 @@ class PolicyResolverProfiler extends PolicyResolver {
     }
     
     protected function addResult($policy) {
-        $this->results[] = ' > '.(new \ReflectionClass($policy))->getShortName()
+        $this->results[] = '    > '.(new \ReflectionClass($policy))->getShortName()
             .' p'.rtrim(number_format($policy->priority, 16),'0')
             .($policy->nested ? ' {...}('.count($policy->nested).')' : '');
     }
