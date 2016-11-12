@@ -19,6 +19,8 @@ error_reporting(E_ALL | E_STRICT);
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Indaxia\OTR\Tests\Mocks;
+use Indaxia\OTR\Annotations\PolicyResolver;
+use Indaxia\OTR\Annotations\PolicyResolverProfiler;
 
 AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 
