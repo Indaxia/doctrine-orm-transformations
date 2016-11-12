@@ -33,9 +33,9 @@ $entityManager = Mocks\EntityManagerMock::create(
     $config
 );
 
-global $useProfiler;
+global $useProfiler, $argv;
 $useProfiler = false;
-if(isset($argv)) { foreach($argv as $i => $a) {
+if(isset($argv)) { foreach($argv as $a) {
     if($a == 'profiler') {
         $useProfiler = true;
         break;
