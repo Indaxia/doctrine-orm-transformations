@@ -85,7 +85,7 @@ class ToPolicyScalarTest extends TestCase
         $a = $e->toArray($policy, null, $pr);
         printPR($pr);
         
-        $this->assertEquals('Thu, 31 Dec 2099 23:59:59 +0000', $a['dt1']);
+        $this->assertEquals('2099-12-31T23:59:59.000Z', $a['dt1']);
         $this->assertArrayNotHasKey('dt2', $a);
         $this->assertEquals($dt, $a['dt3']);
         $this->assertEquals($dt, $a['date']);

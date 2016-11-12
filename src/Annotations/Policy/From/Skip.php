@@ -5,7 +5,7 @@ use \Indaxia\OTR\Annotations\Policy\Interfaces;
 use \Doctrine\ORM\Mapping as ORM;
 
 /** ITransformable policy.
- * Skips (doesn't handle) the field in ITransformabe::fromArray. Opposite to Accept.
+ * Skips (doesn't handle) the field.
  * @Annotation */
 class Skip
     extends \Indaxia\OTR\Annotations\Annotation
