@@ -31,4 +31,24 @@ $entityManager = Mocks\EntityManagerMock::create(
     $config
 );
 
+$useProfiler = false;
+if(isset($argv) { foreach($argv as $i => $a) {
+    if($a == 'profiler') {
+        $useProfiler = true;
+        break;
+    }    
+} }
 
+function newPR($options) {
+    return $useProfiler
+           ? new PolicyResolverProfiler($options | PolicyResolverProfiler::PRIORITY_DETAILS)
+           : new PolicyResolver($options);
+}
+function printPR($pr) {
+    if($useProfiler) {
+        echo PHP_EOL;
+        echo 'PolicyResolverProfiler Results:'.PHP_EOL;
+        foreach($pr->results as $r) { echo '    '.$r.PHP_EOL; }
+        echo PHP_EOL;         
+    }
+}

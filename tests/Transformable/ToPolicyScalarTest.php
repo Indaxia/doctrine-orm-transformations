@@ -5,6 +5,7 @@ use PHPUnit\Framework\TestCase;
 use Indaxia\OTR\Tests\Entity;
 use Indaxia\OTR\Annotations\PolicyResolver;
 use Indaxia\OTR\Annotations\PolicyResolverProfiler;
+use Indaxia\OTR\Annotations\Policy;
 
 class ToPolicyScalarTest extends TestCase
 {
@@ -29,10 +30,10 @@ class ToPolicyScalarTest extends TestCase
             ->setBln(true)
             ->setFlt(0.0000001)
             ->setStrNull(null);
-        $prp = new PolicyResolverProfiler(PolicyResolver::SIMPLE_ARRAY_FIX | PolicyResolverProfiler::PRIORITY_DETAILS);
-        $a = $e->toArray(null, null, $prp);
-        
-        echo PHP_EOL; foreach($prp->results as $r) { echo '    '.$r.PHP_EOL; } echo PHP_EOL; 
+
+        $pr = newPR(PolicyResolver::SIMPLE_ARRAY_FIX);
+        $a = $e->toArray(null, null, $pr);
+        printPR($pr);
         
         $this->assertEquals(['class' => 'Indaxia\OTR\Tests\Entity\ToPolicyScalar'], $a['__meta']);
         $this->assertEquals(123456, $a['id']);
@@ -50,6 +51,48 @@ class ToPolicyScalarTest extends TestCase
         $this->assertEquals('1234567890987654321', $a['BI']);
         $this->assertEquals(true, $a['bln']);
         $this->assertEquals(0.0000001, $a['flt'], '', 0.00000001);
+    }
+    
+    public function testValuesWithLocalPolicy()
+    {
+        $dt = \DateTime::createFromFormat('Y-m-d H:i:s', '2099-12-31 23:59:59');
+        
+        $e = (new Entity\ToPolicyScalar())
+            ->setId(123456)
+            ->setDt1($dt)
+            ->setDt2($dt)
+            ->setDt3($dt)
+            ->setDate($dt)
+            ->setTime($dt)
+            ->setStr('test string \'"')
+            ->setStrNull(null);
+            
+        $pr = newPR(PolicyResolver::SIMPLE_ARRAY_FIX);
+        
+        $policy = (new Policy\To\Auto)->inside([
+            'dt1' => new Policy\To\Auto,
+            'dt2' => new Policy\To\Skip,
+            'dt3' => new Policy\Auto,
+            'date' => new Policy\To\KeepDateTime,
+            'time' => new Policy\To\FormatDateTime('Y_m_d_H_i_s'),
+            'str' => (new Policy\To\Custom)->format(function($value, $propertyName) {
+                return str_replace('test', 'demo', $value);
+            }),
+            'strSkip' => new Policy\To\Auto,
+            'strNull' => new Policy\To\Skip
+        ]);
+        
+        $a = $e->toArray($policy, null, $pr);
+        printPR($pr);
+        
+        $this->assertEquals('Thu, 31 Dec 2099 23:59:59 +0000', $a['dt1']);
+        $this->assertArrayNotHasKey('dt2', $a);
+        $this->assertEquals($dt, $a['dt3']);
+        $this->assertEquals($dt, $a['date']);
+        $this->assertEquals($dt->format('Y_m_d_H_i_s'), $a['time']);
+        $this->assertEquals('demo string \'"', $a['str']);
+        $this->assertArrayHasKey('strSkip', $a);
+        $this->assertArrayNotHasKey('strNull', $a);
     }
     
 }
