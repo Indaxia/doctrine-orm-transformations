@@ -55,6 +55,17 @@ class PolicyResolver {
             $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
         }
         
+        // global
+        if(! $this->hasOption(PolicyResolver::NO_GLOBAL_POLICIES)) {
+            $pa = $ar->getPropertyAnnotations($p);
+            foreach($pa as $a) {
+                if($a instanceof Policy\Interfaces\PolicyFrom) {
+                    // add global policies with double lowered priority
+                    $policies[] = $a->createWithLowerPriority(2.0); 
+                }
+            }
+        }
+        
         // local
         $policies = [];
         if(isset($policy->nested[$propertyName])) { // has property policy
@@ -75,17 +86,6 @@ class PolicyResolver {
             $newp = clone $policy;
             $policies[] = $newp->inside([]);
         }
-        
-        // global
-        if(! $this->hasOption(PolicyResolver::NO_GLOBAL_POLICIES)) {
-            $pa = $ar->getPropertyAnnotations($p);
-            foreach($pa as $a) {
-                if($a instanceof Policy\Interfaces\PolicyFrom) {
-                    // add global policies with double lowered priority
-                    $policies[] = $a->createWithLowerPriority(2.0); 
-                }
-            }
-        }
         return $this->mergeFrom($policies);
     }
     
@@ -97,6 +97,17 @@ class PolicyResolver {
         if(! $policy) {
             $policy = new Policy\To\Auto();
             $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
+        }
+        
+        // global
+        if(! $this->hasOption(PolicyResolver::NO_GLOBAL_POLICIES)) {
+            $pa = $ar->getPropertyAnnotations($p);
+            foreach($pa as $a) {
+                if($a instanceof Policy\Interfaces\PolicyTo) {
+                    // add global policies with double lowered priority
+                    $policies[] = $a->createWithLowerPriority(2.0); 
+                }
+            }
         }
         
         // local
@@ -116,17 +127,6 @@ class PolicyResolver {
             // inherit parent policy with nothing inside
             $newp = clone $policy;
             $policies[] = $newp->inside([]);
-        }
-        
-        // global
-        if(! $this->hasOption(PolicyResolver::NO_GLOBAL_POLICIES)) {
-            $pa = $ar->getPropertyAnnotations($p);
-            foreach($pa as $a) {
-                if($a instanceof Policy\Interfaces\PolicyTo) {
-                    // add global policies with double lowered priority
-                    $policies[] = $a->createWithLowerPriority(2.0); 
-                }
-            }
         }
         return $this->mergeTo($policies);
     }
