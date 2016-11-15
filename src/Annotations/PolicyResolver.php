@@ -95,7 +95,7 @@ class PolicyResolver {
                                             $propertyName,
                                             \ReflectionProperty $p,
                                             Reader $ar) {
-        if(! $policy) {
+        if(! $policy || ($policy instanceof Policy\Interfaces\FetchPaginateTo)) { // pagination is for parent only
             $policy = new Policy\To\Auto();
             $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority);
         }

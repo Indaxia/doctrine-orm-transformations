@@ -86,7 +86,7 @@ trait Transformable {
             $collection = $this->$getter(); // entity collection
             if($collection->count()) {
                 if($policy instanceof Policy\Interfaces\FetchPaginateTo) {
-                    if($policy->reverse) {
+                    if($policy->fromTail) {
                         $offset = $collection->count() - $policy->limit - $policy->offset;
                         if($offset < 0) { $offset = 0; }
                         $limit = ($collection->count() > $policy->limit) ? $collection->count() : $policy->limit;

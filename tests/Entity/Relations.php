@@ -77,7 +77,7 @@ class Relations implements ITransformable {
     protected $manyB;
     
     /**
-     * @Policy\To\FetchPaginate(reverse=true)
+     * @Policy\To\FetchPaginate(limit=2, fromTail=true)
      * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"}, fetch="EAGER")
      * @ORM\JoinTable(name="many_c",
      *      joinColumns={ @ORM\JoinColumn(name="relations_id", referencedColumnName="id") },
