@@ -43,7 +43,7 @@ if(isset($argv)) { foreach($argv as $a) {
 } }
 
 /** Creates a new PolicyResolver or PolicyResolverProfiler depending on arg 'profiler' */
-function newPR($options) {
+function newPR($options = 0) {
     global $useProfiler;
     return $useProfiler
            ? new PolicyResolverProfiler($options | PolicyResolverProfiler::PRIORITY_DETAILS)
