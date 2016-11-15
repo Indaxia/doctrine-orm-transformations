@@ -9,7 +9,7 @@ use Indaxia\OTR\Annotations\Policy;
 /**
  * @ORM\Entity
  */
-class ToPolicyScalar implements ITransformable {
+class Scalar implements ITransformable {
     use Transformable;
     
     /** @ORM\Id
