@@ -126,7 +126,7 @@ class Relations implements ITransformable {
     }
     
     public function getId() { return $this->id; }
-    public function setId($v) { $this->id = $v; }
+    public function setId($v) { $this->id = $v; return $this; }
     
     public function getOneA() { return $this->oneA; }
     public function setOneA($v) { $this->oneA = $v; return $this; }
