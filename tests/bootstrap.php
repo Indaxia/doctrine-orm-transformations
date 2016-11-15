@@ -55,7 +55,7 @@ function printPR($pr) {
     global $useProfiler;
     if($useProfiler) {
         echo PHP_EOL;
-        echo debug_backtrace()[1]['function'].' PolicyResolverProfiler Results:'.PHP_EOL;
+        echo debug_backtrace()[1]['class'].'::'.debug_backtrace()[1]['function'].' profiling:'.PHP_EOL;
         foreach($pr->results as $r) { echo '    '.$r.PHP_EOL; }
         echo PHP_EOL;         
     }
