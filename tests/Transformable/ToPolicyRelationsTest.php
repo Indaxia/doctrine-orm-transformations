@@ -63,7 +63,7 @@ class ToPolicyRelationsTest extends TestCase
         $this->assertEquals(2, count($a['manyC']['collection']));
         foreach($a['manyC']['collection'] as $i => $se) {
             $this->assertArrayHasKey('value', $a['manyC']['collection'][$i]);
-            $this->assertEquals('many C sub-entity '.$i+1, $a['manyC']['collection'][$i]['value']);            
+            $this->assertEquals('many C sub-entity '.($i+1), $a['manyC']['collection'][$i]['value']);            
         }
         
         $this->assertArrayNotHasKey('manyD', $a);
