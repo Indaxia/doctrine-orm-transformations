@@ -21,7 +21,7 @@ class PolicyResolverProfiler extends PolicyResolver {
                                               $propertyName,
                                               \ReflectionProperty $p,
                                               Reader $ar) {
-        $this->results[] = '[From] ';
+        $this->results[] = $this->padding().'[From] ';
         $el = & $this->results[count($this->results)-1];
         $result = parent::resolvePropertyPolicyFrom($policy, $propertyName, $p, $ar);
         $el .= number_format(microtime(true) - $this->timeStart, 6)
@@ -36,7 +36,7 @@ class PolicyResolverProfiler extends PolicyResolver {
                                             $propertyName,
                                             \ReflectionProperty $p,
                                             Reader $ar) {
-        $this->results[] = '[To] ';
+        $this->results[] = $this->padding().'[To] ';
         $el = & $this->results[count($this->results)-1];
         $result = parent::resolvePropertyPolicyTo($policy, $propertyName, $p, $ar);
         $el .= number_format(microtime(true) - $this->timeStart, 6)
@@ -72,5 +72,9 @@ class PolicyResolverProfiler extends PolicyResolver {
         $this->results[] = '    - '.(new \ReflectionClass($policy))->getShortName()
             .' (p '.rtrim(number_format($policy->priority, 16),'0').')'
             .($policy->nested ? ' {...}('.count($policy->nested).')' : '');
+    }
+    
+    protected function padding() {
+        return str_repeat('  ', $this->currentDepth);
     }
 }

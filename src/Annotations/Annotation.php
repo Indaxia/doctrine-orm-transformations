@@ -2,13 +2,15 @@
 namespace Indaxia\OTR\Annotations;
 
 abstract class Annotation implements \Doctrine\ORM\Mapping\Annotation {
+    const EPSILON = 0.000001;
+    const PRIORITY_MULTIPLIER = 10.0;
+    
     public $nested = [];
-    public $priority = 0.0000001;
+    public $priority = 0.95;
     public $getter = null; // cannot be used with relations
     public $setter = null;
     public $propagating = true; // allow policy propagation from parent to children
-    const EPSILON = 0.00001;
-    const PRIORITY_MULTIPLIER = 10.0;
+    
     
     public function __construct(array $data = [])
     {

@@ -18,7 +18,7 @@ class PolicyResolver {
      * @see https://github.com/doctrine/doctrine2/issues/4673 */
     const SIMPLE_ARRAY_FIX = 0x10;
     
-    public $resolved;
+    public $currentDepth = 0;
     protected $options;
     
     /** @param integer $options can be merged with | operator.

@@ -106,16 +106,9 @@ class ToPolicyRelationsTest extends TestCase
                     })
                 ]),
                 'oneB' => new Policy\To\Skip,
-                'oneC' => new Policy\To\Skip,
-                'oneD' => new Policy\To\Skip,
-                'oneE' => new Policy\To\Skip,
-                'oneF' => new Policy\To\Skip,
                 'manyA' => new Policy\To\Skip,
                 'manyB' => new Policy\To\Skip,
                 'manyC' => new Policy\To\Skip,
-                'manyD' => new Policy\To\Skip,
-                'manyE' => new Policy\To\Skip,
-                'manyF' => new Policy\To\Skip,
                 'deep' => new Policy\To\Skip
             ])
         ]);

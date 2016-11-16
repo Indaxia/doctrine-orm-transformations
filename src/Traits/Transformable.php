@@ -34,9 +34,14 @@ trait Transformable {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
             if($pn[0] === '_' && $pn[1] === '_') { continue; }
+            $pr->currentDepth++;
             $propertyPolicy = $pr->resolvePropertyPolicyTo($policy, $pn, $p, $ar);
-            if($propertyPolicy instanceof Policy\Interfaces\SkipTo) { continue; }
+            if($propertyPolicy instanceof Policy\Interfaces\SkipTo) {
+                $pr->currentDepth--;
+                continue;
+            }
             $result[$pn] = $this->toArrayProperty($p, $pn, $propertyPolicy, $ar, $pr, $refClass);
+            $pr->currentDepth--;
         }
         return $result;
     }
@@ -140,9 +145,14 @@ trait Transformable {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
             if(!array_key_exists($pn, $src) || ($pn[0] === '_' && $pn[1] === '_')) { continue; }
+            $pr->currentDepth++;
             $propertyPolicy = $pr->resolvePropertyPolicyFrom($policy, $pn, $p, $ar);
-            if($propertyPolicy instanceof Policy\Interfaces\SkipFrom) { continue; }
+            if($propertyPolicy instanceof Policy\Interfaces\SkipFrom) {
+                $pr->currentDepth--;
+                continue;
+            }
             $this->fromArrayProperty($src[$pn], $p, $pn, $propertyPolicy, $ar, $pr, $entityManager, $refClass);
+            $pr->currentDepth--;
         }
         return $this;
     }
