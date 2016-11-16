@@ -67,6 +67,10 @@ class ToPolicyRelationsTest extends TestCase
             $this->assertEquals('many C sub-entity '.($i+1), $a['manyC']['collection'][$i]['value']);            
         }
         
+        $this->assertArrayNotHasKey('manyD', $a);
+        $this->assertArrayNotHasKey('manyE', $a);
+        $this->assertArrayNotHasKey('manyF', $a);
+        
         $this->assertArrayHasKey('deep', $a);
         $this->assertNotEmpty($a['deep']);
         $this->assertArrayHasKey('oneA', $a['deep']);
@@ -77,10 +81,6 @@ class ToPolicyRelationsTest extends TestCase
         $this->assertNotEmpty($a['deep']['oneA']);
         $this->assertArrayHasKey('value', $a['deep']['oneA']);
         $this->assertEquals('one A sub-sub-entity', $a['deep']['oneA']['value']);
-        
-        $this->assertArrayNotHasKey('manyD', $a);
-        $this->assertArrayNotHasKey('manyE', $a);
-        $this->assertArrayNotHasKey('manyF', $a);
     }
     
     public function testValuesWithLocalPolicy()
@@ -102,7 +102,7 @@ class ToPolicyRelationsTest extends TestCase
             'deep' => (new Policy\To\Auto)->inside([
                 'oneA' => (new Policy\To\Auto)->inside([
                     'value' => (new Policy\To\Custom)->format(function($value, $columnType) {
-                        return $value;
+                        return 'deep one A sub-sub-entity';
                     })
                 ]),
                 'oneB' => new Policy\To\Skip,
@@ -172,6 +172,17 @@ class ToPolicyRelationsTest extends TestCase
         $this->assertArrayNotHasKey('manyD', $a);
         $this->assertArrayNotHasKey('manyE', $a);
         $this->assertArrayNotHasKey('manyF', $a);
+        
+        $this->assertArrayHasKey('deep', $a);
+        $this->assertNotEmpty($a['deep']);
+        $this->assertArrayHasKey('oneA', $a['deep']);
+        $this->assertArrayHasKey('id', $a['deep']);
+        $this->assertEquals(10000, $a['deep']['id']);
+        $this->assertArrayHasKey('__meta', $a['deep']);
+        $this->assertEquals(['class' => 'Indaxia\OTR\Tests\Entity\Relations'], $a['deep']['__meta']);
+        $this->assertNotEmpty($a['deep']['oneA']);
+        $this->assertArrayHasKey('value', $a['deep']['oneA']);
+        $this->assertEquals('deep one A sub-sub-entity', $a['deep']['oneA']['value']);
     }
 }
 ?>
