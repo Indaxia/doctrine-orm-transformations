@@ -65,15 +65,18 @@ class PolicyResolver {
            && ($policy instanceof Policy\Interfaces\PolicyFrom)) {
             $policies[] = $policy->cloneFromParent();
         } else { // not propagating - create auto with double lowered priority
-            $policy = (new Policy\From\Auto())->insideOf($policy);
-            $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
-            $policies[] = $policy;
+            $propagated = new Policy\From\Auto();
+            $propagated->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($propagated->priority, 2.0);
+            $policies[] = $propagated;
         }
         
         // local
-        if(isset($policy->nested[$propertyName])
-           && ($policy->nested[$propertyName] instanceof Policy\Interfaces\PolicyFrom)) {
-            $policies[] = $policy->nested[$propertyName];
+        if(isset($policy->nested[$propertyName])) {
+            if($policy->nested[$propertyName] instanceof Policy\Interfaces\PolicyFrom) {
+                $policies[] = $policy->nested[$propertyName];
+            } else {
+                $policies[] = (new Policy\From\Auto())->insideOf($policy->nested[$propertyName]);
+            }
         }
         
         return $this->mergeFrom($policies);
@@ -101,15 +104,18 @@ class PolicyResolver {
            && ($policy instanceof Policy\Interfaces\PolicyTo)) {
             $policies[] = $policy->cloneFromParent();
         } else { // not propagating - create auto with double lowered priority
-            $policy = (new Policy\To\Auto())->insideOf($policy);
-            $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
-            $policies[] = $policy;
+            $propagated = new Policy\To\Auto();
+            $propagated->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($propagated->priority, 2.0);
+            $policies[] = $propagated;
         }
         
         // local
-        if(isset($policy->nested[$propertyName])
-           && ($policy->nested[$propertyName] instanceof Policy\Interfaces\PolicyTo)) {
-            $policies[] = $policy->nested[$propertyName];
+        if(isset($policy->nested[$propertyName])) {
+            if($policy->nested[$propertyName] instanceof Policy\Interfaces\PolicyTo) {
+                $policies[] = $policy->nested[$propertyName];
+            } else {
+                $policies[] = (new Policy\To\Auto())->insideOf($policy->nested[$propertyName]);
+            }
         }
         
         return $this->mergeTo($policies);
