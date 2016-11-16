@@ -17,6 +17,7 @@ class ToPolicyRelationsTest extends TestCase
         $a = $e->toArray(null, null, $pr);
         printPR($pr);
         
+        $this->assertArrayHasKey('__meta', $a);
         $this->assertEquals(['class' => 'Indaxia\OTR\Tests\Entity\Relations'], $a['__meta']);
         $this->assertArrayHasKey('id', $a);
         $this->assertEquals(1000, $a['id']);
@@ -66,6 +67,17 @@ class ToPolicyRelationsTest extends TestCase
             $this->assertEquals('many C sub-entity '.($i+1), $a['manyC']['collection'][$i]['value']);            
         }
         
+        $this->assertArrayHasKey('deep', $a);
+        $this->assertNotEmpty($a['deep']);
+        $this->assertArrayHasKey('oneA', $a['deep']);
+        $this->assertArrayHasKey('id', $a['deep']);
+        $this->assertEquals(10000, $a['deep']['id']);
+        $this->assertArrayHasKey('__meta', $a['deep']);
+        $this->assertEquals(['class' => 'Indaxia\OTR\Tests\Entity\Relations'], $a['deep']['__meta']);
+        $this->assertNotEmpty($a['deep']['oneA']);
+        $this->assertArrayHasKey('value', $a['deep']['oneA']);
+        $this->assertEquals('one A sub-sub-entity', $a['deep']['oneA']['value']);
+        
         $this->assertArrayNotHasKey('manyD', $a);
         $this->assertArrayNotHasKey('manyE', $a);
         $this->assertArrayNotHasKey('manyF', $a);
@@ -86,7 +98,26 @@ class ToPolicyRelationsTest extends TestCase
             'oneD' => new Policy\Auto,
             'manyA' => new Policy\Skip,
             'manyB' => new Policy\To\FetchPaginate(['limit' => 1, 'fromTail' => true]),
-            'manyC' => new Policy\Auto
+            'manyC' => new Policy\Auto,
+            'deep' => (new Policy\To\Auto)->inside([
+                'oneA' => (new Policy\To\Auto)->inside([
+                    'value' => (new Policy\To\Custom)->format(function($value, $columnType) {
+                        return $value;
+                    })
+                ]),
+                'oneB' => new Policy\To\Skip,
+                'oneC' => new Policy\To\Skip,
+                'oneD' => new Policy\To\Skip,
+                'oneE' => new Policy\To\Skip,
+                'oneF' => new Policy\To\Skip,
+                'manyA' => new Policy\To\Skip,
+                'manyB' => new Policy\To\Skip,
+                'manyC' => new Policy\To\Skip,
+                'manyD' => new Policy\To\Skip,
+                'manyE' => new Policy\To\Skip,
+                'manyF' => new Policy\To\Skip,
+                'deep' => new Policy\To\Skip
+            ])
         ]);
         
         $a = $e->toArray($policy, null, $pr);

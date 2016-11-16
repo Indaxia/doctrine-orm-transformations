@@ -116,6 +116,14 @@ class Relations implements ITransformable {
      */
     protected $manyF;
     
+    
+    /**
+     * @Policy\To\Auto
+     * @ORM\ManyToOne(targetEntity="Relations", cascade={"persist", "remove"}, fetch="EAGER")
+     * @ORM\JoinColumn(name="one_deep", referencedColumnName="id") */
+    protected $deep;
+        
+    
     public function __construct() {
         $this->manyA = new ArrayCollection();
         $this->manyB = new ArrayCollection();
@@ -154,6 +162,8 @@ class Relations implements ITransformable {
     public function getManyF() { return $this->manyF; }
     public function setManyF($v) { $this->manyF = $v; return $this; }
     
+    public function getDeep() { return $this->deep; }
+    public function setDeep($v) { $this->deep = $v; return $this; }
     
     // to keep tests clean
     public static function generate() {
@@ -195,6 +205,12 @@ class Relations implements ITransformable {
         $c->add((new Simple())->setId(60)->setValue('many F sub-entity 0'));
         $c->add((new Simple())->setId(61)->setValue('many F sub-entity 1'));
         $c->add((new Simple())->setId(62)->setValue('many F sub-entity 2'));
+        
+        $e->setDeep(
+            (new Relations())
+            ->setId(10000)
+            ->setOneA((new Simple())->setId(100)->setValue('one A sub-sub-entity'))
+        );
         
         return $e;
     }
