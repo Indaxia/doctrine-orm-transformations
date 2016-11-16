@@ -138,7 +138,6 @@ class ToPolicyRelationsTest extends TestCase
             $this->assertEquals('many C sub-entity '.$i, $a['manyC']['collection'][$i]['value']);            
         }
         
-        $this->assertArrayNotHasKey('manyC', $a);
         $this->assertArrayNotHasKey('manyD', $a);
         $this->assertArrayNotHasKey('manyE', $a);
         $this->assertArrayNotHasKey('manyF', $a);
