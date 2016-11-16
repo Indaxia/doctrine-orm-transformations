@@ -63,12 +63,12 @@ class PolicyResolver {
            && $policy->propagating
            && !$this->hasOption(PolicyResolver::NO_PROPAGATION)
            && ($policy instanceof Policy\Interfaces\PolicyFrom)) {
-            $policy = $policy->cloneFromParent();
+            $policies[] = $policy->cloneFromParent();
         } else { // not propagating - create auto with double lowered priority
             $policy = (new Policy\From\Auto())->insideOf($policy);
             $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
+            $policies[] = $policy;
         }
-        $policies[] = $policy;
         
         // local
         if(isset($policy->nested[$propertyName])
@@ -99,12 +99,12 @@ class PolicyResolver {
            && $policy->propagating
            && !$this->hasOption(PolicyResolver::NO_PROPAGATION)
            && ($policy instanceof Policy\Interfaces\PolicyTo)) {
-            $policy = $policy->cloneFromParent();
+            $policies[] = $policy->cloneFromParent();
         } else { // not propagating - create auto with double lowered priority
             $policy = (new Policy\To\Auto())->insideOf($policy);
             $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
+            $policies[] = $policy;
         }
-        $policies[] = $policy;
         
         // local
         if(isset($policy->nested[$propertyName])
