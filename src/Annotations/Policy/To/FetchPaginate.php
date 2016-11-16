@@ -16,7 +16,7 @@ class FetchPaginate
     extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\FetchPaginateTo {
     public $offset = 0;
-    public $limit = 20;
+    public $limit = \PHP_INT_MAX;
     /** Count from the end. It doesn't reverse the result's order (!) */
     public $fromTail = false;
 

@@ -5,7 +5,7 @@ use \Indaxia\OTR\Annotations\Policy\Interfaces;
 use \Doctrine\ORM\Mapping as ORM;
 
 /** ITransformable policy.
- * Uses closure to format field.
+ * Uses closure to format field and return a new value.
  * @Annotation */
 class Custom
     extends \Indaxia\OTR\Annotations\Annotation
@@ -16,8 +16,11 @@ class Custom
     public $closure = null;
     
     /** Sets closure to prove if the field should be changed or skipped.
-     * @param \Closure $c function($value, $propertyName)
-     * @return mixed formatted value */
+     * @param \Closure $c function($value,
+     *                             $propertyName)
+     *      The closure function MUST return a new value even if the $value is an Entity.
+     * 
+     * @return Custom */
     public function format(\Closure $c) {
         $this->closure = $c;
         return $this;

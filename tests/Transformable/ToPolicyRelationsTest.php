@@ -70,5 +70,77 @@ class ToPolicyRelationsTest extends TestCase
         $this->assertArrayNotHasKey('manyE', $a);
         $this->assertArrayNotHasKey('manyF', $a);
     }
+    
+    public function testValuesWithLocalPolicy()
+    {
+        $e = Entity\Relations::generate();
+        $pr = newPR();
+        
+        $policy = (new Policy\To\Auto())->inside([
+            'oneA' => (new Policy\To\Custom())->format(function($value, $propertyName) {
+                return $value->setValue('one A sub-entity customized'); // note that 'setValue' returns $this inside
+            }),
+            'oneB' => new Policy\To\Skip,
+            'oneC' => new Policy\To\Auto,
+            'oneD' => new Policy\Auto,
+            'manyA' => new Policy\Skip,
+            'manyB' => new Policy\To\FetchPaginate(['limit' => 1, 'fromTail' => true]),
+            'manyC' => new Policy\Auto
+        ]);
+        
+        $a = $e->toArray($policy, null, $pr);
+        printPR($pr);
+        
+        $this->assertEquals(['class' => 'Indaxia\OTR\Tests\Entity\Relations'], $a['__meta']);
+        $this->assertArrayHasKey('id', $a);
+        $this->assertEquals(1000, $a['id']);
+        
+        $this->assertArrayHasKey('oneA', $a);
+        $this->assertNotEmpty($a['oneA']);
+        $this->assertArrayHasKey('value', $a['oneA']);
+        $this->assertEquals('one A sub-entity customized', $a['oneA']['value']);
+        
+        $this->assertArrayNotHasKey('oneB', $a);
+        
+        $this->assertArrayHasKey('oneC', $a);
+        $this->assertNotEmpty($a['oneC']);
+        $this->assertArrayHasKey('value', $a['oneC']);
+        $this->assertEquals('one C sub-entity', $a['oneC']['value']);
+        
+        $this->assertArrayHasKey('oneD', $a);
+        $this->assertNotEmpty($a['oneD']);
+        $this->assertArrayHasKey('value', $a['oneD']);
+        $this->assertEquals('one D sub-entity', $a['oneD']['value']);
+        
+        $this->assertArrayNotHasKey('oneE', $a);
+        $this->assertArrayNotHasKey('oneF', $a);
+        
+        $this->assertArrayNotHasKey('manyA', $a);
+        
+        $this->assertArrayHasKey('manyB', $a);
+        $this->assertNotEmpty($a['manyB']);
+        $this->assertArrayHasKey('collection', $a['manyB']);
+        $this->assertNotEmpty($a['manyB']['collection']);
+        $this->assertEquals(1, count($a['manyB']['collection']));
+        foreach($a['manyB']['collection'] as $i => $se) {
+            $this->assertArrayHasKey('value', $a['manyB']['collection'][$i]);
+            $this->assertEquals('many B sub-entity '.($i+2), $a['manyB']['collection'][$i]['value']);            
+        }
+        
+        $this->assertArrayHasKey('manyC', $a);
+        $this->assertNotEmpty($a['manyC']);
+        $this->assertArrayHasKey('collection', $a['manyC']);
+        $this->assertNotEmpty($a['manyC']['collection']);
+        $this->assertEquals(3, count($a['manyC']['collection']));
+        foreach($a['manyC']['collection'] as $i => $se) {
+            $this->assertArrayHasKey('value', $a['manyC']['collection'][$i]);
+            $this->assertEquals('many C sub-entity '.$i, $a['manyC']['collection'][$i]['value']);            
+        }
+        
+        $this->assertArrayNotHasKey('manyC', $a);
+        $this->assertArrayNotHasKey('manyD', $a);
+        $this->assertArrayNotHasKey('manyE', $a);
+        $this->assertArrayNotHasKey('manyF', $a);
+    }
 }
 ?>
