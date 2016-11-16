@@ -6,6 +6,7 @@ abstract class Annotation implements \Doctrine\ORM\Mapping\Annotation {
     public $priority = 0.0000001;
     public $getter = null; // cannot be used with relations
     public $setter = null;
+    public $propagating = true; // allow policy propagation from parent to children
     const EPSILON = 0.00001;
     const PRIORITY_MULTIPLIER = 10.0;
     

@@ -21,4 +21,5 @@ class FetchPaginate
     public $fromTail = false;
 
     public $priority = 0.2;
+    public $propagating = false;
 }

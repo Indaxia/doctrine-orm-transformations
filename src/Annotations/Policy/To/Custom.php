@@ -11,10 +11,10 @@ class Custom
     extends \Indaxia\OTR\Annotations\Annotation
     implements Interfaces\CustomTo
 {
-    public $priority = 0.5;
-    
     public $format = null;
     public $transform = null;
+    public $priority = 0.5;
+    public $propagating = false;
     
     /** Sets closure to format the SCALAR field.
      * @param \Closure $handler function($value, $columnType)

@@ -12,6 +12,7 @@ class Custom
     implements Interfaces\CustomFrom
 {    
     public $priority = 0.5;
+    public $propagating = false;
     
     public $closure = null;
     
