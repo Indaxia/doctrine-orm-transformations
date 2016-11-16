@@ -21,7 +21,7 @@ class Custom
      *      The $value is passed to closure BEFORE any transformation.
      *      $columnType can be one of Doctrine DBAL types or null for non-doctrine type.
      *      @see http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/types.html#mapping-matrix
-     *      The closure function MUST return a new value that will be placed at the result array untouched.
+     *      The closure function MUST return a new value that will be placed at the result array.
      * 
      * @return Custom */
     public function format(\Closure $handler) {
@@ -30,10 +30,10 @@ class Custom
     }
     
     /** Sets closure to transform the RELATION (Entity or Collection) field into array.
-     * @param \Closure $handler function($original, & $transformed)
+     * @param \Closure $handler function($original, $transformed)
      *      $original can be an Entity, Collection or null
-     *      $transformed is the value to be placed at the result array. It can be changed by the closure.
-     *      Return is not expected.
+     *      $transformed is a transformation result, it can be changed and returned.
+     *      The closure function MUST return a new value that will be placed at the result array.
      * 
      * @return Custom */
     public function transform(\Closure $handler) {

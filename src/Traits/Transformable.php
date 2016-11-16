@@ -111,7 +111,7 @@ trait Transformable {
             }
             
             if(($policy instanceof Policy\Interfaces\CustomTo) && $policy->transform) {
-                call_user_func_array($policy->transform, [$v, $result]);
+                $result = call_user_func_array($policy->transform, [$v, $result]);
             }
         } else { // not a doctrine type
             $result = $this->$getter();
