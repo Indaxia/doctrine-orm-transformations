@@ -13,4 +13,5 @@ class DenyNewUpdate
     implements Interfaces\DenyUpdateFrom, Interfaces\DenyNewFrom {
 
     public $priority = 0.6;
+    public $propagating = false;
 }

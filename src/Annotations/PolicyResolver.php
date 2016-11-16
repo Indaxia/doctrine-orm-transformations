@@ -9,10 +9,8 @@ class PolicyResolver {
     /** Allows to use serialize/unserialize in entity array field types.
      * @see https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-0231 */
     const IGNORE_CVE_2015_0231 = 0x01;
-    /** Don't use parent policy when nested policies not specified */
-    const NO_POLICY_NESTING = 0x02;
-    /** Don't use any of global policies (from Entity annotations) */
-    const NO_GLOBAL_POLICIES = 0x04;
+    /** Don't use parent's policy when nested policies are not specified */
+    const NO_PROPAGATION = 0x02;
     /** Allow setting to null value for non-nullable scalar types */
     const ALLOW_NON_NULLABLE = 0x08;
     /** Replaces empty "simple_array" type with array(null) and vice versa
@@ -49,49 +47,35 @@ class PolicyResolver {
     public function resolvePropertyPolicyFrom(Policy\Interfaces\Policy $policy = null,
                                               $propertyName,
                                               \ReflectionProperty $p,
-                                              Reader $ar) { // TODO: simplify
-        if(! $policy || !$policy->propagating) {
-            $policy = new Policy\From\Auto();
-            $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority);
-        }
-        
+                                              Reader $ar) {
         $policies = [];
         
         // global
-        if(! $this->hasOption(PolicyResolver::NO_GLOBAL_POLICIES)) {
-            $pa = $ar->getPropertyAnnotations($p);
-            foreach($pa as $a) {
-                if($a instanceof Policy\Interfaces\PolicyFrom) {
-                    // add global policies with lowered priority
-                    $policies[] = $a->createWithLowerPriority(); 
-                }
+        $pa = $ar->getPropertyAnnotations($p);
+        foreach($pa as $a) {
+            if($a instanceof Policy\Interfaces\PolicyFrom) {
+                $policies[] = $a->cloneFromGlobal(); 
             }
         }
         
-        // local
-        if(isset($policy->nested[$propertyName])) { // has property policy
-            if(($policy instanceof Policy\Interfaces\PolicyFrom)
-                  && !($policy instanceof Policy\Interfaces\DenyFrom)
-                  && !$this->hasOption(PolicyResolver::NO_POLICY_NESTING)) {
-                // add parent policy with lowered priority and nothing inside
-                $newp = $policy->createWithLowerPriority()->inside([]);
-                $newp->getter = null;
-                $newp->setter = null;
-                $policies[] = $newp;
-            }
-            if($policy->nested[$propertyName] instanceof Policy\Interfaces\PolicyFrom) {
-                // add current policy
-                $policies[] = $policy->nested[$propertyName];
-            }
-        } else if(($policy instanceof Policy\Interfaces\PolicyFrom)
-                  && !($policy instanceof Policy\Interfaces\DenyFrom)
-                  && !$this->hasOption(PolicyResolver::NO_POLICY_NESTING)) {
-            // inherit parent policy with nothing inside
-            $newp = clone $policy;
-            $newp->getter = null;
-            $newp->setter = null;
-            $policies[] = $newp->inside([]);
+        // propagating
+        if($policy
+           && $policy->propagating
+           && !$this->hasOption(PolicyResolver::NO_PROPAGATION)
+           && ($policy instanceof Policy\Interfaces\PolicyFrom)) {
+            $policy = $policy->cloneFromParent();
+        } else { // not propagating - create auto with double lowered priority
+            $policy = (new Policy\From\Auto())->insideOf($policy);
+            $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
         }
+        $policies[] = $policy;
+        
+        // local
+        if(isset($policy->nested[$propertyName])
+           && ($policy->nested[$propertyName] instanceof Policy\Interfaces\PolicyFrom)) {
+            $policies[] = $policy->nested[$propertyName];
+        }
+        
         return $this->mergeFrom($policies);
     }
     
@@ -99,47 +83,35 @@ class PolicyResolver {
     public function resolvePropertyPolicyTo(Policy\Interfaces\Policy $policy = null,
                                             $propertyName,
                                             \ReflectionProperty $p,
-                                            Reader $ar) { // TODO: simplify
-        if(! $policy || !$policy->propagating) { // pagination is for parent only
-            $policy = new Policy\To\Auto();
-            $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority);
-        }
-        
+                                            Reader $ar) {
         $policies = [];
         
         // global
-        if(! $this->hasOption(PolicyResolver::NO_GLOBAL_POLICIES)) {
-            $pa = $ar->getPropertyAnnotations($p);
-            foreach($pa as $a) {
-                if($a instanceof Policy\Interfaces\PolicyTo) {
-                    // add global policies with lowered priority
-                    $policies[] = $a->createWithLowerPriority(); 
-                }
+        $pa = $ar->getPropertyAnnotations($p);
+        foreach($pa as $a) {
+            if($a instanceof Policy\Interfaces\PolicyTo) {
+                $policies[] = $a->cloneFromGlobal(); 
             }
         }
         
-        // local
-        if(isset($policy->nested[$propertyName])) { // has property policy
-            if(($policy instanceof Policy\Interfaces\PolicyTo)
-               && !$this->hasOption(PolicyResolver::NO_POLICY_NESTING)) {
-                // add parent policy with lowered priority and nothing inside
-                $newp = $policy->createWithLowerPriority()->inside([]);
-                $newp->getter = null;
-                $newp->setter = null;
-                $policies[] = $newp;
-            }
-            if($policy->nested[$propertyName] instanceof Policy\Interfaces\PolicyTo) {
-                // add current policy
-                $policies[] = $policy->nested[$propertyName];
-            }
-        } else if(($policy instanceof Policy\Interfaces\PolicyTo)
-                  && !$this->hasOption(PolicyResolver::NO_POLICY_NESTING)) {
-            // inherit parent policy with nothing inside
-            $newp = clone $policy;
-            $newp->getter = null;
-            $newp->setter = null;
-            $policies[] = $newp->inside([]);
+        // propagating
+        if($policy
+           && $policy->propagating
+           && !$this->hasOption(PolicyResolver::NO_PROPAGATION)
+           && ($policy instanceof Policy\Interfaces\PolicyTo)) {
+            $policy = $policy->cloneFromParent();
+        } else { // not propagating - create auto with double lowered priority
+            $policy = (new Policy\To\Auto())->insideOf($policy);
+            $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority, 2.0);
         }
+        $policies[] = $policy;
+        
+        // local
+        if(isset($policy->nested[$propertyName])
+           && ($policy->nested[$propertyName] instanceof Policy\Interfaces\PolicyTo)) {
+            $policies[] = $policy->nested[$propertyName];
+        }
+        
         return $this->mergeTo($policies);
     }
     

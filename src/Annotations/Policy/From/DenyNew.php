@@ -16,4 +16,5 @@ class DenyNew
     implements Interfaces\DenyNewFrom {
 
     public $priority = 0.6;
+    public $propagating = false;
 }

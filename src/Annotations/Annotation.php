@@ -36,21 +36,22 @@ abstract class Annotation implements \Doctrine\ORM\Mapping\Annotation {
     public function isPriorityGreaterThanOrEqualTo(Annotation $a) {
         return ($this->priority > $a->priority) || (abs($this->priority - $a->priority) < static::EPSILON);
     }
-    public function createWithLowerPriority($times = 1.0) {
+    public function cloneFromParent($lowerPriorityTimes = 1.0) {
+        $new = $this->cloneWithLowerPriority($lowerPriorityTimes);
+        $new->setter = null;
+        $new->getter = null;
+        return $new->inside([]);
+    }
+    public function cloneFromGlobal($lowerPriorityTimes = 1.0) {
+        return $this->cloneWithLowerPriority($lowerPriorityTimes);
+    }
+    public function cloneWithLowerPriority($times = 1.0) {
         $new = clone $this;
         $new->priority = static::lowerPriority($this->priority, $times);
         return $new;
     }
-    public function createWithIncreasedPriority($times = 1.0) {
-        $new = clone $this;
-        $new->priority = static::increasePriority($this->priority, $times);
-        return $new;
-    }
     public static function lowerPriority($p, $times = 1.0) {
         return $p / (pow(self::PRIORITY_MULTIPLIER, $times));
-    }
-    public static function increasePriority($p, $times = 1.0) {
-        return $p * (pow(self::PRIORITY_MULTIPLIER, $times));
     }
     
 }

@@ -13,4 +13,5 @@ class DenyUnsetUpdate
     implements Interfaces\DenyUnsetFrom, Interfaces\DenyUpdateFrom {
 
     public $priority = 0.6;
+    public $propagating = false;
 }
