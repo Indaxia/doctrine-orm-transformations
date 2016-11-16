@@ -49,7 +49,7 @@ class PolicyResolver {
     public function resolvePropertyPolicyFrom(Policy\Interfaces\Policy $policy = null,
                                               $propertyName,
                                               \ReflectionProperty $p,
-                                              Reader $ar) {
+                                              Reader $ar) { // TODO: simplify
         if(! $policy) {
             $policy = new Policy\From\Auto();
             $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority);
@@ -74,7 +74,10 @@ class PolicyResolver {
                   && !($policy instanceof Policy\Interfaces\DenyFrom)
                   && !$this->hasOption(PolicyResolver::NO_POLICY_NESTING)) {
                 // add parent policy with lowered priority and nothing inside
-                $policies[] = $policy->createWithLowerPriority()->inside([]);
+                $newp = $policy->createWithLowerPriority()->inside([]);
+                $newp->getter = null;
+                $newp->setter = null;
+                $policies[] = $newp;
             }
             if($policy->nested[$propertyName] instanceof Policy\Interfaces\PolicyFrom) {
                 // add current policy
@@ -85,6 +88,8 @@ class PolicyResolver {
                   && !$this->hasOption(PolicyResolver::NO_POLICY_NESTING)) {
             // inherit parent policy with nothing inside
             $newp = clone $policy;
+            $newp->getter = null;
+            $newp->setter = null;
             $policies[] = $newp->inside([]);
         }
         return $this->mergeFrom($policies);
@@ -94,7 +99,7 @@ class PolicyResolver {
     public function resolvePropertyPolicyTo(Policy\Interfaces\Policy $policy = null,
                                             $propertyName,
                                             \ReflectionProperty $p,
-                                            Reader $ar) {
+                                            Reader $ar) { // TODO: simplify
         if(! $policy || ($policy instanceof Policy\Interfaces\FetchPaginateTo)) { // pagination is for parent only
             $policy = new Policy\To\Auto();
             $policy->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($policy->priority);
@@ -118,7 +123,10 @@ class PolicyResolver {
             if(($policy instanceof Policy\Interfaces\PolicyTo)
                && !$this->hasOption(PolicyResolver::NO_POLICY_NESTING)) {
                 // add parent policy with lowered priority and nothing inside
-                $policies[] = $policy->createWithLowerPriority()->inside([]);
+                $newp = $policy->createWithLowerPriority()->inside([]);
+                $newp->getter = null;
+                $newp->setter = null;
+                $policies[] = $newp;
             }
             if($policy->nested[$propertyName] instanceof Policy\Interfaces\PolicyTo) {
                 // add current policy
@@ -128,6 +136,8 @@ class PolicyResolver {
                   && !$this->hasOption(PolicyResolver::NO_POLICY_NESTING)) {
             // inherit parent policy with nothing inside
             $newp = clone $policy;
+            $newp->getter = null;
+            $newp->setter = null;
             $policies[] = $newp->inside([]);
         }
         return $this->mergeTo($policies);

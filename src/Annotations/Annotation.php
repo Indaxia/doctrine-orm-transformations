@@ -4,6 +4,8 @@ namespace Indaxia\OTR\Annotations;
 abstract class Annotation implements \Doctrine\ORM\Mapping\Annotation {
     public $nested = [];
     public $priority = 0.0000001;
+    public $getter = null; // cannot be used with relations
+    public $setter = null;
     const EPSILON = 0.00001;
     const PRIORITY_MULTIPLIER = 10.0;
     

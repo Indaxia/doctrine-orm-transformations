@@ -20,8 +20,8 @@ class Custom
      *                             $propertyName,
      *                             \Indaxia\OTR\ITransformable $entity,
      *                             \Doctrine\ORM\EntityManagerInterface $em)
-     *      The closure function MUST return TRUE if the field processed
-     *      or FALSE to process it using Auto policy.
+     *      The closure function MUST return TRUE if the field has been processed
+     *      or FALSE to let OTR process it using Auto policy.
      *      
      * @return Custom */
     public function parse(\Closure $c) {

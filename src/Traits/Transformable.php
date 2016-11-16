@@ -42,66 +42,84 @@ trait Transformable {
     }
     
     protected function toArrayProperty($p, $pn, $policy, Reader $ar, PolicyResolver $pr, \ReflectionClass $headRefClass) {
-        $getter = 'get'.ucfirst($pn);
-        if($policy instanceof Policy\Interfaces\CustomTo) {
-            return call_user_func_array($policy->closure, [$this->$getter(), $pn]);
-        }
+        $getter = $policy->getter ?: 'get'.ucfirst($pn);
+        $result = null;
+        
         if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
-            $v = $this->$getter();
+            $result = $this->$getter();
+            if(($policy instanceof Policy\Interfaces\CustomTo) && $policy->format) {
+                return call_user_func_array($policy->format, [$result, $column->type]);
+            }
             switch($column->type) {
                 case 'simple_array':
                     // @see https://github.com/doctrine/doctrine2/issues/4673
-                    if($pr->hasOption(PolicyResolver::SIMPLE_ARRAY_FIX) && is_array($v) && (count($v) === 1) && ($v[0] === null)) {
+                    if($pr->hasOption(PolicyResolver::SIMPLE_ARRAY_FIX)
+                       && is_array($result)
+                       && (count($result) === 1)
+                       && ($result[0] === null)) {
                         return [];
                     } break;
                 case 'date':
                 case 'time':
                 case 'datetime':
                 case 'detetimez':
-                    if($v !== null) {
+                    if($result !== null) {
                         if($policy instanceof Policy\Interfaces\FormatDateTimeTo) {
-                            $r = $v->format($policy->format);
-                            if($r === false) { throw new Exceptions\PolicyException('Wrong DateTime format for field "'.$pn.'"'); }
-                            return $r;
+                            $result = $result->format($policy->format);
+                            if($result === false) { throw new Exceptions\PolicyException('Wrong DateTime format for field "'.$pn.'"'); }
                         } else if(!$policy instanceof Policy\Interfaces\KeepDateTimeTo) {
-                            return $v->format('Y-m-d\TH:i:s').'.000Z';
+                            $result = $result->format('Y-m-d\TH:i:s').'.000Z';
                         }
                     }
                     break;
             }
-            return $v;
+        
         } else if($association = static::getPropertyAssociation($p, $ar)) { // entity or collection
-            $result = null;
+            $isCollection = false;
+            
             if($association instanceof OneToMany) {
                 $result = ['__meta' => ['class' => static::getEntityFullName($headRefClass, $association->targetEntity),
                                        'association' => 'OneToMany'], 'collection' => []];
+                $isCollection = true;
             } else if($association instanceof ManyToMany) {
                 $result = ['__meta' => ['class' => static::getEntityFullName($headRefClass, $association->targetEntity),
                                        'association' => 'ManyToMany'], 'collection' => []];
-            } else { // single entity
-                $result = $this->$getter();
-                if($result) { $result = $result->toArray($policy, $ar, $pr); }
-                return $result;
+                $isCollection = true;
             }
-            $collection = $this->$getter(); // entity collection
-            if($collection->count()) {
-                if($policy instanceof Policy\Interfaces\FetchPaginateTo) {
-                    if($policy->fromTail) {
-                        $offset = $collection->count() - $policy->limit - $policy->offset;
-                        if($offset < 0) { $offset = 0; }
-                        $limit = ($collection->count() > $policy->limit) ? $collection->count() : $policy->limit;
-                        $collection = $collection->slice($offset, $limit);
-                    } else {
-                        $collection = $collection->slice($policy->offset, $policy->limit);
+            
+            $v = $this->$getter();
+            
+            if($isCollection) {
+                $collection = $v; // entity collection
+                if($collection->count()) {
+                    if($policy instanceof Policy\Interfaces\FetchPaginateTo) {
+                        if($policy->fromTail) {
+                            $offset = $collection->count() - $policy->limit - $policy->offset;
+                            if($offset < 0) { $offset = 0; }
+                            $limit = ($collection->count() > $policy->limit) ? $collection->count() : $policy->limit;
+                            $collection = $collection->slice($offset, $limit);
+                        } else {
+                            $collection = $collection->slice($policy->offset, $policy->limit);
+                        }
+                    }
+                    foreach($collection as $el) {
+                        $result['collection'][] = $el->toArray($policy, $ar, $pr);
                     }
                 }
-                foreach($collection as $el) {
-                    $result['collection'][] = $el->toArray($policy, $ar, $pr);
-                }
+            } else { // single entity
+                if($v) { $result = $v->toArray($policy, $ar, $pr); }
             }
-            return $result;
+            
+            if(($policy instanceof Policy\Interfaces\CustomTo) && $policy->transform) {
+                call_user_func_array($policy->transform, [$v, $result]);
+            }
+        } else { // not a doctrine type
+            $result = $this->$getter();
+            if(($policy instanceof Policy\Interfaces\CustomTo) && $policy->format) {
+                return call_user_func_array($policy->format, [$result, null]);
+            }
         }
-        return $this->$getter();
+        return $result;
     }
     
     /** @see ITransformable::fromArray() */
@@ -138,8 +156,8 @@ trait Transformable {
                                          PolicyResolver $pr,
                                          EntityManagerInterface $em,
                                          \ReflectionClass $refClass) {
-        $setter = 'set'.ucfirst($pn);
-        $getter = 'get'.ucfirst($pn);
+        $setter = $policy->setter ?: 'set'.ucfirst($pn);
+        $getter = $policy->getter ?: 'get'.ucfirst($pn);
             
         if($policy instanceof Policy\Interfaces\CustomFrom) {
             if(call_user_func_array($policy->closure, [$v, $pn, $this, $em])) { return; }

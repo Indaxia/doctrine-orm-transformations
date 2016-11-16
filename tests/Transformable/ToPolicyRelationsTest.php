@@ -77,8 +77,8 @@ class ToPolicyRelationsTest extends TestCase
         $pr = newPR();
         
         $policy = (new Policy\To\Auto())->inside([
-            'oneA' => (new Policy\To\Custom())->format(function($value, $propertyName) {
-                return $value->setValue('one A sub-entity customized'); // note that 'setValue' returns $this inside
+            'oneA' => (new Policy\To\Custom())->transform(function($original, & $transformed) {
+                $transformed['value'] = 'one A sub-entity customized';
             }),
             'oneB' => new Policy\To\Skip,
             'oneC' => new Policy\To\Auto,

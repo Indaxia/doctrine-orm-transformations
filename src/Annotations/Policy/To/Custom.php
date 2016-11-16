@@ -5,7 +5,7 @@ use \Indaxia\OTR\Annotations\Policy\Interfaces;
 use \Doctrine\ORM\Mapping as ORM;
 
 /** ITransformable policy.
- * Uses closure to format field and return a new value.
+ * Uses closure to override the default formatting behaviour.
  * @Annotation */
 class Custom
     extends \Indaxia\OTR\Annotations\Annotation
@@ -13,17 +13,32 @@ class Custom
 {
     public $priority = 0.5;
     
-    public $closure = null;
+    public $format = null;
+    public $transform = null;
     
-    /** Sets closure to prove if the field should be changed or skipped.
-     * @param \Closure $c function($value,
-     *                             $propertyName)
-     *      The closure function MUST return a new value even if the $value is an Entity.
+    /** Sets closure to format the SCALAR field.
+     * @param \Closure $handler function($value, $columnType)
+     *      The $value is passed to closure BEFORE any transformation.
+     *      $columnType can be one of Doctrine DBAL types or null for non-doctrine type.
+     *      @see http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/types.html#mapping-matrix
+     *      The closure function MUST return a new value that will be placed at the result array untouched.
      * 
      * @return Custom */
-    public function format(\Closure $c) {
-        $this->closure = $c;
+    public function format(\Closure $handler) {
+        $this->format = $handler;
         return $this;
     }
+    
+    /** Sets closure to transform the RELATION (Entity or Collection) field into array.
+     * @param \Closure $handler function($original, & $transformed)
+     *      $original can be an Entity, Collection or null
+     *      $transformed is the value to be placed at the result array. It can be changed by the closure.
+     *      Return is not expected.
+     * 
+     * @return Custom */
+    public function transform(\Closure $handler) {
+        $this->transform = $handler;
+        return $this;
+    }    
 
 }
