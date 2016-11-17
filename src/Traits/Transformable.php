@@ -41,7 +41,7 @@ trait Transformable {
                 continue;
             }
             $result[$pn] = $this->toArrayProperty($p, $pn, $propertyPolicy, $ar, $pr, $refClass);
-            $pr->increaseDepth();
+            $pr->decreaseDepth();
         }
         return $result;
     }
@@ -152,7 +152,7 @@ trait Transformable {
                 continue;
             }
             $this->fromArrayProperty($src[$pn], $p, $pn, $propertyPolicy, $ar, $pr, $entityManager, $refClass);
-            $pr->increaseDepth();
+            $pr->decreaseDepth();
         }
         return $this;
     }
