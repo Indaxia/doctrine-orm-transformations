@@ -55,7 +55,7 @@ class PolicyResolverProfiler extends PolicyResolver {
      * Adds profiler details if static::PROFILER_DETAILS option is passed to constructor. */
     public function merge(array $policies) {
         $result = parent::merge($policies);
-        if($this->hasOption(PROFILER_DETAILS)) {
+        if($this->hasOption(static::PRIORITY_DETAILS)) {
             foreach($policies as $p) {
                 $this->addResult($p);
             }
