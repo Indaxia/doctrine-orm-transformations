@@ -453,6 +453,7 @@ trait Transformable {
                 $newCollection->add($e);
             }
         }
+        $this->$setter($newCollection);
     }
     
     
