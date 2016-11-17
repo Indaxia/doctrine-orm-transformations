@@ -3,6 +3,11 @@
     colors="true"
     bootstrap="./tests/bootstrap.php"
 >
+  <php>
+    <env name="PROFILER" value="1"/>
+    <env name="PROFILER_DETAILS" value="1"/>
+  </php>
+
   <testsuites>
     <testsuite name="Indaxia OTR Transformable">
       <file>tests/Transformable/ToSimpleTest.php</file>
@@ -10,4 +15,5 @@
       <file>tests/Transformable/ToPolicyRelationsTest.php</file>
     </testsuite>
   </testsuites>
+  
 </phpunit>

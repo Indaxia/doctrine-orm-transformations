@@ -34,19 +34,14 @@ $entityManager = Mocks\EntityManagerMock::create(
 );
 
 global $useProfiler, $argv;
-$useProfiler = false;
-if(isset($argv)) { foreach($argv as $a) {
-    if($a == 'profiler') {
-        $useProfiler = true;
-        break;
-    }    
-} }
+$useProfiler = getenv('PROFILER');
+$profilerDetails = getenv('PROFILER_DETAILS');
 
 /** Creates a new PolicyResolver or PolicyResolverProfiler depending on arg 'profiler' */
 function newPR($options = 0) {
     global $useProfiler;
     return $useProfiler
-           ? new PolicyResolverProfiler($options | PolicyResolverProfiler::PRIORITY_DETAILS)
+           ? new PolicyResolverProfiler($profilerDetails ? ($options | PolicyResolverProfiler::PRIORITY_DETAILS) : $options)
            : new PolicyResolver($options);
 }
 
