@@ -135,7 +135,7 @@ class PolicyResolver {
     }
     
     /** @return Policy\Skip */
-    protected function createSkipWithDoubleLoweredPriority() {
+    protected function createSkipWithLoweredPriority() {
         $new = new Policy\Skip();
         $new->priority = $new->getLowerPriority(1.0);
         return $new;
