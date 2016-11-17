@@ -177,7 +177,7 @@ trait Transformable {
             $oldV = $this->$getter();
 
             if($policy instanceof Policy\Interfaces\DenyUnsetFrom) {
-                if($v === null && !$column->nullable) { return; } // deny set to null
+                if($v === null) { return; } // deny set to null
                 if(!$pr->isNumberType($column->type) && !$v) { 
                     // numbers can never be "empty": deny unset for non-numbers only
                     return; 
