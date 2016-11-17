@@ -16,7 +16,7 @@ class Simple implements ITransformable {
      * @ORM\Column(type="integer") */
     protected $id;
     
-    /* @ORM\Column(type="string") */
+    /** @ORM\Column(type="string") */
     protected $value;
     
     public function getId() { return $this->id; }
