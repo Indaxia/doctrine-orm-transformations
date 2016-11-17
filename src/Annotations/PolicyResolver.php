@@ -29,20 +29,43 @@ class PolicyResolver {
         $this->options = $options;
     }
     
-    public function getOptions() { return $this->options; }
-    public function setOptions($v) { $this->options = $v; }
-    public function hasOption($o) { return $this->options & $o; }
-    
-    public function isNumberType($t) {
-        switch($t) {
-            case 'integer':
-            case 'smallint':
-            case 'bigint':
-            case 'float':
-            case 'decimal':
-                return true;
+    /** Retrieves policy list of Entity's property for ITransformable::toArray() and returns the resolved one.
+     * @param Policy\Interfaces\Policy $policy parent's policy
+     * @param string $propertyName
+     * @param \ReflectionProperty $p the property
+     * @param Reader $ar
+     * @return Policy\Interfaces\Policy|null */
+    public function resolvePropertyPolicyTo(Policy\Interfaces\Policy $policy = null,
+                                            $propertyName,
+                                            \ReflectionProperty $p,
+                                            Reader $ar) {
+        $policies = [];
+        
+        // global
+        $pa = $ar->getPropertyAnnotations($p);
+        foreach($pa as $a) {
+            if($a instanceof Policy\Interfaces\PolicyTo) {
+                $policies[] = $this->cloneWithLowerPriority($a); 
+            }
         }
-        return false;
+        
+        // propagating
+        if($this->isPropagating($policy) && ($policy instanceof Policy\Interfaces\PolicyTo)) {
+            $policies[] = $this->cloneWithLowerPriority($policy)->clear();
+        } else { // not propagating
+            $policies[] = $this->createAutoWithDoubleLoweredPriority();
+        }
+        
+        // local
+        if(isset($policy->nested[$propertyName])) {
+            if($policy->nested[$propertyName] instanceof Policy\Interfaces\PolicyTo) {
+                $policies[] = $policy->nested[$propertyName];
+            } else {
+                $policies[] = (new Policy\To\Auto())->insideOf($policy->nested[$propertyName]);
+            }
+        }
+        
+        return $this->merge($policies);
     }
     
     /** Retrieves policy list of Entity's property for ITransformable::fromArray() and returns the resolved one.
@@ -84,45 +107,6 @@ class PolicyResolver {
         return $this->merge($policies);
     }
     
-    /** Retrieves policy list of Entity's property for ITransformable::toArray() and returns the resolved one.
-     * @param Policy\Interfaces\Policy $policy parent's policy
-     * @param string $propertyName
-     * @param \ReflectionProperty $p the property
-     * @param Reader $ar
-     * @return Policy\Interfaces\Policy|null */
-    public function resolvePropertyPolicyTo(Policy\Interfaces\Policy $policy = null,
-                                            $propertyName,
-                                            \ReflectionProperty $p,
-                                            Reader $ar) {
-        $policies = [];
-        
-        // global
-        $pa = $ar->getPropertyAnnotations($p);
-        foreach($pa as $a) {
-            if($a instanceof Policy\Interfaces\PolicyTo) {
-                $policies[] = $this->cloneWithLowerPriority($a); 
-            }
-        }
-        
-        // propagating
-        if($this->isPropagating($policy) && ($policy instanceof Policy\Interfaces\PolicyTo)) {
-            $policies[] = $this->cloneWithLowerPriority($policy)->clear();
-        } else { // not propagating
-            $policies[] = $this->createAutoWithDoubleLoweredPriority();
-        }
-        
-        // local
-        if(isset($policy->nested[$propertyName])) {
-            if($policy->nested[$propertyName] instanceof Policy\Interfaces\PolicyTo) {
-                $policies[] = $policy->nested[$propertyName];
-            } else {
-                $policies[] = (new Policy\To\Auto())->insideOf($policy->nested[$propertyName]);
-            }
-        }
-        
-        return $this->merge($policies);
-    }
-    
     /** Merges property list into priority one and returns it
      * @param array $policies list of policies to merge
      * @return Policy\Interfaces\Policy */
@@ -154,6 +138,22 @@ class PolicyResolver {
     /** @return boolean */
     protected function isPropagating($policy) {
          return $policy && $policy->propagating && !$this->hasOption(PolicyResolver::NO_PROPAGATION);
+    }
+    
+    public function getOptions() { return $this->options; }
+    public function setOptions($v) { $this->options = $v; }
+    public function hasOption($o) { return $this->options & $o; }
+    
+    public function isNumberType($t) {
+        switch($t) {
+            case 'integer':
+            case 'smallint':
+            case 'bigint':
+            case 'float':
+            case 'decimal':
+                return true;
+        }
+        return false;
     }
     
     public function increaseDepth() {}
