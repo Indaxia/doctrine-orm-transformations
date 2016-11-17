@@ -29,7 +29,7 @@ class PolicyResolverProfiler extends PolicyResolver {
         $el = & $this->results[count($this->results)-1];
         $result = parent::resolvePropertyPolicyFrom($policy, $propertyName, $p, $ar);
         $el .= number_format(microtime(true) - $this->timeStart, 6)
-            .': '.$p->getDeclaringShortClass()->getName().'.'.$propertyName
+            .': '.$p->getDeclaringClass()->getShortName().'.'.$propertyName
             .' -> '.($result ? (new \ReflectionClass($result))->getShortName()
             .' (p '.rtrim(number_format($result->priority, 16),'0').')' : 'null');
         return $result;
