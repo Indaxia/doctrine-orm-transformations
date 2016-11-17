@@ -259,7 +259,7 @@ trait Transformable {
                         if(! $dt instanceof \DateTime) {
                             throw new Exceptions\FromArrayException('Field "'.$pn.'" must be an ISO8601 string'.($column->nullable ? ' or null' : ''));
                         }
-                    } else if($column->nullable) {
+                    } else if($column->nullable || $pr->hasOption(PolicyResolver::ALLOW_NON_NULLABLE)) {
                         $dt = null;
                     } else {
                         throw new Exceptions\FromArrayException('Field "'.$pn.'" must be an ISO8601 string');

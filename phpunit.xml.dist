@@ -16,6 +16,7 @@
       <file>tests/Transformable/ToPolicyRelationsTest.php</file>
       
       <file>tests/Transformable/FromSimpleTest.php</file>
+      <file>tests/Transformable/FromPolicyScalarTest.php</file>
       
     </testsuite>
   </testsuites>
