@@ -68,3 +68,5 @@ class FromPolicyRelationsTest extends TestCase
         $this->assertNotEquals(null, $e->getManyB()->get(1));
         $this->assertEquals('existing one', $e->getManyB()->get(1)->getValue());
     }
+    
+}
