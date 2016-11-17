@@ -64,8 +64,10 @@ class FromPolicyRelationsTest extends TestCase
         $this->assertNotEquals(null, $e->getManyB());
         $this->assertEquals(2, $e->getManyB()->count());
         $this->assertNotEquals(null, $e->getManyB()->get(0));
+        $this->assertNotEquals(null, $e->getManyB()->get(0)->getId());
         $this->assertEquals('new one', $e->getManyB()->get(0)->getValue());
         $this->assertNotEquals(null, $e->getManyB()->get(1));
+        $this->assertEquals(20, $e->getManyB()->get(1)->getId());
         $this->assertEquals('existing one', $e->getManyB()->get(1)->getValue());
     }
     
