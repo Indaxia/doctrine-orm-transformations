@@ -330,7 +330,7 @@ trait Transformable {
             // sub-Entity
             if($association instanceof OneToOne || $association instanceof ManyToOne)
             {
-                $this->fromArrayRelationCollection($v, $p, $pn, $getter, $setter, $association, $policy,
+                $this->fromArrayRelationEntity($v, $p, $pn, $getter, $setter, $association, $policy,
                                    $ar, $pr, $em, $refClass, $idField, $class, $subPolicy);
             
             // Collection
