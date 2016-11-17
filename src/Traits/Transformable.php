@@ -25,7 +25,7 @@ trait Transformable {
     ) {
         if(!$ar) { $ar = static::createCachedReader(); }
         if(!$pr) { $pr = new PolicyResolver(); }
-        $refClass = new \ReflectionClass(get_class($this));
+        $refClass = new \ReflectionClass($this);
         $result = ['__meta' => ['class' => static::getEntityFullName($refClass)]];
         $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
                                        | \ReflectionProperty::IS_PROTECTED
@@ -137,7 +137,7 @@ trait Transformable {
     ) {
         if(!$ar) { $ar = static::createCachedReader(); }
         if(!$pr) { $pr = new PolicyResolver(); }
-        $refClass = new \ReflectionClass(get_class($this));
+        $refClass = new \ReflectionClass($this);
         $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
                                        | \ReflectionProperty::IS_PROTECTED
                                        | \ReflectionProperty::IS_PRIVATE);
@@ -278,6 +278,8 @@ trait Transformable {
             throw new Exceptions\FromArrayException('Field "'.$pn.'" must be a type of "'.$column->type.'"');
         } else if($association = static::getPropertyAssociation($p, $ar)) { // entity or collection
             $this->fromArrayRelation($v, $p, $pn, $getter, $setter, $association, $policy, $ar, $pr, $em, $refClass);   
+        } else {
+            $this->$setter($v);
         }
     }
     
