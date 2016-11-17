@@ -5,15 +5,26 @@ abstract class Annotation implements \Doctrine\ORM\Mapping\Annotation {
     const EPSILON = 0.000001;
     const PRIORITY_MULTIPLIER = 10.0;
     
+    /** Sub-policies for fields. Use Annotation::inside() or Annotation::insideOf() to fill the value */
     public $nested = [];
+    
+    /** Policy priority. It's used in PolicyResolver when merging policies of one level. Higher = More important. */
     public $priority = 0.95;
-    public $getter = null; // cannot be used with relations
+    
+    /** Read access method name for the field. 'get'+(field name in upper-case-first) is used by default.
+     * (!) it's cleared by local policy, you have to specify it manually inside it.
+     * (!) It's not considered when working with relations, 'get'+referencedColumnName is used instead. */
+    public $getter = null;
+    
+    /** Write access method name for the field. 'set'+(field name in upper-case-first) is used by default.
+     * (!) it's cleared by local policy, you have to specify it manually inside it. */
     public $setter = null;
-    public $propagating = true; // allow policy propagation from parent to children
+    
+    /** Allow policy propagation from parent entity to children field if no local policy specified. */
+    public $propagating = true;
     
     
-    public function __construct(array $data = [])
-    {
+    public function __construct(array $data = []) {
         foreach ($data as $key => $value) {
             $this->$key = $value;
         }

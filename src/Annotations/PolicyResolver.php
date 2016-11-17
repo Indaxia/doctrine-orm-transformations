@@ -125,12 +125,12 @@ class PolicyResolver {
     
     /** Merges property list into priority one and returns it
      * @param array $policies list of policies to merge
-     * @return Policy\Interfaces\Policy|null */
+     * @return Policy\Interfaces\Policy */
     public function merge(array $policies) {
-        $last = null;
-        foreach($policies as $p) { // select by priority
-            if(!$last || $p->isPriorityGreaterThanOrEqualTo($last)) {
-                $last = $p->insideOf($last);
+        $last = reset($policies);
+        for($i = 1; $i < count($policies); ++$i) {
+            if($p->isPriorityGreaterThanOrEqualTo($last)) {
+                $last = $p;
             }
         }
         return $last;
