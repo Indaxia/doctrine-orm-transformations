@@ -28,6 +28,7 @@ AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
 $isDevMode = true;
 $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/Entity"), $isDevMode);
 
+global $entityManager;
 $entityManager = Mocks\EntityManagerMock::create(
     new Mocks\ConnectionMock([], new Mocks\DriverMock()), 
     $config

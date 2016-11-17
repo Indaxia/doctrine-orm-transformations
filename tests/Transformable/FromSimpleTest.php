@@ -8,6 +8,7 @@ class FromSimpleTest extends TestCase
 {
     public function testSimple()
     {
+        global $entityManager;
         $e = new Entity\Simple();
         $data = [
             '__meta' => [
@@ -17,7 +18,7 @@ class FromSimpleTest extends TestCase
             'value' => 'abc!@#)([\'"do'
         ];
         $pr = newPR();
-        $e->fromArray($data, null, null, $pr);
+        $e->fromArray($data, $entityManager, null, null, $pr);
         printPR($pr);
         $this->assertEquals(1000, $e->getId());
         $this->assertEquals('abc!@#)([\'"do', $e->getValue());
@@ -25,6 +26,7 @@ class FromSimpleTest extends TestCase
     
     public function testSimpleNull()
     {
+        global $entityManager;
         $e = (new Entity\Simple())->setId(1001)->setValue('test');
         $data = [
             '__meta' => [
@@ -34,7 +36,7 @@ class FromSimpleTest extends TestCase
             'value' => null
         ];
         $pr = newPR();
-        $e->fromArray($data, null, null, $pr);
+        $e->fromArray($data, $entityManager, null, null, $pr);
         printPR($pr);
         $this->assertEquals(1001, $e->getId()); // id is untouched
         $this->assertEquals(null, $e->getValue());
@@ -42,6 +44,7 @@ class FromSimpleTest extends TestCase
     
     public function testSimpleEmpty()
     {
+        global $entityManager;
         $e = (new Entity\Simple())->setId(1002)->setValue('test');
         $data = [
             '__meta' => [
@@ -51,7 +54,7 @@ class FromSimpleTest extends TestCase
             'value' => ''
         ];
         $pr = newPR();
-        $e->fromArray($data, null, null, $pr);
+        $e->fromArray($data, $entityManager, null, null, $pr);
         printPR($pr);
         $this->assertEquals(1002, $e->getId()); // id is untouched
         $this->assertEquals('', $e->getValue());
