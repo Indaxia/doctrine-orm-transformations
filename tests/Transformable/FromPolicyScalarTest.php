@@ -28,7 +28,7 @@ class FromPolicyScalarTest extends TestCase
         $this->assertEquals($dt, $e->getDt2());
         $this->assertEquals(null, $e->getDt3());
         $this->assertEquals($dt, $e->getDate());
-        $this->assertEquals($dt, $e->getTime());
+        $this->assertEquals(null, $e->getTime());
     }
     
     public function testArrays()
@@ -92,7 +92,7 @@ class FromPolicyScalarTest extends TestCase
         $this->assertEquals('set', $e->getStr3());
         $this->assertEquals('', $e->getStr4());
         $this->assertEquals('', $e->getStr5());
-        $this->assertEquals('', $e->getStr6());
+        $this->assertEquals('set', $e->getStr6());
         
         $this->assertEquals(1.0, $e->getFlt1());
         $this->assertEquals(null, $e->getFlt2());
