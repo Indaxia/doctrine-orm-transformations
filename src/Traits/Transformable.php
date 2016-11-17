@@ -342,7 +342,8 @@ trait Transformable {
                 $values = [];
                 $jt = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\JoinTable'); // find target id field name
                 if($jt) {
-                    $ijc = reset($jt->inverseJoinColumns);
+                    if(count($jt->inverseJoinColumns) > 1) { throw new Exceptions\FromArrayException('Composite key relations not supported yet. Field "'.$pn.'".'); }
+                    $ijc = reset($jt->inverseJoinColumns); // TODO: composite keys support
                     if($ijc) {
                         $idField = $ijc->referencedColumnName;
                     }
@@ -369,10 +370,9 @@ trait Transformable {
                 $idGetter = 'get'.ucfirst($idField);                
                 foreach($collection as $index => $e) {
                     $id = $e->$idGetter();
-                    $existent = isset($existentRaw[$id]) ? $existentRaw[$id] : null;
-                    if($existent) { // update
+                    if(isset($existentRaw[$id])) { // update
                         if(!$policy instanceof Policy\Interfaces\DenyUpdateFrom) {
-                            $e->fromArray($existent, $em, $subPolicy, $ar, $pr); // PROBLEM: sub-fields not updated!!!
+                            $e->fromArray($existentRaw[$id], $em, $subPolicy, $ar, $pr); // PROBLEM: sub-fields not updated!!!
                         }
                     } else { // doesn't exist in source, unset
                         if(!$policy instanceof Policy\Interfaces\DenyUnsetFrom) {
