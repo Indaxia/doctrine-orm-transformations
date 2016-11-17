@@ -3,9 +3,12 @@ namespace Indaxia\OTR\Annotations;
 
 use \Doctrine\Common\Annotations\Reader;
 use \Indaxia\OTR\Annotations\Policy;
+use \Indaxia\OTR\Annotations\Annotation;
 use \Indaxia\OTR\Exceptions\PolicyException;
 
+/** Resolves policies passed by \Indaxia\OTR\Traits\Transformable */
 class PolicyResolver {
+    
     /** Allows to use serialize/unserialize in entity array field types.
      * @see https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-0231 */
     const IGNORE_CVE_2015_0231 = 0x01;
@@ -18,7 +21,6 @@ class PolicyResolver {
      * @see https://github.com/doctrine/doctrine2/issues/4673 */
     const SIMPLE_ARRAY_FIX = 0x10;
     
-    public $currentDepth = 0;
     protected $options;
     
     /** @param integer $options can be merged with | operator.
@@ -43,7 +45,12 @@ class PolicyResolver {
         return false;
     }
     
-    /** @return Policy\Interfaces\Policy|null */
+    /** Retrieves policy list of Entity's property for ITransformable::fromArray() and returns the resolved one.
+     * @param Policy\Interfaces\Policy $policy parent's policy
+     * @param string $propertyName
+     * @param \ReflectionProperty $p the property
+     * @param Reader $ar
+     * @return Policy\Interfaces\Policy|null */
     public function resolvePropertyPolicyFrom(Policy\Interfaces\Policy $policy = null,
                                               $propertyName,
                                               \ReflectionProperty $p,
@@ -54,20 +61,15 @@ class PolicyResolver {
         $pa = $ar->getPropertyAnnotations($p);
         foreach($pa as $a) {
             if($a instanceof Policy\Interfaces\PolicyFrom) {
-                $policies[] = $a->cloneFromGlobal(); 
+                $policies[] = $this->cloneWithLowerPriority($a); 
             }
         }
         
         // propagating
-        if($policy
-           && $policy->propagating
-           && !$this->hasOption(PolicyResolver::NO_PROPAGATION)
-           && ($policy instanceof Policy\Interfaces\PolicyFrom)) {
-            $policies[] = $policy->cloneFromParent();
-        } else { // not propagating - create auto with double lowered priority
-            $propagated = new Policy\From\Auto();
-            $propagated->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($propagated->priority, 2.0);
-            $policies[] = $propagated;
+        if($this->isPropagating($policy) && ($policy instanceof Policy\Interfaces\PolicyFrom)) {
+            $policies[] = $this->cloneWithLowerPriority($policy)->clear();
+        } else { // not propagating
+            $policies[] = $this->createAutoWithDoubleLoweredPriority();
         }
         
         // local
@@ -79,10 +81,15 @@ class PolicyResolver {
             }
         }
         
-        return $this->mergeFrom($policies);
+        return $this->merge($policies);
     }
     
-    /** @return Policy\Interfaces\Policy|null */
+    /** Retrieves policy list of Entity's property for ITransformable::toArray() and returns the resolved one.
+     * @param Policy\Interfaces\Policy $policy parent's policy
+     * @param string $propertyName
+     * @param \ReflectionProperty $p the property
+     * @param Reader $ar
+     * @return Policy\Interfaces\Policy|null */
     public function resolvePropertyPolicyTo(Policy\Interfaces\Policy $policy = null,
                                             $propertyName,
                                             \ReflectionProperty $p,
@@ -93,20 +100,15 @@ class PolicyResolver {
         $pa = $ar->getPropertyAnnotations($p);
         foreach($pa as $a) {
             if($a instanceof Policy\Interfaces\PolicyTo) {
-                $policies[] = $a->cloneFromGlobal(); 
+                $policies[] = $this->cloneWithLowerPriority($a); 
             }
         }
         
         // propagating
-        if($policy
-           && $policy->propagating
-           && !$this->hasOption(PolicyResolver::NO_PROPAGATION)
-           && ($policy instanceof Policy\Interfaces\PolicyTo)) {
-            $policies[] = $policy->cloneFromParent();
-        } else { // not propagating - create auto with double lowered priority
-            $propagated = new Policy\To\Auto();
-            $propagated->priority = \Indaxia\OTR\Annotations\Annotation::lowerPriority($propagated->priority, 2.0);
-            $policies[] = $propagated;
+        if($this->isPropagating($policy) && ($policy instanceof Policy\Interfaces\PolicyTo)) {
+            $policies[] = $this->cloneWithLowerPriority($policy)->clear();
+        } else { // not propagating
+            $policies[] = $this->createAutoWithDoubleLoweredPriority();
         }
         
         // local
@@ -118,68 +120,13 @@ class PolicyResolver {
             }
         }
         
-        return $this->mergeTo($policies);
+        return $this->merge($policies);
     }
     
-    
-    /** @return Policy\Interfaces\Policy */
-    public function mergeFrom(array $policies) {
-        $last = null;
-        $deny = null; // [new, unset, update]
-        foreach($policies as $p) { // select by priority
-            if(!$last || $p->isPriorityGreaterThanOrEqualTo($last)) {
-                $last = $p->insideOf($last);
-                if($last instanceof Policy\Interfaces\DenyFrom) {
-                    if(! $deny) { $deny = [false, false, false]; }
-                    if($last instanceof Policy\Interfaces\DenyNewFrom) {
-                        $deny[0] = true;
-                    }
-                    if($last instanceof Policy\Interfaces\DenyUnsetFrom) {
-                        $deny[1] = true;
-                    }
-                    if($last instanceof Policy\Interfaces\DenyUpdateFrom) {
-                        $deny[2] = true;
-                    }
-                } else if($last instanceof Policy\Interfaces\AutoFrom) {
-                    $deny = [false, false, false];
-                } else if($last instanceof Policy\Interfaces\SkipFrom) {
-                    $deny = [true, true, true];
-                }
-            }
-        }
-        
-        if($deny) { // merge DenyFrom instances
-            if($deny[0]) { // new
-                if($deny[1]) { // new unset
-                    if($deny[2]) { // new unset update
-                        $last = (new Policy\From\Skip())->insideOf($last);
-                    } else { // new unset
-                        $last = (new Policy\From\DenyNewUnset())->insideOf($last);
-                    }
-                } else if($deny[2] && !$deny[1]) { // new update
-                    $last = (new Policy\From\DenyNewUpdate())->insideOf($last);
-                } else { // new
-                    $last = (new Policy\From\DenyNew())->insideOf($last);
-                }
-            } else if($deny[1]) { // unset
-                if($deny[2]) { // unset update
-                    $last = (new Policy\From\DenyUnsetUpdate())->insideOf($last);
-                } else { // unset
-                    $last = (new Policy\From\DenyUnset())->insideOf($last);
-                }
-            } else if($deny[2]) { // update
-                $last = (new Policy\From\DenyUpdate())->insideOf($last);
-            } else {
-                $last = (new Policy\From\Auto())->insideOf($last);
-            }
-        }
-        
-        return $last ? $last : (new Policy\From\Auto());
-    }
-    
-    
-    /** @return Policy\Interfaces\Policy */
-    public function mergeTo(array $policies) {
+    /** Merges property list into priority one and returns it
+     * @param array $policies list of policies to merge
+     * @return Policy\Interfaces\Policy|null */
+    public function merge(array $policies) {
         $last = null;
         foreach($policies as $p) { // select by priority
             if(!$last || $p->isPriorityGreaterThanOrEqualTo($last)) {
@@ -188,4 +135,27 @@ class PolicyResolver {
         }
         return $last;
     }
+    
+    
+    /** @return Policy\Auto */
+    protected function createAutoWithDoubleLoweredPriority() {
+        $new = new Policy\Auto();
+        $new->priority = $new->getLowerPriority(2.0);
+        return $new;
+    }
+    
+    /** @return Policy\Interfaces\Policy */
+    protected function cloneWithLowerPriority($policy, $times = 1.0) {
+        $new = clone $policy;
+        $new->priority = $policy->getLowerPriority($times);
+        return $new;
+    }
+    
+    /** @return boolean */
+    protected function isPropagating($policy) {
+         return $policy && $policy->propagating && !$this->hasOption(PolicyResolver::NO_PROPAGATION);
+    }
+    
+    public function increaseDepth() {}
+    public function decreaseDepth() {}
 }

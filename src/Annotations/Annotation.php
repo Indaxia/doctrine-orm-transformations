@@ -32,28 +32,21 @@ abstract class Annotation implements \Doctrine\ORM\Mapping\Annotation {
         return $this;
     }
     
+    public function clear() {
+        $this->nested = [];
+        $this->getter = null;
+        $this->setter = null;
+        return $this;
+    }
     
     /** @return integer priority relative to the other policies in the namespace */
     public function getPriority() { return $this->priority; }
     public function isPriorityGreaterThanOrEqualTo(Annotation $a) {
         return ($this->priority > $a->priority) || (abs($this->priority - $a->priority) < static::EPSILON);
     }
-    public function cloneFromParent($lowerPriorityTimes = 1.0) {
-        $new = $this->cloneWithLowerPriority($lowerPriorityTimes);
-        $new->setter = null;
-        $new->getter = null;
-        return $new->inside([]);
-    }
-    public function cloneFromGlobal($lowerPriorityTimes = 1.0) {
-        return $this->cloneWithLowerPriority($lowerPriorityTimes);
-    }
-    public function cloneWithLowerPriority($times = 1.0) {
-        $new = clone $this;
-        $new->priority = static::lowerPriority($this->priority, $times);
-        return $new;
-    }
-    public static function lowerPriority($p, $times = 1.0) {
-        return $p / (pow(self::PRIORITY_MULTIPLIER, $times));
+
+    public function getLowerPriority($times = 1.0) {
+        return $this->priority / (pow(self::PRIORITY_MULTIPLIER, $times));
     }
     
 }

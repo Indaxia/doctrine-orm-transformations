@@ -34,14 +34,14 @@ trait Transformable {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
             if($pn[0] === '_' && $pn[1] === '_') { continue; }
-            $pr->currentDepth++;
+            $pr->increaseDepth();
             $propertyPolicy = $pr->resolvePropertyPolicyTo($policy, $pn, $p, $ar);
             if($propertyPolicy instanceof Policy\Interfaces\SkipTo) {
-                $pr->currentDepth--;
+                $pr->decreaseDepth();
                 continue;
             }
             $result[$pn] = $this->toArrayProperty($p, $pn, $propertyPolicy, $ar, $pr, $refClass);
-            $pr->currentDepth--;
+            $pr->increaseDepth();
         }
         return $result;
     }
@@ -145,14 +145,14 @@ trait Transformable {
             if($p->isStatic()) { continue; }
             $pn = $p->getName();
             if(!array_key_exists($pn, $src) || ($pn[0] === '_' && $pn[1] === '_')) { continue; }
-            $pr->currentDepth++;
+            $pr->increaseDepth();
             $propertyPolicy = $pr->resolvePropertyPolicyFrom($policy, $pn, $p, $ar);
             if($propertyPolicy instanceof Policy\Interfaces\SkipFrom) {
-                $pr->currentDepth--;
+                $pr->decreaseDepth();
                 continue;
             }
             $this->fromArrayProperty($src[$pn], $p, $pn, $propertyPolicy, $ar, $pr, $entityManager, $refClass);
-            $pr->currentDepth--;
+            $pr->increaseDepth();
         }
         return $this;
     }
@@ -402,6 +402,7 @@ trait Transformable {
         return null;
     }
     
+    /** Doctrine replaces Entity class with Proxy class, so remove proxy namespace from results. */
     protected static function getEntityFullName(\ReflectionClass $headRefClass, $name = null) {
         if($name && $name[0] !== "\\") {
             $ns = $headRefClass->getNamespaceName();

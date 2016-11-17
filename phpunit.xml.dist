@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<phpunit
+    colors="true"
+    bootstrap="./tests/bootstrap.php"
+>
+  <testsuites>
+    <testsuite name="Indaxia OTR Transformable">
+      <file>tests/Transformable/ToSimpleTest.php</file>
+      <file>tests/Transformable/ToPolicyScalarTest.php</file>
+      <file>tests/Transformable/ToPolicyRelationsTest.php</file>
+    </testsuite>
+  </testsuites>
+</phpunit>

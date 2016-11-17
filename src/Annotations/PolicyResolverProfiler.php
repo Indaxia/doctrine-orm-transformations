@@ -10,13 +10,17 @@ class PolicyResolverProfiler extends PolicyResolver {
     public $timeStart = 0.0;
     
     const PRIORITY_DETAILS = 0x10000;
+    const NO_DEPTH_PADDING = 0x10002;
+    
+    public $currentDepth = 0; // for recursion purposes
     
     public function __construct($options = 0x00) {
         $this->timeStart = microtime(true);
         parent::__construct($options);
     }
     
-    /** @return Policy\Interfaces\Policy|null */
+    /** {@inheritDoc}
+     * Adds resolution profiler details. */
     public function resolvePropertyPolicyFrom(Policy\Interfaces\Policy $policy = null,
                                               $propertyName,
                                               \ReflectionProperty $p,
@@ -31,7 +35,8 @@ class PolicyResolverProfiler extends PolicyResolver {
         return $result;
     }
     
-    /** @return Policy\Interfaces\Policy|null */
+    /** {@inheritDoc}
+     * Adds resolution profiler details. */
     public function resolvePropertyPolicyTo(Policy\Interfaces\Policy $policy = null,
                                             $propertyName,
                                             \ReflectionProperty $p,
@@ -46,20 +51,11 @@ class PolicyResolverProfiler extends PolicyResolver {
         return $result;
     }
     
-    public function mergeFrom(array $policies) {
-        $result = parent::mergeFrom($policies);
+    /** {@inheritDoc}
+     * Adds profiler details if static::PROFILER_DETAILS option is passed to constructor. */
+    public function merge(array $policies) {
+        $result = parent::merge($policies);
         if($this->hasOption(PROFILER_DETAILS)) {
-            foreach($policies as $p) {
-                $this->addResult($p);
-            }
-            $this->results[] = '';
-        }
-        return $result;
-    }
-    
-    public function mergeTo(array $policies) {
-        $result = parent::mergeTo($policies);
-        if($this->hasOption(static::PRIORITY_DETAILS)) {
             foreach($policies as $p) {
                 $this->addResult($p);
             }
@@ -75,6 +71,9 @@ class PolicyResolverProfiler extends PolicyResolver {
     }
     
     protected function padding() {
-        return str_repeat('    ', $this->currentDepth);
+        return $this->hasOption(static::NO_DEPTH_PADDING) ? '' : str_repeat('    ', $this->currentDepth);
     }
+    
+    public function increaseDepth() { ++$this->currentDepth; }
+    public function decreaseDepth() { --$this->currentDepth; }
 }
