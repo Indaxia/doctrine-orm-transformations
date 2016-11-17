@@ -97,7 +97,7 @@ class PolicyResolver {
         // propagating
         if($this->isPropagating($policy) && ($policy instanceof Policy\Interfaces\PolicyFrom)) {
             $policies[] = $this->cloneWithLowerPriority($policy)->clear();
-        } else if() { // not propagating
+        } else { // not propagating
             $policies[] = $this->createAutoWithDoubleLoweredPriority();
         }
         
