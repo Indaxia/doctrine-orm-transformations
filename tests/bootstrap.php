@@ -33,22 +33,17 @@ $entityManager = Mocks\EntityManagerMock::create(
     $config
 );
 
-global $useProfiler, $argv;
-$useProfiler = getenv('PROFILER');
-$profilerDetails = getenv('PROFILER_DETAILS');
 
 /** Creates a new PolicyResolver or PolicyResolverProfiler depending on arg 'profiler' */
 function newPR($options = 0) {
-    global $useProfiler;
-    return $useProfiler
-           ? new PolicyResolverProfiler($profilerDetails ? ($options | PolicyResolverProfiler::PRIORITY_DETAILS) : $options)
+    return getenv('PROFILER')
+           ? new PolicyResolverProfiler(getenv('PROFILER_DETAILS') ? ($options | PolicyResolverProfiler::PRIORITY_DETAILS) : $options)
            : new PolicyResolver($options);
 }
 
 /** Prints PolicyResolverProfiler results depending on arg 'profiler' */
 function printPR($pr) {
-    global $useProfiler;
-    if($useProfiler) {
+    if(getenv('PROFILER')) {
         echo PHP_EOL;
         echo debug_backtrace()[1]['class'].'::'.debug_backtrace()[1]['function'].' profiling:'.PHP_EOL;
         foreach($pr->results as $r) { echo '    '.$r.PHP_EOL; }
