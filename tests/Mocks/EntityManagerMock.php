@@ -11,6 +11,8 @@ use Doctrine\ORM\EntityManager;
  */
 class EntityManagerMock extends EntityManager
 {
+    private $intities;
+    
     /**
      * @var \Doctrine\ORM\UnitOfWork|null
      */
@@ -20,6 +22,8 @@ class EntityManagerMock extends EntityManager
      * @var \Doctrine\ORM\Proxy\ProxyFactory|null
      */
     private $_proxyFactoryMock;
+    
+    
 
     /**
      * {@inheritdoc}
@@ -79,5 +83,28 @@ class EntityManagerMock extends EntityManager
         }
 
         return new EntityManagerMock($conn, $config, $eventManager);
+    }
+    
+    public function persist($entity) {
+        if(!$entity) { throw new \Exception('EntityManagerMock: persist: Not an entity'); }
+        if(!method_exists($entity, 'getId')) { throw new \Exception('EntityManagerMock::persist: working with custom "id" name is not implemented'); }
+        if(!$entity->getId()) { $entity->setId(mt_rand(10000, \PHP_INT_MAX)); }
+        $this->entities[get_class($entity).'#'.$entity->getId()] = $entity;
+    }
+    
+    public function getReference($entityName, $id) {
+        if(isset($this->entities[$entityName.'#'.$id])) {
+            return $this->entities[$entityName.'#'.$id];
+        }
+        return null;
+    }
+    
+    public function clear($entity = null) {
+        if($entity) {
+            if(!method_exists($entity, 'getId')) { throw new \Exception('EntityManagerMock::clear: working with custom "id" name is not implemented'); }
+            unset($this->entities[get_class($entity).'#'.$entity->getId()]);
+        } else {
+            $this->entities = [];
+        }
     }
 }
