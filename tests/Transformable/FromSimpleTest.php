@@ -9,18 +9,18 @@ class FromSimpleTest extends TestCase
     public function testSimple()
     {
         global $entityManager;
-        $e = new Entity\Simple();
+        $e = (new Entity\Simple())->setId(1000);
         $data = [
             '__meta' => [
                 'class' => 'Indaxia\OTR\Tests\Entity\Simple'
             ],
-            'id' => 1000,
+            'id' => 999,
             'value' => 'abc!@#)([\'"do'
         ];
         $pr = newPR();
         $e->fromArray($data, $entityManager, null, null, $pr);
         printPR($pr);
-        $this->assertEquals(1000, $e->getId());
+        $this->assertEquals(1000, $e->getId()); // id is untouched
         $this->assertEquals('abc!@#)([\'"do', $e->getValue());
     }
     

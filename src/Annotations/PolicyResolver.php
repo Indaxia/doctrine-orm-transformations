@@ -80,6 +80,7 @@ class PolicyResolver {
                                               Reader $ar) {
         $policies = [];
         
+        
         // global
         $pa = $ar->getPropertyAnnotations($p);
         foreach($pa as $a) {
@@ -88,10 +89,15 @@ class PolicyResolver {
             }
         }
         
+        // skip id by default
+        if($ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Id')) {
+            $policies[] = $this->createSkipWithLoweredPriority();
+        }
+        
         // propagating
         if($this->isPropagating($policy) && ($policy instanceof Policy\Interfaces\PolicyFrom)) {
             $policies[] = $this->cloneWithLowerPriority($policy)->clear();
-        } else { // not propagating
+        } else if() { // not propagating
             $policies[] = $this->createAutoWithDoubleLoweredPriority();
         }
         
@@ -125,6 +131,13 @@ class PolicyResolver {
     protected function createAutoWithDoubleLoweredPriority() {
         $new = new Policy\Auto();
         $new->priority = $new->getLowerPriority(2.0);
+        return $new;
+    }
+    
+    /** @return Policy\Skip */
+    protected function createSkipWithDoubleLoweredPriority() {
+        $new = new Policy\Skip();
+        $new->priority = $new->getLowerPriority(1.0);
         return $new;
     }
     

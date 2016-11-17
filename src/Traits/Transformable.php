@@ -173,9 +173,7 @@ trait Transformable {
             if(call_user_func_array($policy->closure, [$v, $pn, $this, $em])) { return; }
         }
             
-        if($id = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Id')) {
-            // Skip id, it will be processed in the next steps
-        } else if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
+        if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
             $oldV = $this->$getter();
 
             if($policy instanceof Policy\Interfaces\DenyUnsetFrom) {
