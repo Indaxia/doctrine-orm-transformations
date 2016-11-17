@@ -129,8 +129,8 @@ class PolicyResolver {
     public function merge(array $policies) {
         $last = reset($policies);
         for($i = 1; $i < count($policies); ++$i) {
-            if($p->isPriorityGreaterThanOrEqualTo($last)) {
-                $last = $p;
+            if($policies[$i]->isPriorityGreaterThanOrEqualTo($last)) {
+                $last = $policies[$i];
             }
         }
         return $last;
