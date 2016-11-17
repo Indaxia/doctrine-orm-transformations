@@ -150,7 +150,7 @@ class FromPolicyScalarTest extends TestCase
             'flt6' => new Policy\From\Auto
         ]);
         $pr = newPR();
-        $e->fromArray($data, $entityManager, null, null, $pr);
+        $e->fromArray($data, $entityManager, $policy, null, $pr);
         printPR($pr);
         $this->assertEquals('new', $e->getStr1());
         $this->assertEquals('', $e->getStr2());
