@@ -3,6 +3,7 @@ namespace Indaxia\OTR\Tests\Transformable;
 
 use PHPUnit\Framework\TestCase;
 use Indaxia\OTR\Tests\Entity;
+use Indaxia\OTR\Annotations\Policy;
 
 class FromPolicyScalarTest extends TestCase
 {
