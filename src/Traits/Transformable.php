@@ -17,7 +17,9 @@ use \Indaxia\OTR\Annotations\PolicyResolver;
 /* Implements Entity Transformations methods
  * @see ITransformable */
 trait Transformable {
-    /** @see ITransformable::toArray() */
+    
+    /** @see ITransformable::toArray()
+      * ============================== */
     public function toArray(
         Policy\Interfaces\Policy $policy = null,
         Reader $ar = null,
@@ -46,10 +48,14 @@ trait Transformable {
         return $result;
     }
     
+    
+    
+    /** ========== PROPERTY (TO) ========== */
     protected function toArrayProperty($p, $pn, $policy, Reader $ar, PolicyResolver $pr, \ReflectionClass $headRefClass) {
         $getter = $policy->getter ?: 'get'.ucfirst($pn);
         $result = null;
         
+        // ========== SCALAR TYPES ==========
         if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
             $result = $this->$getter();
             if(($policy instanceof Policy\Interfaces\CustomTo) && $policy->format) {
@@ -79,6 +85,7 @@ trait Transformable {
                     break;
             }
         
+        // ========== RELATIONS ==========
         } else if($association = static::getPropertyAssociation($p, $ar)) { // entity or collection
             $isCollection = false;
             
@@ -94,10 +101,11 @@ trait Transformable {
             
             $v = $this->$getter();
             
+            // ========== COLLECTION RELATION ==========
             if($isCollection) {
-                $collection = $v; // entity collection
+                $collection = $v;
                 if($collection->count()) {
-                    if($policy instanceof Policy\Interfaces\FetchPaginateTo) {
+                    if($policy instanceof Policy\Interfaces\FetchPaginateTo) { // pagination policy
                         if($policy->fromTail) {
                             $offset = $collection->count() - $policy->limit - $policy->offset;
                             if($offset < 0) { $offset = 0; }
@@ -111,6 +119,8 @@ trait Transformable {
                         $result['collection'][] = $el->toArray($policy, $ar, $pr);
                     }
                 }
+                
+            // ========== SUB-ENTITY RELATION ==========
             } else { // single entity
                 if($v) { $result = $v->toArray($policy, $ar, $pr); }
             }
@@ -118,7 +128,9 @@ trait Transformable {
             if(($policy instanceof Policy\Interfaces\CustomTo) && $policy->transform) {
                 $result = call_user_func_array($policy->transform, [$v, $result]);
             }
-        } else { // not a doctrine type
+            
+        // ========== NON-DOCTRINE TYPE ==========
+        } else {
             $result = $this->$getter();
             if(($policy instanceof Policy\Interfaces\CustomTo) && $policy->format) {
                 return call_user_func_array($policy->format, [$result, null]);
@@ -127,7 +139,11 @@ trait Transformable {
         return $result;
     }
     
-    /** @see ITransformable::fromArray() */
+    
+    
+    
+    /** @see ITransformable::fromArray()
+      * ================================ */
     public function fromArray(
         array $src,
         EntityManagerInterface $entityManager,
@@ -157,10 +173,9 @@ trait Transformable {
         return $this;
     }
     
-    /** Here we have 3 cases:
-     * 1. ID field
-     * 2. Scalar property
-     * 3. Relation property */
+    
+    
+    /** ========== PROPERTY (FROM) ========== */
     protected function fromArrayProperty($v, $p, $pn, $policy,
                                          Reader $ar,
                                          PolicyResolver $pr,
@@ -173,7 +188,8 @@ trait Transformable {
             if(call_user_func_array($policy->closure, [$v, $pn, $this, $em])) { return; }
         }
             
-        if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) { // scalar
+        // ========== SCALAR TYPES ==========
+        if($column = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\Column')) {
             $oldV = $this->$getter();
 
             if($policy instanceof Policy\Interfaces\DenyUnsetFrom) {
@@ -222,8 +238,7 @@ trait Transformable {
                         }
                         $this->$setter($v); return;
                     } break;
-                case 'json_array':
-                    if(is_array($v)) { $this->$setter($v); return; } break;
+                case 'json_array':  if(is_array($v)) { $this->$setter($v); return; } break;
                 case 'blob':
                     if(is_resource($v) && get_resource_type($v) == 'stream') {
                         $this->$setter($v);
@@ -237,16 +252,11 @@ trait Transformable {
                     }
                     break;
                 case 'integer':
-                case 'smallint':
-                    if(is_integer($v)) { $this->$setter($v); return; } break;
-                case 'bigint':
-                    if(is_numeric($v)) { $this->$setter($v); return; } break;
-                case 'boolean':
-                    if(is_bool($v)) { $this->$setter($v); return; } break;
-                case 'decimal':
-                    if(is_numeric($v)) { $this->$setter($v); return; } break;
-                case 'float':
-                    if(is_integer($v) || is_double($v)) { $this->$setter((double)$v); return; } break;
+                case 'smallint':    if(is_integer($v)) { $this->$setter($v); return; } break;
+                case 'bigint':      if(is_numeric($v)) { $this->$setter($v); return; } break;
+                case 'boolean':     if(is_bool($v)) { $this->$setter($v); return; } break;
+                case 'decimal':     if(is_numeric($v)) { $this->$setter($v); return; } break;
+                case 'float':       if(is_integer($v) || is_double($v)) { $this->$setter((double)$v); return; } break;
                 case 'date':
                 case 'time':
                 case 'datetime':
@@ -276,20 +286,20 @@ trait Transformable {
                 }
             }
             throw new Exceptions\FromArrayException('Field "'.$pn.'" must be a type of "'.$column->type.'"');
-        } else if($association = static::getPropertyAssociation($p, $ar)) { // entity or collection
-            $this->fromArrayRelation($v, $p, $pn, $getter, $setter, $association, $policy, $ar, $pr, $em, $refClass);   
+        
+        // ========== RELATIONS ==========
+        } else if($association = static::getPropertyAssociation($p, $ar)) {
+            $this->fromArrayRelation($v, $p, $pn, $getter, $setter, $association, $policy, $ar, $pr, $em, $refClass);
+            
+        // ========== NON-DOCTRINE TYPE ==========
         } else {
             $this->$setter($v);
         }
     }
     
     
-    /** Here we have 5 cases:
-     * 1. Sub-entity with empty id (new)
-     * 2. Sub-entity with non-empty id (existent)
-     * 3. Sub-entity as null value
-     * 4. Sub-collection with some entities (some new, some existent)
-     * 5. Sub-collection with no entities */
+    
+    /** ========== RELATIONS ========== */
     protected function fromArrayRelation($v, $p, $pn, $getter, $setter,
                                                 $association, $policy,
                                                 Reader $ar,
@@ -317,78 +327,156 @@ trait Transformable {
                 $subPolicy = (new Policy\From\Auto())->insideOf($policy);
             }
             
+            // sub-Entity
             if($association instanceof OneToOne || $association instanceof ManyToOne)
             {
-                $jc = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\JoinColumn'); // find target id field name
-                if($jc) { $idField = $jc->referencedColumnName; }
-                                
-                $subEntity = null;
-                if(empty($v[$idField])) { // Sub-entity with empty id (new)
-                    if($policy instanceof Policy\Interfaces\DenyNewFrom) { return; }
-                    $subEntity = new $class();
-                } else { // Sub-entity with non-empty id (existent)
-                    if($policy instanceof Policy\Interfaces\DenyUpdateFrom) { return; }
-                    $subEntity = $em->getReference($class, $v[$idField]);
-                }
-                if($subEntity) {
-                    $subEntity->fromArray($v, $em, $subPolicy, $ar, $pr);
-                }
-                $this->$setter($subEntity);
-                return;
-            } else if(isset($v['__meta'])
+                $this->fromArrayRelationCollection($v, $p, $pn, $getter, $setter, $association, $policy,
+                                   $ar, $pr, $em, $refClass, $idField, $class, $subPolicy);
+            
+            // Collection
+            } else if(($association instanceof OneToMany || $association instanceof ManyToMany)
+                      && isset($v['__meta'])
                       && is_array($v['__meta'])
                       && isset($v['collection'])
                       && is_array($v['collection'])) { // OneToMany, ManyToMany
-                $values = [];
-                $jt = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\JoinTable'); // find target id field name
-                if($jt) {
-                    if(count($jt->inverseJoinColumns) > 1) { throw new Exceptions\FromArrayException('Composite key relations not supported yet. Field "'.$pn.'".'); }
-                    $ijc = reset($jt->inverseJoinColumns); // TODO: composite keys support
-                    if($ijc) {
-                        $idField = $ijc->referencedColumnName;
-                    }
-                }
-                
-                $newEntities = [];
-                $existentRaw = [];
-                foreach($v['collection'] as $e) { // find new entities
-                    if(empty($e[$idField])) { // new
-                        if($policy instanceof Policy\Interfaces\DenyNewFrom) { continue; }
-                        $subEntity = new $class();
-                        $subEntity->fromArray($e, $em, $subPolicy, $ar, $pr);
-                        $newEntities[] = $subEntity;
-                    } else {
-                        $existentRaw[$e[$idField]] = $e;
-                    }
-                }
-                
-                
-                $collection = $this->$getter();
-                if(! $collection instanceof \Doctrine\Common\Collections\Collection) {
-                    throw new Exceptions\FromArrayException('Method "'.$getter.'" of the field "'.$pn.'" doesn\'t return Collection');
-                }
-                $idGetter = 'get'.ucfirst($idField);                
-                foreach($collection as $index => $e) {
-                    $id = $e->$idGetter();
-                    if(isset($existentRaw[$id])) { // update
-                        if(!$policy instanceof Policy\Interfaces\DenyUpdateFrom) {
-                            $e->fromArray($existentRaw[$id], $em, $subPolicy, $ar, $pr); // PROBLEM: sub-fields not updated!!!
-                        }
-                    } else { // doesn't exist in source, unset
-                        if(!$policy instanceof Policy\Interfaces\DenyUnsetFrom) {
-                            $collection->remove($index);
-                        }
-                    }
-                }
-                
-                foreach($newEntities as $e) { // insert all new
-                    $collection->add($e);
-                }
-                return;
+                $this->fromArrayRelationCollection($v, $p, $pn, $getter, $setter, $association, $policy,
+                                                   $ar, $pr, $em, $refClass, $idField, $class, $subPolicy);
+            }
+        } else {
+            throw new Exceptions\FromArrayException('Field "'.$pn.'" must be an Entity representation or contain "collection" field');
+        }
+    }
+    
+    
+    
+    /** ========== SUB-ENTITY RELATION ========== */
+    protected function fromArrayRelationEntity($v, $p, $pn, $getter, $setter,
+                                                $association, $policy,
+                                                Reader $ar,
+                                                PolicyResolver $pr,
+                                                EntityManagerInterface $em,
+                                                \ReflectionClass $refClass,
+                                                $idField, $class, $subPolicy) {
+        $jc = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\JoinColumn'); // find target id field name
+        if($jc) { $idField = $jc->referencedColumnName; }
+        $idGetter = 'get'.ucfirst($idField);  
+                        
+        $subEntity = null;
+        if(empty($v[$idField])) { // Sub-entity with empty id (new)
+            if($policy instanceof Policy\Interfaces\DenyNewFrom) { return; }
+            $subEntity = new $class();
+        } else { // Sub-entity with non-empty id (existent)
+            $current = $this->$getter();
+            if($current && ($current->$idGetter() === $v[$idField])) { // same entity
+                $subEntity = $current;                        
+            } else if(!($policy instanceof Policy\Interfaces\DenyUpdateFrom)
+                      || $policy->allowExternal) { // external entity
+                $subEntity = $em->getReference($class, $v[$idField]);
             }
         }
-        throw new Exceptions\FromArrayException('Field "'.$pn.'" must be an Entity representation or contain "collection" field');
+        if($subEntity) {
+            $subEntity->fromArray($v, $em, $subPolicy, $ar, $pr);
+        }
+        $this->$setter($subEntity);
     }
+    
+    
+    
+    /** ========== COLLECTION RELATION ========== */
+    protected function fromArrayRelationCollection($v, $p, $pn, $getter, $setter,
+                                                $association, $policy,
+                                                Reader $ar,
+                                                PolicyResolver $pr,
+                                                EntityManagerInterface $em,
+                                                \ReflectionClass $refClass,
+                                                $idField, $class, $subPolicy) {
+        // find target id field name
+        $jt = $ar->getPropertyAnnotation($p, 'Doctrine\ORM\Mapping\JoinTable');
+        if($jt) {
+            if(count($jt->inverseJoinColumns) > 1) { throw new Exceptions\FromArrayException('Composite key relations not supported yet. Field "'.$pn.'".'); }
+            $ijc = reset($jt->inverseJoinColumns); // TODO: composite keys support
+            if($ijc) {
+                $idField = $ijc->referencedColumnName;
+            }
+        }
+        
+        $idGetter = 'get'.ucfirst($idField);
+        $collection = $this->$getter();
+        $newCollection = new \Doctrine\Common\Collections\ArrayCollection();
+        $existent = [];
+        
+        if(! $collection instanceof \Doctrine\Common\Collections\Collection) {
+            throw new Exceptions\FromArrayException('Method "'.$getter.'" of the field "'.$pn.'" doesn\'t return Collection');
+        }
+        
+        // collect internal existent and index by id
+        foreach($collection as $e) { 
+            $existent[$e->$idGetter()] = $e;
+        }
+        
+        // handle input entities
+        foreach($v['collection'] as $e) {
+            // new entity
+            if(empty($e[$idField])) { 
+                if($policy instanceof Policy\Interfaces\DenyNewFrom) { continue; }
+                $subEntity = new $class();
+                $subEntity->fromArray($e, $em, $subPolicy, $ar, $pr);
+                $newCollection->add($subEntity);
+                
+            } else { // existent entity
+                $id = $e[$idField];
+                
+                // internal existent
+                if(isset($existent[$id])) { 
+                    if(!($policy instanceof Policy\Interfaces\DenyUpdateFrom) || $policy->allowExistent) {
+                        $existent[$id]->fromArray($e, $em, $subPolicy, $ar, $pr);
+                    }
+                    $newCollection->add($existent[$id]);
+                    unset($existent[$id]);
+                    
+                // external existent
+                } else if(!($policy instanceof Policy\Interfaces\DenyUpdateFrom) || $policy->allowExternal) { 
+                    $external = $em->getReference($class, $id);
+                    if($external) {
+                        if(!($policy instanceof Policy\Interfaces\DenyUpdateFrom) || $policy->allowExistent) {
+                            $external->fromArray($e, $em, $subPolicy, $ar, $pr);
+                        }
+                        $newCollection->add($external);
+                    }
+                }
+            }
+        }
+        
+        // keep the rest for DenyUnset
+        if($policy instanceof Policy\Interfaces\DenyUnsetFrom) {
+            foreach($existent as $e) {
+                $newCollection->add($e);
+            }
+        }
+    }
+    
+    
+    
+    
+    /** @see ITransformable::toArrays()
+      * =============================== */
+    public static function toArrays(
+        array $entities,
+        Policy\Interfaces\Policy $policy = null,
+        Reader $ar = null,
+        PolicyResolver $pr = null
+    ) {
+        if(!$ar) { $ar = static::createCachedReader(); }
+        if(!$pr) { $ar = new PolicyResolver(); }
+        $arrays = [];
+        foreach($entities as $e) { $arrays[] = $e->toArray($policy, null, $ar, $pr); }
+        return $arrays;
+    }
+    
+    
+    
+    
+    /* ========== MISC. ========== */
     
     /** @return Annotation|null returns null if its inversed side of bidirectional relation */
     protected static function getPropertyAssociation(\ReflectionProperty $p, Reader $ar) {
@@ -416,20 +504,6 @@ trait Transformable {
             $name = substr($name, 15);
         }
         return $name;        
-    }
-    
-    /** @see ITransformable::toArrays() */
-    public static function toArrays(
-        array $entities,
-        Policy\Interfaces\Policy $policy = null,
-        Reader $ar = null,
-        PolicyResolver $pr = null
-    ) {
-        if(!$ar) { $ar = static::createCachedReader(); }
-        if(!$pr) { $ar = new PolicyResolver(); }
-        $arrays = [];
-        foreach($entities as $e) { $arrays[] = $e->toArray($policy, null, $ar, $pr); }
-        return $arrays;
     }
     
     public static function createCachedReader() {

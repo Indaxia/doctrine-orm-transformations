@@ -14,4 +14,6 @@ class DenyUnsetUpdate
 
     public $priority = 0.6;
     public $propagating = false;
+    public $allowExistent = false;
+    public $allowExternal = false;
 }
