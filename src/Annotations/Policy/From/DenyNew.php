@@ -13,7 +13,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * @Annotation */
 class DenyNew
     extends \Indaxia\OTR\Annotations\Annotation
-    implements Interfaces\DenyInsertExistentFrom {
+    implements Interfaces\DenyNewFrom {
 
     public $priority = 0.6;
     public $propagating = false;
