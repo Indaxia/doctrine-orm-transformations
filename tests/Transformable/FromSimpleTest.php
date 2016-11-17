@@ -35,7 +35,7 @@ class FromSimpleTest extends TestCase
             'id' => null,
             'value' => null
         ];
-        $pr = newPR(Indaxia\OTR\Annotations\PolicyResolver::ALLOW_NON_NULLABLE);
+        $pr = newPR(\Indaxia\OTR\Annotations\PolicyResolver::ALLOW_NON_NULLABLE);
         $e->fromArray($data, $entityManager, null, null, $pr);
         printPR($pr);
         $this->assertEquals(1001, $e->getId()); // id is untouched
