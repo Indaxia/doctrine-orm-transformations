@@ -10,7 +10,7 @@ class PolicyResolverProfiler extends PolicyResolver {
     public $timeStart = 0.0;
     
     const PRIORITY_DETAILS = 0x10000;
-    const NO_DEPTH_PADDING = 0x10002;
+    const NO_DEPTH_PADDING = 0x20000;
     
     public $currentDepth = 0; // for recursion purposes
     
@@ -74,6 +74,6 @@ class PolicyResolverProfiler extends PolicyResolver {
         return $this->hasOption(static::NO_DEPTH_PADDING) ? '' : str_repeat('    ', $this->currentDepth);
     }
     
-    public function increaseDepth() { ++$this->currentDepth; }
-    public function decreaseDepth() { --$this->currentDepth; }
+    public function increaseDepth() { $this->currentDepth++; }
+    public function decreaseDepth() { $this->currentDepth--; }
 }
