@@ -246,7 +246,7 @@ trait Transformable {
                 case 'decimal':
                     if(is_numeric($v)) { $this->$setter($v); return; } break;
                 case 'float':
-                    if(is_integer($v) || is_double($v)) { $this->$setter($v); return; } break;
+                    if(is_integer($v) || is_double($v)) { $this->$setter((double)$v); return; } break;
                 case 'date':
                 case 'time':
                 case 'datetime':
