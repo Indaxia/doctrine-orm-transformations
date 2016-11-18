@@ -6,7 +6,7 @@ use Indaxia\OTR\Tests\Entity;
 use Indaxia\OTR\Annotations\Policy;
 use \Doctrine\Common\Collections\ArrayCollection;
 
-class FromPolicyRelationsTest extends TestCase
+class FromPolicyRelationsCollectionTest extends TestCase
 {
     public function testDenyNew_NonExistentToEmpty()
     {
