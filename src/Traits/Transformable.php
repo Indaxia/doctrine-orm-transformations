@@ -362,22 +362,35 @@ trait Transformable {
         $idGetter = 'get'.ucfirst($idField);  
                         
         $subEntity = null;
-        if(empty($v[$idField])) { // Sub-entity with empty id (new)
+        
+         // non-existent
+        if(empty($v[$idField])) {
             if($policy instanceof Policy\Interfaces\DenyNewFrom) { return; }
             $subEntity = new $class();
-        } else { // Sub-entity with non-empty id (existent)
+            $subEntity->fromArray($v, $em, $subPolicy, $ar, $pr);
+            
+        // existent
+        } else {
             $current = $this->$getter();
-            if($current && ($current->$idGetter() === $v[$idField])) { // same entity
-                $subEntity = $current;                        
-            } else if(!($policy instanceof Policy\Interfaces\DenyUpdateFrom)
-                      || $policy->allowExternal) { // external entity
+            
+            // existent internal
+            if($current && ($current->$idGetter() === $v[$idField])) { 
+                $subEntity = $current;
+                
+            // RETRIEVING existent external
+            } else if(!($policy instanceof Policy\Interfaces\DenyUpdateFrom) || $policy->allowExternal) { 
                 $subEntity = $em->getReference($class, $v[$idField]);
             }
+            
+            // UPDATING internal or external
+            if($subEntity) {
+                if(!($policy instanceof Policy\Interfaces\DenyUpdateFrom) || $policy->allowExistent) {
+                    $subEntity->fromArray($v, $em, $subPolicy, $ar, $pr);
+                }
+                $this->$setter($subEntity);
+            }
+            
         }
-        if($subEntity) {
-            $subEntity->fromArray($v, $em, $subPolicy, $ar, $pr);
-        }
-        $this->$setter($subEntity);
     }
     
     
@@ -427,17 +440,19 @@ trait Transformable {
                 $id = $e[$idField];
                 
                 // internal existent
-                if(isset($existent[$id])) { 
+                if(isset($existent[$id])) {
+                    // UPDATING internal
                     if(!($policy instanceof Policy\Interfaces\DenyUpdateFrom) || $policy->allowExistent) {
                         $existent[$id]->fromArray($e, $em, $subPolicy, $ar, $pr);
                     }
                     $newCollection->add($existent[$id]);
                     unset($existent[$id]);
                     
-                // external existent
+                // RETRIEVING external
                 } else if(!($policy instanceof Policy\Interfaces\DenyUpdateFrom) || $policy->allowExternal) { 
                     $external = $em->getReference($class, $id);
                     if($external) {
+                        // UPDATING internal
                         if(!($policy instanceof Policy\Interfaces\DenyUpdateFrom) || $policy->allowExistent) {
                             $external->fromArray($e, $em, $subPolicy, $ar, $pr);
                         }

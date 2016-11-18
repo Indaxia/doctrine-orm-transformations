@@ -31,19 +31,20 @@ class Relations implements ITransformable {
     
     /**
      * @Policy\To\Skip
+     * @Policy\From\DenyNew
      * @ORM\ManyToOne(targetEntity="Simple", cascade={"persist", "remove"}, fetch="EAGER")
      * @ORM\JoinColumn(name="one_c", referencedColumnName="id") */
     protected $oneC;
     
     /**
-     * @Policy\From\DenyNew
+     * @Policy\From\DenyUpdate
      * @Policy\To\Skip
      * @ORM\ManyToOne(targetEntity="Simple", cascade={"persist", "remove"}, fetch="EAGER")
      * @ORM\JoinColumn(name="one_d", referencedColumnName="id") */
     protected $oneD;
     
     /**
-     * @Policy\From\DenyUpdate
+     * @Policy\From\DenyUpdate(allowExternal=true)
      * @Policy\To\Skip
      * @ORM\ManyToOne(targetEntity="Simple", cascade={"persist", "remove"}, fetch="LAZY")
      * @ORM\JoinColumn(name="one_e", referencedColumnName="id") */

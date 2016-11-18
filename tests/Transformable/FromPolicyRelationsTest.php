@@ -8,7 +8,7 @@ use \Doctrine\Common\Collections\ArrayCollection;
 
 class FromPolicyRelationsTest extends TestCase
 {
-    public function testValuesWithGlobalPolicy()
+    public function testBrief()
     {
         global $entityManager;
         $e = new Entity\Relations();
@@ -70,4 +70,153 @@ class FromPolicyRelationsTest extends TestCase
         $this->assertEquals('existing one', $e->getManyB()->get(1)->getValue());
     }
     
+    public function testNonExistentEntityDenyNew()
+    {
+        global $entityManager;
+        $e = new Entity\Relations();
+        
+        $data = [
+            '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Relations'],
+            'oneC' => [
+                '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Simple'],
+                'value' => 'new one'
+            ],
+        ];
+        
+        $pr = newPR();
+        $e->fromArray($data, $entityManager, null, null, $pr);
+        printPR($pr);
+        
+        $this->assertEquals(null, $e->getOneC());        
+    }
+    
+    public function testExistentInternalEntityDenyNew()
+    {
+        global $entityManager;
+        $e = (new Entity\Relations())->setOneC((new Entity\Simple())->setId(1)->setValue('old one'));
+        
+        $data = [
+            '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Relations'],
+            'oneC' => [
+                '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Simple'],
+                'id' => 1,
+                'value' => 'new one'
+            ],
+        ];
+        
+        $pr = newPR();
+        $e->fromArray($data, $entityManager, null, null, $pr);
+        printPR($pr);
+        
+        $this->assertNotEquals(null, $e->getOneC());
+        $this->assertEquals('new one', $e->getOneC()->getValue());        
+    }
+    
+    public function testExistentExternalEntityDenyNew()
+    {
+        global $entityManager;
+        $e = (new Entity\Relations())->setOneC((new Entity\Simple())->setId(1)->setValue('first one'));
+        $entityManager->persist((new Entity\Simple())->setId(2)->setValue('second one'));
+        
+        $data = [
+            '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Relations'],
+            'oneC' => [
+                '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Simple'],
+                'id' => 2
+            ],
+        ];
+        
+        $pr = newPR();
+        $e->fromArray($data, $entityManager, null, null, $pr);
+        printPR($pr);
+        
+        $this->assertNotEquals(null, $e->getOneC());
+        $this->assertEquals(2, $e->getOneC()->getId()); 
+        $this->assertEquals('second one', $e->getOneC()->getValue());        
+    }
+    
+    public function testExistentInternalEntityDenyUpdate()
+    {
+        global $entityManager;
+        $e = (new Entity\Relations())->setOneD((new Entity\Simple())->setId(1)->setValue('first one'));
+        
+        $data = [
+            '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Relations'],
+            'oneD' => [
+                '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Simple'],
+                'id' => 1,
+                'value' => 'second one'
+            ],
+        ];
+        
+        $pr = newPR();
+        $e->fromArray($data, $entityManager, null, null, $pr);
+        printPR($pr);
+        
+        $this->assertNotEquals(null, $e->getOneD());
+        $this->assertEquals('first one', $e->getOneD()->getValue());
+    }
+    
+    public function testExistentExternalEntityDenyUpdate()
+    {
+        global $entityManager;
+        $e = (new Entity\Relations())->setOneD((new Entity\Simple())->setId(1)->setValue('internal'));
+        $entityManager->persist((new Entity\Simple())->setId(2)->setValue('external'));
+        
+        $data = [
+            '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Relations'],
+            'oneD' => [
+                '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Simple'],
+                'id' => 2,
+                'value' => 'external updated'
+            ],
+        ];
+        
+        $pr = newPR();
+        $e->fromArray($data, $entityManager, null, null, $pr);
+        printPR($pr);
+        
+        $this->assertNotEquals(null, $e->getOneD());
+        $this->assertEquals('internal', $e->getOneD()->getValue());        
+    }
+    
+    public function testExistentExternalEntityDenyUpdateAllowExternal()
+    {
+        global $entityManager;
+        $e = (new Entity\Relations())->setOneE((new Entity\Simple())->setId(1)->setValue('internal'));
+        $entityManager->persist((new Entity\Simple())->setId(2)->setValue('external'));
+        
+        $data = [
+            '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Relations'],
+            'oneE' => [
+                '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Simple'],
+                'id' => 2,
+                'value' => 'external updated'
+            ],
+        ];
+        
+        $pr = newPR();
+        $e->fromArray($data, $entityManager, null, null, $pr);
+        printPR($pr);
+        
+        $this->assertNotEquals(null, $e->getOneE());
+        $this->assertEquals('external', $e->getOneE()->getValue());        
+    }  
+    
+    public function testEntityDenyUnset()
+    {
+        global $entityManager;
+        $e = (new Entity\Relations())->setOneF((new Entity\Simple())->setId(1)->setValue('first one'));
+        
+        $data = [
+            '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Relations'],
+            'oneF' => null
+        ];
+        
+        $pr = newPR();
+        $e->fromArray($data, $entityManager, null, null, $pr);
+        printPR($pr);
+        
+        $this->assertNotEquals(null, $e->getOneF());    
+    }
 }
