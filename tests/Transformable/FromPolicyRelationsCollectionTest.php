@@ -209,7 +209,7 @@ class FromPolicyRelationsTest extends TestCase
     {
         global $entityManager;
         $e = new Entity\Relations();
-        $e->getManyE()->add((new Entity\Simple())->setId(1)->setValue('existent'))
+        $e->getManyE()->add((new Entity\Simple())->setId(1)->setValue('existent'));
         $entityManager->persist((new Entity\Simple())->setId(2)->setValue('external'));
         
         $data = [
