@@ -120,7 +120,7 @@ $result = $car->toArray((new Policy\Auto)->inside([
     'keys' => new Policy\Auto
 ]));
 ```
-[Policy options](https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Policy.php)
+[Policy options](https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Annotations/Policy.php)
             
 $result will be something like:
 
@@ -188,7 +188,7 @@ $carB->fromArray($result, $entityManager, (new Policy\Auto())->inside([
     ])
 ]);
 ```
-[Policy options](https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Policy.php)
+[Policy options](https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Annotations/Policy.php)
 
 
 How to redeclare Transformable methods
