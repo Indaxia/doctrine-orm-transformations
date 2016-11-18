@@ -6,7 +6,7 @@ use Indaxia\OTR\Tests\Entity;
 use Indaxia\OTR\Annotations\Policy;
 use \Doctrine\Common\Collections\ArrayCollection;
 
-class FromPolicyRelationsTest extends TestCase
+class FromPolicyRelationsCollectionTest extends TestCase
 {
     public function testDenyNew_NonExistentToEmpty()
     {
@@ -209,7 +209,7 @@ class FromPolicyRelationsTest extends TestCase
     {
         global $entityManager;
         $e = new Entity\Relations();
-        $e->getManyE()->add((new Entity\Simple())->setId(1)->setValue('existent'))
+        $e->getManyE()->add((new Entity\Simple())->setId(1)->setValue('existent'));
         $entityManager->persist((new Entity\Simple())->setId(2)->setValue('external'));
         
         $data = [
@@ -244,7 +244,7 @@ class FromPolicyRelationsTest extends TestCase
     {
         global $entityManager;
         $e = new Entity\Relations();
-        $e->getManyD()->add((new Entity\Simple())->setId(1)->setValue('existent'));
+        $e->getManyF()->add((new Entity\Simple())->setId(1)->setValue('existent'));
         
         $data = [
             '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Relations'],
@@ -263,7 +263,7 @@ class FromPolicyRelationsTest extends TestCase
         $e->fromArray($data, $entityManager, null, null, $pr);
         printPR($pr);
         
-        $this->assertEquals(2, $e->getManyD()->count());
+        $this->assertEquals(2, $e->getManyF()->count());
         $this->assertEquals('existent', $e->getManyF()->get(0)->getValue());
         $this->assertEquals('new one', $e->getManyF()->get(1)->getValue());
     }
