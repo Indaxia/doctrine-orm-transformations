@@ -4,7 +4,7 @@ JSON-ready Doctrine ORM Entity-Array Transformations
 Features
 --------
 - JSON-ready toArray and fromArray Trait (**no need to extend class**);
-- Manipulating fields and **nested** sub-fields using [Policy](https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Annotations/Policy.php) for each one;
+- Manipulating fields and **nested** sub-fields using [Policy](https://github.com/Indaxia/doctrine-orm-transformations/tree/master/src/Annotations/Policy) for each one;
 - Supports all Doctrine ORM Column types;
 - Supports JavaScript [ISO8601](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse) format for "date", "time" and "datetime" types;
 - Supports nested **Entities** and **Collections** for all the [Association](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html) types (be careful with self-referencing);
@@ -120,7 +120,7 @@ $result = $car->toArray((new Policy\Auto)->inside([
     'keys' => new Policy\Auto
 ]));
 ```
-[Policy options](https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Annotations/Policy.php)
+[Policy options](https://github.com/Indaxia/doctrine-orm-transformations/tree/master/src/Annotations/Policy)
             
 $result will be something like:
 
@@ -188,7 +188,7 @@ $carB->fromArray($result, $entityManager, (new Policy\Auto())->inside([
     ])
 ]);
 ```
-[Policy options](https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Annotations/Policy.php)
+[Policy options](https://github.com/Indaxia/doctrine-orm-transformations/tree/master/src/Annotations/Policy)
 
 
 How to redeclare Transformable methods
