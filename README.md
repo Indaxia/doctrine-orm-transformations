@@ -20,7 +20,7 @@ in **composer.json** add:
 ```json
 "require": {
 
-    "Indaxia/doctrine-orm-transformations": "^1.*"
+    "Indaxia/doctrine-orm-transformations": "^2.*"
 }
 ```
 then
