@@ -38,6 +38,11 @@ use \Indaxia\OTR\Traits\Transformable;
 use \Indaxia\OTR\Annotations\Policy;
 ```
 
+Documentation
+-------------
+
+[Full Documentation](https://github.com/Indaxia/doctrine-orm-transformations/wiki)
+
 How to transform entities to arrays and vice versa
 --------------------------------------------------
 
