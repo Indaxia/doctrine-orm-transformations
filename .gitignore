@@ -1,4 +1,5 @@
 *.komodoproject
+*.komodotools
 /vendor/
 /build/
 /phpunit.xml

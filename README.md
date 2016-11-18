@@ -112,7 +112,7 @@ $result = $car->toArray();
     
 // Using local policy
 $result = $car->toArray((new Policy\Auto)->inside([
-    'wheels' => new Policy\To\Paginate(offset=0, limit=4)
+    'wheels' => new Policy\To\FetchPaginate(['offset'=0, 'limit'=4, 'fromTail'=false])
 ]));
 
 // Local policy overrides global policy
@@ -126,14 +126,14 @@ $result will be something like:
 
 ```php
 [
-    '_meta' => ['class' => 'Car'],
+    '__meta' => ['class' => 'Car'],
     'id' => 1,
     'engine' => [
-        '_meta' => ['class' => 'Engine', 'association' => 'OneToOne'],
+        '__meta' => ['class' => 'Engine', 'association' => 'OneToOne'],
         'id' => 83
     ],
     'wheels' => [
-        '_meta' => ['class' => 'Wheel', 'association' => 'OneToMany'],
+        '__meta' => ['class' => 'Wheel', 'association' => 'OneToMany'],
         'collection' => [
             [
                 '_meta' => ['class' => 'Wheel'],
@@ -181,7 +181,7 @@ $carB->fromArray($result, $entityManager);
 $carB->fromArray($result, $entityManager, (new Policy\Auto())->inside([
     'keys' => mew Policy\Skip,
     'engine' => (new Policy\Auto())->inside([
-        'serialNumber' => new Policy\From\AllowNewOnly
+        'serialNumber' => new Policy\From\DenyNewUnset
     ]),
     'wheels' => (new Policy\Auto())->inside([
         'brakes' => new Policy\From\Auto
@@ -189,10 +189,6 @@ $carB->fromArray($result, $entityManager, (new Policy\Auto())->inside([
 ]);
 ```
 [Policy options](https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Policy.php)
-
-More Demos
-----------
-[Example Entities & Symfony 3 Controller](https://github.com/Indaxia/doctrine-orm-transformations/tree/master/examples) are included.
 
 
 How to redeclare Transformable methods
