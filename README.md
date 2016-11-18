@@ -56,7 +56,7 @@ Let's say we have the following entities:
         protected $keys;
         
         /** @ORM\OneToMany(targetEntity="Wheel") ... */
-        $protected $wheels;
+        protected $wheels;
         
         public function getId();
         public function getKeys() ...
