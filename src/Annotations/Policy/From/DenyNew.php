@@ -8,8 +8,7 @@ use \Doctrine\ORM\Mapping as ORM;
  * Don't create a new sub-Entity or scalar when it needed, skip instead in ITransformabe::fromArray.
  * It's applicable to Collection too.
  * It's applicable to scalar fields: it denies to set the new value if the value is empty.
- * Note: it won't work with non-nullable numbers. Numbers cannot be "empty".
- * It's not applicable to non-nullable numbers. @see DenyUpdate
+ * Note: it won't work with non-nullable numbers. Numbers cannot be "empty". @see DenyUpdate
  * It's not inherited from parent's policy (!). Specify inside() to change behaviour.
  * @Annotation */
 class DenyNew

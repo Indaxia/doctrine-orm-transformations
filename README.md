@@ -4,7 +4,7 @@ JSON-ready Doctrine ORM Entity-Array Transformations
 Features
 --------
 - JSON-ready toArray and fromArray Trait (**no need to extend class**);
-- Manipulating fields and **nested** sub-fields using [Policy](https://github.com/Indaxia/doctrine-orm-transformations/tree/master/src/Annotations/Policy) for each one;
+- Manipulating fields and **nested** sub-fields using [Policy](https://github.com/Indaxia/doctrine-orm-transformations/wiki/Policies) for each one;
 - Supports all Doctrine ORM Column types;
 - Supports JavaScript [ISO8601](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse) format for "date", "time" and "datetime" types;
 - Supports nested **Entities** and **Collections** for all the [Association](http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html) types (be careful with self-referencing);
@@ -28,6 +28,8 @@ then
 > cd <your doc root>
 > composer update
 ```
+
+[Requirements & Restrictions](https://github.com/Indaxia/doctrine-orm-transformations/wiki/Requirements-and-Restrictions)
 
 Step 2: Reference common classes
 --------------------------------
@@ -125,7 +127,7 @@ $result = $car->toArray((new Policy\Auto)->inside([
     'keys' => new Policy\Auto
 ]));
 ```
-[Policy options](https://github.com/Indaxia/doctrine-orm-transformations/tree/master/src/Annotations/Policy)
+[Policies Documentation](https://github.com/Indaxia/doctrine-orm-transformations/wiki/Policies)
             
 $result will be something like:
 
@@ -193,23 +195,7 @@ $carB->fromArray($result, $entityManager, (new Policy\Auto())->inside([
     ])
 ]);
 ```
-[Policy options](https://github.com/Indaxia/doctrine-orm-transformations/tree/master/src/Annotations/Policy)
-
-
-How to redeclare Transformable methods
---------------------------------------
-
-```php
-    class A implements ITransformable {
-        use Transformable {
-            toArray as traitToArray;
-            fromArray as traitFromArray;
-        }
-        
-        public function toArray ...
-        public function fromArray ...
-    }
-```
+[Policies Documentation](https://github.com/Indaxia/doctrine-orm-transformations/wiki/Policies)
 
 Documentation
 -------------
