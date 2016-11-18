@@ -16,7 +16,7 @@
     <div class="wrapper">
       <header>
         <h1>Doctrine ORM Transformations</h1>
-        <p>Provides JSON-ready Doctrine ORM Entity-Array Transformations</p>
+        <p>This library allows you to transform Doctrine ORM Entities into nested arrays of scalar data types and vise versa. It can be used together with JSON, XML, YAML or any serializer/deserializer that supports php nested assoc arrays and scalar types.</p>
 
         <p class="view"><a href="https://github.com/Indaxia/doctrine-orm-transformations">View the Project on GitHub <small>Indaxia/doctrine-orm-transformations</small></a></p>
 
@@ -36,7 +36,7 @@
 
 <ul>
 <li>JSON-ready toArray and fromArray Trait (<strong>no need to extend class</strong>);</li>
-<li>Manipulating fields and <strong>nested</strong> sub-fields using <a href="https://github.com/ScorpioT1000/doctrine-orm-transformations/blob/master/src/Policy.php">Policy</a> for each one;</li>
+<li>Manipulating fields and <strong>nested</strong> sub-fields using <a href="https://github.com/Indaxia/doctrine-orm-transformations/tree/master/src/Annotations/Policy">Policy</a> for each one;</li>
 <li>Supports all Doctrine ORM Column types;</li>
 <li>Supports JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse">ISO8601</a> format for "date", "time" and "datetime" types;</li>
 <li>Supports nested <strong>Entities</strong> and <strong>Collections</strong> for all the <a href="http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/association-mapping.html">Association</a> types (be careful with self-referencing);</li>
@@ -70,6 +70,11 @@
 <span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">\Indaxia\OTR\Annotations\Policy</span>;</span></pre></div>
 
 <h2>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Documentation</h2>
+
+<p><a href="https://github.com/Indaxia/doctrine-orm-transformations/wiki">Full Documentation</a></p>
+
+<h2>
 <a id="how-to-transform-entities-to-arrays-and-vice-versa" class="anchor" href="#how-to-transform-entities-to-arrays-and-vice-versa" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to transform entities to arrays and vice versa</h2>
 
 <p>Let's say we have the following entities:</p>
@@ -86,7 +91,7 @@
 <span class="pl-s1">        <span class="pl-k">protected</span> <span class="pl-smi">$keys</span>;</span>
 <span class="pl-s1"></span>
 <span class="pl-s1">        <span class="pl-c">/** @ORM\OneToMany(targetEntity="Wheel") ... */</span></span>
-<span class="pl-s1">        <span class="pl-smi">$protected</span> <span class="pl-smi">$wheels</span>;</span>
+<span class="pl-s1">        <span class="pl-k">protected</span> <span class="pl-smi">$wheels</span>;</span>
 <span class="pl-s1"></span>
 <span class="pl-s1">        <span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">getId</span>();</span>
 <span class="pl-s1">        <span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">getKeys</span>() <span class="pl-k">...</span></span>
@@ -148,7 +153,7 @@
 <span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>keys<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-k">new</span> <span class="pl-c1">Policy\</span><span class="pl-c1">Auto</span></span>
 <span class="pl-s1">]));</span></pre></div>
 
-<p><a href="https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Policy.php">Policy options</a></p>
+<p><a href="https://github.com/Indaxia/doctrine-orm-transformations/tree/master/src/Annotations/Policy">Policy options</a></p>
 
 <p>$result will be something like:</p>
 
@@ -212,7 +217,7 @@ Don't forget to use try-catch block to avoid uncaught exceptions.</p>
 <span class="pl-s1">    ])</span>
 <span class="pl-s1">]);</span></pre></div>
 
-<p><a href="https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Policy.php">Policy options</a></p>
+<p><a href="https://github.com/Indaxia/doctrine-orm-transformations/tree/master/src/Annotations/Policy">Policy options</a></p>
 
 <h2>
 <a id="how-to-redeclare-transformable-methods" class="anchor" href="#how-to-redeclare-transformable-methods" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to redeclare Transformable methods</h2>
