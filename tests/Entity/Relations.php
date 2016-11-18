@@ -81,6 +81,7 @@ class Relations implements ITransformable {
     
     /**
      * @Policy\To\FetchPaginate(limit=2, fromTail=true)
+     * @Policy\From\DenyNew
      * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"}, fetch="EAGER")
      * @ORM\JoinTable(name="many_c",
      *      joinColumns={ @ORM\JoinColumn(name="relations_id", referencedColumnName="id") },
@@ -90,7 +91,7 @@ class Relations implements ITransformable {
     protected $manyC;
     
     /**
-     * @Policy\From\DenyNew
+     * @Policy\From\DenyUpdate
      * @Policy\To\Skip
      * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"}, fetch="EAGER")
      * @ORM\JoinTable(name="many_d",
@@ -101,7 +102,7 @@ class Relations implements ITransformable {
     protected $manyD;
     
     /**
-     * @Policy\From\DenyUpdate
+     * @Policy\From\DenyUpdate(allowExternal=true)
      * @Policy\To\Skip
      * @ORM\ManyToMany(targetEntity="Simple", cascade={"persist", "remove"}, fetch="LAZY")
      * @ORM\JoinTable(name="many_e",
