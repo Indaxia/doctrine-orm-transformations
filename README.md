@@ -41,7 +41,7 @@ use \Indaxia\OTR\Annotations\Policy;
 Documentation
 -------------
 
-[Full Documentation](https://github.com/Indaxia/doctrine-orm-transformations/wiki)
+[Full Documentation](https://github.com/Indaxia/doctrine-orm-transformations/wiki/Indaxia-OTR-Documentation)
 
 How to transform entities to arrays and vice versa
 --------------------------------------------------
@@ -210,6 +210,11 @@ How to redeclare Transformable methods
         public function fromArray ...
     }
 ```
+
+Documentation
+-------------
+
+[Full Documentation](https://github.com/Indaxia/doctrine-orm-transformations/wiki/Indaxia-OTR-Documentation)
 
 -------------------------------
 
