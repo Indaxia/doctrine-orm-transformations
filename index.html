@@ -1,34 +1,34 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <title>Doctrine ORM Transformations by Indaxia</title>
 
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
-    <title>Doctrine ORM Transformations by Indaxia</title>
   </head>
-
   <body>
-    <header>
-      <div class="inner">
+    <div class="wrapper">
+      <header>
         <h1>Doctrine ORM Transformations</h1>
-        <h2>Provides JSON-ready Doctrine ORM Entity-Array Transformations</h2>
-        <a href="https://github.com/Indaxia/doctrine-orm-transformations" class="button"><small>View project on</small> GitHub</a>
-      </div>
-    </header>
+        <p>Provides JSON-ready Doctrine ORM Entity-Array Transformations</p>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h1>
+        <p class="view"><a href="https://github.com/Indaxia/doctrine-orm-transformations">View the Project on GitHub <small>Indaxia/doctrine-orm-transformations</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/Indaxia/doctrine-orm-transformations/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/Indaxia/doctrine-orm-transformations/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/Indaxia/doctrine-orm-transformations">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
 <a id="json-ready-doctrine-orm-entity-array-transformations" class="anchor" href="#json-ready-doctrine-orm-entity-array-transformations" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>JSON-ready Doctrine ORM Entity-Array Transformations</h1>
 
 <h2>
@@ -54,7 +54,7 @@
 
 <div class="highlight highlight-source-json"><pre><span class="pl-s"><span class="pl-pds">"</span>require<span class="pl-pds">"</span></span>: {
 
-    <span class="pl-s"><span class="pl-pds">"</span>Indaxia/doctrine-orm-transformations<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>^1.*<span class="pl-pds">"</span></span>
+    <span class="pl-s"><span class="pl-pds">"</span>Indaxia/doctrine-orm-transformations<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>^2.*<span class="pl-pds">"</span></span>
 }</pre></div>
 
 <p>then</p>
@@ -140,27 +140,27 @@
 <span class="pl-s1"></span>
 <span class="pl-s1"><span class="pl-c">// Using local policy</span></span>
 <span class="pl-s1"><span class="pl-smi">$result</span> <span class="pl-k">=</span> <span class="pl-smi">$car</span><span class="pl-k">-&gt;</span>toArray((<span class="pl-k">new</span> <span class="pl-c1">Policy\</span><span class="pl-c1">Auto</span>)<span class="pl-k">-&gt;</span>inside([</span>
-<span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>wheels<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-k">new</span> <span class="pl-c1">Policy\To\</span><span class="pl-c1">Paginate</span>(<span class="pl-c1">offset</span><span class="pl-k">=</span><span class="pl-c1">0</span>, <span class="pl-c1">limit</span><span class="pl-k">=</span><span class="pl-c1">4</span>)</span>
+<span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>wheels<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-k">new</span> <span class="pl-c1">Policy\To\</span><span class="pl-c1">FetchPaginate</span>([<span class="pl-s"><span class="pl-pds">'</span>offset<span class="pl-pds">'</span></span><span class="pl-k">=</span><span class="pl-c1">0</span>, <span class="pl-s"><span class="pl-pds">'</span>limit<span class="pl-pds">'</span></span><span class="pl-k">=</span><span class="pl-c1">4</span>, <span class="pl-s"><span class="pl-pds">'</span>fromTail<span class="pl-pds">'</span></span><span class="pl-k">=</span><span class="pl-c1">false</span>])</span>
 <span class="pl-s1">]));</span>
 <span class="pl-s1"></span>
 <span class="pl-s1"><span class="pl-c">// Local policy overrides global policy</span></span>
-<span class="pl-s1"><span class="pl-smi">$result</span> <span class="pl-k">=</span> <span class="pl-smi">$car</span><span class="pl-k">-&gt;</span>toArray([</span>
+<span class="pl-s1"><span class="pl-smi">$result</span> <span class="pl-k">=</span> <span class="pl-smi">$car</span><span class="pl-k">-&gt;</span>toArray((<span class="pl-k">new</span> <span class="pl-c1">Policy\</span><span class="pl-c1">Auto</span>)<span class="pl-k">-&gt;</span>inside([</span>
 <span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>keys<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-k">new</span> <span class="pl-c1">Policy\</span><span class="pl-c1">Auto</span></span>
-<span class="pl-s1">]);</span></pre></div>
+<span class="pl-s1">]));</span></pre></div>
 
 <p><a href="https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Policy.php">Policy options</a></p>
 
 <p>$result will be something like:</p>
 
 <div class="highlight highlight-text-html-php"><pre><span class="pl-s1">[</span>
-<span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>_meta<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [<span class="pl-s"><span class="pl-pds">'</span>class<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>Car<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>__meta<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [<span class="pl-s"><span class="pl-pds">'</span>class<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>Car<span class="pl-pds">'</span></span>],</span>
 <span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">1</span>,</span>
 <span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>engine<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [</span>
-<span class="pl-s1">        <span class="pl-s"><span class="pl-pds">'</span>_meta<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [<span class="pl-s"><span class="pl-pds">'</span>class<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>Engine<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>association<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>OneToOne<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s1">        <span class="pl-s"><span class="pl-pds">'</span>__meta<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [<span class="pl-s"><span class="pl-pds">'</span>class<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>Engine<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>association<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>OneToOne<span class="pl-pds">'</span></span>],</span>
 <span class="pl-s1">        <span class="pl-s"><span class="pl-pds">'</span>id<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">83</span></span>
 <span class="pl-s1">    ],</span>
 <span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>wheels<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [</span>
-<span class="pl-s1">        <span class="pl-s"><span class="pl-pds">'</span>_meta<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [<span class="pl-s"><span class="pl-pds">'</span>class<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>Wheel<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>association<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>OneToMany<span class="pl-pds">'</span></span>],</span>
+<span class="pl-s1">        <span class="pl-s"><span class="pl-pds">'</span>__meta<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [<span class="pl-s"><span class="pl-pds">'</span>class<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>Wheel<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>association<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>OneToMany<span class="pl-pds">'</span></span>],</span>
 <span class="pl-s1">        <span class="pl-s"><span class="pl-pds">'</span>collection<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [</span>
 <span class="pl-s1">            [</span>
 <span class="pl-s1">                <span class="pl-s"><span class="pl-pds">'</span>_meta<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> [<span class="pl-s"><span class="pl-pds">'</span>class<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>Wheel<span class="pl-pds">'</span></span>],</span>
@@ -205,7 +205,7 @@ Don't forget to use try-catch block to avoid uncaught exceptions.</p>
 <span class="pl-s1"><span class="pl-smi">$carB</span><span class="pl-k">-&gt;</span>fromArray(<span class="pl-smi">$result</span>, <span class="pl-smi">$entityManager</span>, (<span class="pl-k">new</span> <span class="pl-c1">Policy\</span><span class="pl-c1">Auto</span>())<span class="pl-k">-&gt;</span>inside([</span>
 <span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>keys<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">mew</span> <span class="pl-c1">Policy\</span><span class="pl-c1">Skip</span>,</span>
 <span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>engine<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> (<span class="pl-k">new</span> <span class="pl-c1">Policy\</span><span class="pl-c1">Auto</span>())<span class="pl-k">-&gt;</span>inside([</span>
-<span class="pl-s1">        <span class="pl-s"><span class="pl-pds">'</span>serialNumber<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-k">new</span> <span class="pl-c1">Policy\From\</span><span class="pl-c1">AllowNewOnly</span></span>
+<span class="pl-s1">        <span class="pl-s"><span class="pl-pds">'</span>serialNumber<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-k">new</span> <span class="pl-c1">Policy\From\</span><span class="pl-c1">DenyNewUnset</span></span>
 <span class="pl-s1">    ]),</span>
 <span class="pl-s1">    <span class="pl-s"><span class="pl-pds">'</span>wheels<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> (<span class="pl-k">new</span> <span class="pl-c1">Policy\</span><span class="pl-c1">Auto</span>())<span class="pl-k">-&gt;</span>inside([</span>
 <span class="pl-s1">        <span class="pl-s"><span class="pl-pds">'</span>brakes<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-k">new</span> <span class="pl-c1">Policy\From\</span><span class="pl-c1">Auto</span></span>
@@ -213,11 +213,6 @@ Don't forget to use try-catch block to avoid uncaught exceptions.</p>
 <span class="pl-s1">]);</span></pre></div>
 
 <p><a href="https://github.com/Indaxia/doctrine-orm-transformations/blob/master/src/Policy.php">Policy options</a></p>
-
-<h2>
-<a id="more-demos" class="anchor" href="#more-demos" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>More Demos</h2>
-
-<p><a href="https://github.com/Indaxia/doctrine-orm-transformations/tree/master/examples">Example Entities &amp; Symfony 3 Controller</a> are included.</p>
 
 <h2>
 <a id="how-to-redeclare-transformable-methods" class="anchor" href="#how-to-redeclare-transformable-methods" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to redeclare Transformable methods</h2>
@@ -235,25 +230,13 @@ Don't forget to use try-catch block to avoid uncaught exceptions.</p>
 <hr>
 
 <p><a href="http://indaxia.com">Indaxia</a> / 2016</p>
-        </section>
-
-        <aside id="sidebar">
-          <a href="https://github.com/Indaxia/doctrine-orm-transformations/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/Indaxia/doctrine-orm-transformations/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
-
-          <p class="repo-owner"><a href="https://github.com/Indaxia/doctrine-orm-transformations"></a> is maintained by <a href="https://github.com/Indaxia">Indaxia</a>.</p>
-
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/Indaxia">Indaxia</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
     </div>
-
-  
+    <script src="javascripts/scale.fix.js"></script>
+    
   </body>
 </html>
