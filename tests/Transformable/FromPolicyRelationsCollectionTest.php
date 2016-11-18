@@ -244,7 +244,7 @@ class FromPolicyRelationsCollectionTest extends TestCase
     {
         global $entityManager;
         $e = new Entity\Relations();
-        $e->getManyD()->add((new Entity\Simple())->setId(1)->setValue('existent'));
+        $e->getManyF()->add((new Entity\Simple())->setId(1)->setValue('existent'));
         
         $data = [
             '__meta' => ['class' => 'Indaxia\OTR\Tests\Entity\Relations'],
