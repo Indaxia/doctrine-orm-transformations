@@ -368,6 +368,7 @@ trait Transformable {
             if($policy instanceof Policy\Interfaces\DenyNewFrom) { return; }
             $subEntity = new $class();
             $subEntity->fromArray($v, $em, $subPolicy, $ar, $pr);
+            $this->$setter($subEntity);
             
         // existent
         } else {
