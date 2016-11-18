@@ -264,7 +264,7 @@ class FromPolicyRelationsCollectionTest extends TestCase
         printPR($pr);
         
         $this->assertEquals(2, $e->getManyF()->count());
-        $this->assertEquals('existent', $e->getManyF()->get(0)->getValue());
-        $this->assertEquals('new one', $e->getManyF()->get(1)->getValue());
+        $this->assertEquals('new one', $e->getManyF()->get(0)->getValue());
+        $this->assertEquals('existent', $e->getManyF()->get(1)->getValue());
     }
 }
