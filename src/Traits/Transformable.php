@@ -28,6 +28,10 @@ trait Transformable {
         if(!$ar) { $ar = static::createCachedReader(); }
         if(!$pr) { $pr = new PolicyResolver(); }
         $refClass = new \ReflectionClass($this);
+        if ($refClass->getName() !== static::getEntityFullName($refClass)) {
+            // if this was a proxy, use the base class for reflection
+            $refClass = new \ReflectionClass(static::getEntityFullName($refClass));
+        }
         $result = ['__meta' => ['class' => static::getEntityFullName($refClass)]];
         $ps = $refClass->getProperties(  \ReflectionProperty::IS_PUBLIC
                                        | \ReflectionProperty::IS_PROTECTED
